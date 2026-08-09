@@ -9,13 +9,17 @@ const { WebcastPushConnection } = require('tiktok-live-connector');
 // Serve your web files (HTML, CSS, JS, Images)
 app.use(express.static(__dirname));
 
+// FIX: This explicitly tells Render to load your index.html file!
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
 // The port Render assigns, or 3000 if testing locally
 const PORT = process.env.PORT || 3000;
 
-// TODO: CHANGE THIS TO YOUR ACTUAL TIKTOK USERNAME
+// Change to your actual TikTok username
 const tiktokUsername = "malikkhannilive3"; 
 
-// This allows you to connect to your live chat without needing credentials
 const tiktokLiveConnection = new WebcastPushConnection(tiktokUsername);
 
 tiktokLiveConnection.connect().then(state => {
@@ -42,4 +46,3 @@ tiktokLiveConnection.on('gift', data => {
 http.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
