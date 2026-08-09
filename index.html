@@ -7,143 +7,220 @@
     <script src="/socket.io/socket.io.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        body { background-color: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'Impact', sans-serif; }
         
+        /* 16:9 Aspect Ratio Arena Container */
         #game-container {
             position: relative;
             width: 1920px;
             height: 1080px;
-            background: #111;
+            background: #0a0a0c;
             overflow: hidden;
             box-shadow: 0 0 50px rgba(0,0,0,1);
         }
 
-        .bg { position: absolute; top: 0; bottom: 0; width: 100vw; background-size: cover; background-position: center; transition: transform 0.3s ease; }
-        #bg-boys { left: 0; background-image: url('1000096984.png'); width: 50%; z-index: 1; }
-        #bg-girls { right: 0; background-image: url('1000096985.png'); width: 50%; z-index: 1; }
+        /* Split Backgrounds with Fallback Gradients */
+        .bg { 
+            position: absolute; 
+            top: 0; 
+            bottom: 0; 
+            background-size: cover; 
+            background-position: center; 
+            transition: width 0.4s ease-in-out; 
+        }
+        #bg-boys { 
+            left: 0; 
+            width: 50%; 
+            background-image: url('1000096984.png'), radial-gradient(circle at center, #112544 0%, #050b14 100%); 
+            border-right: 2px solid #00d2ff;
+            z-index: 1; 
+        }
+        #bg-girls { 
+            right: 0; 
+            width: 50%; 
+            background-image: url('1000096985.png'), radial-gradient(circle at center, #38113e 0%, #120414 100%); 
+            border-left: 2px solid #ff00cc;
+            z-index: 1; 
+        }
 
+        /* Center Tug-of-War Divider Line */
         #center-line {
             position: absolute;
             top: 0;
             bottom: 0;
             left: 50%;
-            width: 10px;
-            background: linear-gradient(to bottom, #00d2ff, #3a7bd5, #ff00cc, #333399);
+            width: 12px;
+            background: #ffffff;
             z-index: 5;
             transform: translateX(-50%);
-            transition: left 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 0 20px #fff;
+            transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 0 25px #ffffff, 0 0 50px #00d2ff, 0 0 50px #ff00cc;
         }
 
-        .fighter {
-            position: absolute;
-            bottom: 100px;
-            height: 600px; 
-            z-index: 10;
-            transition: all 0.3s ease;
-        }
-        #boy-fighter { left: 20%; transform: scaleX(1); } 
-        #girl-fighter { right: 20%; transform: scaleX(-1); } 
-
+        /* Team Headers & Scoreboards */
         .score-board {
             position: absolute;
-            top: 30px;
-            font-family: 'Impact', sans-serif;
-            font-size: 80px;
+            top: 40px;
+            font-size: 70px;
+            letter-spacing: 3px;
             color: white;
-            text-shadow: 4px 4px 10px black, 0 0 20px currentColor;
+            text-shadow: 0 0 20px currentColor, 4px 4px 10px black;
             z-index: 20;
         }
-        #boys-score { left: 50px; color: #00d2ff; }
-        #girls-score { right: 50px; color: #ff00cc; }
+        #boys-score { left: 60px; color: #00d2ff; }
+        #girls-score { right: 60px; color: #ff00cc; }
 
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        /* Fighter Container & Fallbacks */
+        .fighter-box {
+            position: absolute;
+            bottom: 120px;
+            width: 350px;
+            height: 550px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            transition: all 0.3s ease;
         }
-        .shake { animation: shake 0.5s; }
+        #boy-box { left: 18%; }
+        #girl-box { right: 18%; }
+
+        .fighter-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
+        }
+
+        /* Fallback Card when Image is Missing */
+        .fighter-fallback {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 38px;
+            color: #fff;
+            text-transform: uppercase;
+            box-shadow: 0 0 30px currentColor;
+            border: 4px solid #fff;
+        }
+        .boy-card { background: linear-gradient(135deg, #005c97, #363795); color: #00d2ff; }
+        .girl-card { background: linear-gradient(135deg, #e1eec3, #f05053); color: #ff00cc; }
+
+        /* Screen Shake Effect */
+        @keyframes shake {
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            20% { transform: translate(-4px, 0px) rotate(-1deg); }
+            40% { transform: translate(4px, 2px) rotate(1deg); }
+            60% { transform: translate(-4px, 2px) rotate(-1deg); }
+            80% { transform: translate(2px, -2px) rotate(1deg); }
+            100% { transform: translate(0px, 0px) rotate(0deg); }
+        }
+        .shake { animation: shake 0.4s ease-in-out; }
     </style>
 </head>
 <body>
 
     <div id="game-container">
-        <div id="bg-boys"></div>
-        <div id="bg-girls"></div>
+        <!-- Backgrounds -->
+        <div id="bg-boys" class="bg"></div>
+        <div id="bg-girls" class="bg"></div>
         <div id="center-line"></div>
         
-        <div id="boys-score">BOYS: 0</div>
-        <div id="girls-score">GIRLS: 0</div>
+        <!-- Scoreboard -->
+        <div id="boys-score" class="score-board">TEAM BOYS: 0</div>
+        <div id="girls-score" class="score-board">TEAM GIRLS: 0</div>
 
-        <img id="boy-fighter" class="fighter" src="placeholder_boy.gif" alt="Boy Fighter">
-        <img id="girl-fighter" class="fighter" src="placeholder_girl.gif" alt="Girl Fighter">
+        <!-- Fighter Slots -->
+        <div id="boy-box" class="fighter-box">
+            <img id="boy-fighter" class="fighter-img" src="scorp_idle.gif" onerror="showFallback('boy')" alt="Boy Fighter">
+            <div id="boy-card" class="fighter-fallback boy-card" style="display:none;">
+                <span id="boy-name">SCORPION</span>
+            </div>
+        </div>
+
+        <div id="girl-box" class="fighter-box">
+            <img id="girl-fighter" class="fighter-img" src="kitana_idle.gif" onerror="showFallback('girl')" alt="Girl Fighter">
+            <div id="girl-card" class="fighter-fallback girl-card" style="display:none;">
+                <span id="girl-name">KITANA</span>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Automatically connects to the Render cloud URL
         const socket = io();
 
-        let position = 0; 
+        let position = 0; // Center is 0 (-20 Boys Win, +20 Girls Win)
         let boysWins = 0;
         let girlsWins = 0;
 
-                // Use direct internet links instead of uploading files!
-                const boyCharacters = [
-            { 
-                name: "Scorpion", 
-                idle: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Transparent_square.png", 
-                attack: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Transparent_square.png", 
-                heavy: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Transparent_square.png", 
-                hurt: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Transparent_square.png" 
-            }
+        const boyCharacters = [
+            { name: "Scorpion", idle: "https://media.giphy.com/media/134DVXcD94sOWI/giphy.gif" },
+            { name: "Sub-Zero", idle: "https://media.giphy.com/media/13ZxejlX8F6Hvy/giphy.gif" },
+            { name: "Liu Kang", idle: "https://media.giphy.com/media/xT9IgywZ2sD8B2Q1bO/giphy.gif" }
         ];
         
         const girlCharacters = [
-            { 
-                name: "Kitana", 
-                idle: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Transparent_square.png", 
-                attack: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Transparent_square.png", 
-                heavy: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Transparent_square.png", 
-                hurt: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Transparent_square.png" 
-            }
+            { name: "Kitana", idle: "https://media.giphy.com/media/3o7TKM8O733H5VwDLi/giphy.gif" },
+            { name: "Mileena", idle: "https://media.giphy.com/media/xT9IgyuC5Fs6ZnWlW/giphy.gif" },
+            { name: "Sonya Blade", idle: "https://media.giphy.com/media/l0HlU0e8aE8WzJm3S/giphy.gif" }
         ];
-
 
         let currentBoyIndex = 0;
         let currentGirlIndex = 0;
 
         const boyImg = document.getElementById('boy-fighter');
         const girlImg = document.getElementById('girl-fighter');
+        const boyCard = document.getElementById('boy-card');
+        const girlCard = document.getElementById('girl-card');
         const centerLine = document.getElementById('center-line');
         const bgBoys = document.getElementById('bg-boys');
         const bgGirls = document.getElementById('bg-girls');
         const container = document.getElementById('game-container');
 
         function loadFighters() {
+            // Reset visibility
+            boyImg.style.display = "block";
+            boyCard.style.display = "none";
+            girlImg.style.display = "block";
+            girlCard.style.display = "none";
+
+            document.getElementById('boy-name').innerText = boyCharacters[currentBoyIndex].name;
+            document.getElementById('girl-name').innerText = girlCharacters[currentGirlIndex].name;
+
             boyImg.src = boyCharacters[currentBoyIndex].idle;
             girlImg.src = girlCharacters[currentGirlIndex].idle;
         }
+
+        // Automatic fallback if image fails to load
+        function showFallback(team) {
+            if (team === 'boy') {
+                boyImg.style.display = "none";
+                boyCard.style.display = "flex";
+            } else {
+                girlImg.style.display = "none";
+                girlCard.style.display = "flex";
+            }
+        }
+
         loadFighters();
 
+        // Socket logic for gift movements
         socket.on('action', (data) => {
             if (data.team === 'boys') {
-                if (data.type === 'move') executeMove('boys', 1, boyCharacters[currentBoyIndex].attack);
-                if (data.type === 'heavy') executeMove('boys', 10, boyCharacters[currentBoyIndex].heavy);
+                if (data.type === 'move') executeMove('boys', 1);
+                if (data.type === 'heavy') executeMove('boys', 10);
                 if (data.type === 'switch') {
                     currentBoyIndex = (currentBoyIndex + 1) % boyCharacters.length;
                     loadFighters();
                 }
             } else if (data.team === 'girls') {
-                if (data.type === 'move') executeMove('girls', 1, girlCharacters[currentGirlIndex].attack);
-                if (data.type === 'heavy') executeMove('girls', 10, girlCharacters[currentGirlIndex].heavy);
+                if (data.type === 'move') executeMove('girls', 1);
+                if (data.type === 'heavy') executeMove('girls', 10);
                 if (data.type === 'switch') {
                     currentGirlIndex = (currentGirlIndex + 1) % girlCharacters.length;
                     loadFighters();
@@ -151,24 +228,19 @@
             }
         });
 
-        function executeMove(team, damage, animationGif) {
+        function executeMove(team, damage) {
             if (team === 'boys') {
                 position -= damage;
-                boyImg.src = animationGif;
-                girlImg.src = girlCharacters[currentGirlIndex].hurt;
             } else {
                 position += damage;
-                girlImg.src = animationGif;
-                boyImg.src = boyCharacters[currentBoyIndex].hurt;
             }
 
             if (damage >= 10) {
                 container.classList.add('shake');
-                setTimeout(() => container.classList.remove('shake'), 500);
+                setTimeout(() => container.classList.remove('shake'), 400);
             }
 
             updateUI();
-            setTimeout(() => { loadFighters(); }, 1500);
             checkWin();
         }
 
@@ -184,20 +256,20 @@
         function checkWin() {
             if (position <= -20) {
                 boysWins++;
-                document.getElementById('boys-score').innerText = `BOYS: ${boysWins}`;
-                resetGame();
+                document.getElementById('boys-score').innerText = `TEAM BOYS: ${boysWins}`;
+                resetRound();
             } else if (position >= 20) {
                 girlsWins++;
-                document.getElementById('girls-score').innerText = `GIRLS: ${girlsWins}`;
-                resetGame();
+                document.getElementById('girls-score').innerText = `TEAM GIRLS: ${girlsWins}`;
+                resetRound();
             }
         }
 
-        function resetGame() {
+        function resetRound() {
             setTimeout(() => {
                 position = 0;
                 updateUI();
-            }, 3000);
+            }, 2500);
         }
     </script>
 </body>
