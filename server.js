@@ -13,7 +13,7 @@ app.use(express.static(__dirname));
 const PORT = process.env.PORT || 3000;
 
 // TODO: CHANGE THIS TO YOUR ACTUAL TIKTOK USERNAME
-const tiktokUsername = "YOUR_TIKTOK_USERNAME"; 
+const tiktokUsername = "malikkhannilive3"; 
 
 // This allows you to connect to your live chat without needing credentials
 const tiktokLiveConnection = new WebcastPushConnection(tiktokUsername);
