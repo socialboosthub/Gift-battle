@@ -22,9 +22,9 @@
       justify-content: center;
       min-height: 100vh;
       padding: 20px;
+      overflow: hidden;
     }
 
-    /* Secret Key Indicator */
     .secret-hint {
       font-family: sans-serif;
       font-size: 13px;
@@ -54,40 +54,76 @@
       background: #000;
     }
 
-    /* Split Backgrounds */
+    /* Hit & Brutality Animations */
+    .arena-hit {
+      animation: screenShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    
+    .arena-brutality {
+      animation: brutalShake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+      filter: sepia(0.8) hue-rotate(-30deg) saturate(3) contrast(1.2);
+    }
+
+    @keyframes screenShake {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-8px, 5px); }
+      40% { transform: translate(8px, -5px); }
+      60% { transform: translate(-4px, 2px); }
+      80% { transform: translate(4px, -2px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    @keyframes brutalShake {
+      0% { transform: translate(0, 0) scale(1); }
+      10% { transform: translate(-15px, 10px) scale(1.05); }
+      20% { transform: translate(15px, -10px) scale(1.05); }
+      30% { transform: translate(-15px, -10px) scale(1.05); }
+      40% { transform: translate(15px, 10px) scale(1.05); }
+      50% { transform: translate(-10px, 5px) scale(1.02); }
+      70% { transform: translate(10px, -5px) scale(1.01); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    /* Dynamic Split Backgrounds */
     .bg-split {
       position: absolute;
       top: 0;
       bottom: 0;
-      width: 50%;
       background-size: cover;
       background-position: center;
+      transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     .bg-girls {
       left: 0;
+      width: 50%;
       background-image: url('girls.jpg');
       border-right: 2px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 5px 0 20px rgba(176, 38, 255, 0.5);
+      box-shadow: 5px 0 20px rgba(176, 38, 255, 0.8);
+      z-index: 2;
     }
 
     .bg-boys {
       right: 0;
+      width: 50%;
       background-image: url('boys.jpg');
       border-left: 2px solid rgba(255, 255, 255, 0.8);
-      box-shadow: -5px 0 20px rgba(0, 210, 255, 0.5);
+      box-shadow: -5px 0 20px rgba(0, 210, 255, 0.8);
+      z-index: 1;
     }
 
+    /* Moving Center Divider */
     .center-divider {
       position: absolute;
       left: 50%;
       top: 0;
       bottom: 0;
-      width: 4px;
+      width: 6px;
       background: #ffffff;
       transform: translateX(-50%);
       box-shadow: 0 0 15px #fff, 0 0 30px #b026ff, 0 0 45px #00d2ff;
       z-index: 5;
+      transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     /* Top HUD / Health Bars */
@@ -102,9 +138,7 @@
       z-index: 10;
     }
 
-    .fighter-hud {
-      width: 38%;
-    }
+    .fighter-hud { width: 38%; }
 
     .fighter-info {
       display: flex;
@@ -184,9 +218,8 @@
       z-index: 6;
       transition: transform 0.1s;
     }
-
-    .avatar-left { left: 18%; }
-    .avatar-right { right: 18%; }
+    .avatar-left { left: 15%; }
+    .avatar-right { right: 15%; }
 
     /* Floating Attack Announcement */
     .announcement {
@@ -194,7 +227,7 @@
       top: 40%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.5);
-      font-size: 38px;
+      font-size: 42px;
       font-weight: 900;
       text-transform: uppercase;
       text-align: center;
@@ -202,7 +235,7 @@
       opacity: 0;
       pointer-events: none;
       z-index: 20;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       white-space: nowrap;
     }
 
@@ -211,34 +244,10 @@
       transform: translate(-50%, -50%) scale(1.1);
     }
 
-    .annct-girls {
-      color: #fff;
-      text-shadow: 0 0 10px #d800ff, 0 0 20px #d800ff, 3px 3px 0px #000;
-    }
+    .annct-girls { color: #fff; text-shadow: 0 0 10px #d800ff, 0 0 20px #d800ff, 4px 4px 0px #000; }
+    .annct-boys { color: #fff; text-shadow: 0 0 10px #ff7b00, 0 0 20px #ff7b00, 4px 4px 0px #000; }
 
-    .annct-boys {
-      color: #fff;
-      text-shadow: 0 0 10px #ff7b00, 0 0 20px #ff7b00, 3px 3px 0px #000;
-    }
-
-    /* Floating Damage Numbers */
-    .damage-popup {
-      position: absolute;
-      font-size: 28px;
-      color: #ff3333;
-      font-weight: bold;
-      text-shadow: 2px 2px 4px #000;
-      pointer-events: none;
-      z-index: 25;
-      animation: floatUp 0.8s forwards ease-out;
-    }
-
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-40px) scale(1.3); }
-    }
-
-    /* Live Feed Side Log */
+    /* Action Feed Log */
     .action-feed {
       position: absolute;
       bottom: 20px;
@@ -268,7 +277,7 @@
       to { opacity: 1; transform: translateX(0); }
     }
 
-    /* Controls Panel BELOW 16:9 Arena */
+    /* Controls Panel */
     .controls-panel {
       width: 100%;
       max-width: 960px;
@@ -284,43 +293,17 @@
       transition: opacity 0.3s, transform 0.3s;
     }
 
-    .controls-panel.hidden {
-      display: none !important;
-    }
-
-    .button-group {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: all 0.15s ease;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-    }
-
+    .controls-panel.hidden { display: none !important; }
+    .button-group { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; letter-spacing: 1px; transition: all 0.15s ease; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
     .btn:active { transform: scale(0.95); }
 
     .btn-girl-hit { background: #8a1ca6; color: #fff; }
     .btn-girl-hit:hover { background: #a624c7; }
-
     .btn-girl-brutal { background: linear-gradient(135deg, #d800ff, #6200ea); color: #fff; border: 1px solid #ff88ff; }
-    .btn-girl-brutal:hover { filter: brightness(1.2); }
-
     .btn-boy-hit { background: #b85d00; color: #fff; }
     .btn-boy-hit:hover { background: #d46b00; }
-
     .btn-boy-brutal { background: linear-gradient(135deg, #ff7b00, #dd2c00); color: #fff; border: 1px solid #ffaa44; }
-    .btn-boy-brutal:hover { filter: brightness(1.2); }
-
     .btn-util { background: #251d33; color: #ccc; border: 1px solid #44355e; }
     .btn-util:hover { background: #362a4a; color: #fff; }
 
@@ -347,10 +330,10 @@
     Streamer Mode Active: Press <span>H</span> key on your keyboard to <b>Hide / Show</b> controls completely!
   </div>
 
-  <div class="arena-wrapper">
-    <div class="bg-split bg-girls"></div>
-    <div class="bg-split bg-boys"></div>
-    <div class="center-divider"></div>
+  <div class="arena-wrapper" id="arena">
+    <div class="bg-split bg-girls" id="bg-girls"></div>
+    <div class="bg-split bg-boys" id="bg-boys"></div>
+    <div class="center-divider" id="center-line"></div>
 
     <div class="hud-top">
       <div class="fighter-hud girls-hud">
@@ -364,9 +347,7 @@
       </div>
 
       <div class="center-badge">
-        <div class="demo-tag">
-          <div class="demo-dot"></div> DEMO
-        </div>
+        <div class="demo-tag"><div class="demo-dot"></div> DEMO</div>
       </div>
 
       <div class="fighter-hud boys-hud">
@@ -399,7 +380,6 @@
     </svg>
 
     <div class="announcement" id="announcement-text"></div>
-
     <div class="action-feed" id="action-feed"></div>
 
     <button class="secret-toggle-btn" onclick="toggleControls()" title="Toggle Settings Controls">⚙</button>
@@ -407,10 +387,10 @@
 
   <div class="controls-panel" id="controls-panel">
     <div class="button-group">
-      <button class="btn btn-girl-hit" onclick="attack('girl', false)">Girls Hit</button>
-      <button class="btn btn-girl-brutal" onclick="attack('girl', true)">BRUTALITY!</button>
-      <button class="btn btn-boy-hit" onclick="attack('boy', false)">Boys Hit</button>
-      <button class="btn btn-boy-brutal" onclick="attack('boy', true)">BRUTALITY!</button>
+      <button class="btn btn-girl-hit" onclick="attack('girl', false)">Girls Hit (1)</button>
+      <button class="btn btn-girl-brutal" onclick="attack('girl', true)">BRUTALITY! (10)</button>
+      <button class="btn btn-boy-hit" onclick="attack('boy', false)">Boys Hit (1)</button>
+      <button class="btn btn-boy-brutal" onclick="attack('boy', true)">BRUTALITY! (10)</button>
     </div>
 
     <div class="button-group">
@@ -422,68 +402,97 @@
   </div>
 
   <script>
-    // State Variables
-    let girlHP = 100;
-    let boyHP = 100;
+    // Max Health points equals total hits needed to win (20)
+    const MAX_HP = 20;
+    let girlHP = MAX_HP;
+    let boyHP = MAX_HP;
     let girlWins = 0;
     let boyWins = 0;
 
     const girlFighters = ["MILEENA", "KITANA", "SKARLET", "SINDEL", "CASSIE CAGE"];
     const boyFighters = ["SCORPION", "SUB-ZERO", "RAIDEN", "KENSHI", "LIU KANG"];
-
     let currentGirlIndex = 0;
     let currentBoyIndex = 0;
 
-    const girlMoves = ["SAIS STRIKE!", "TELEPORT KICK!", "FACE BITE FATALITY!", "DEATH SENTENCE!"];
+    const girlMoves = ["SAIS STRIKE!", "TELEPORT KICK!", "BLOOD CLOT!", "DEATH SENTENCE!"];
     const boyMoves = ["TELEPORT PUNCH!", "GET OVER HERE!", "HELL FIRE!", "ICE FREEZE!"];
 
-    // Trigger Attacks
+    // Update Visual UI based on current HP
+    function updateVisuals() {
+      // 1. Update Health Bars (Percentage)
+      document.getElementById("girl-health").style.width = (girlHP / MAX_HP) * 100 + "%";
+      document.getElementById("boy-health").style.width = (boyHP / MAX_HP) * 100 + "%";
+
+      // 2. Calculate Center Line Shift
+      // Starts at 50%. Shifts right (up to 100%) if Girl is winning. Shifts left (down to 0%) if Boy is winning.
+      let centerPercentage = 50 + ((MAX_HP - boyHP) * 2.5) - ((MAX_HP - girlHP) * 2.5);
+      
+      // Prevent visual bugs if a massive hit goes way past 0 HP
+      if (centerPercentage > 100) centerPercentage = 100;
+      if (centerPercentage < 0) centerPercentage = 0;
+
+      // 3. Apply the shift to the backgrounds and line
+      document.getElementById("bg-girls").style.width = centerPercentage + "%";
+      document.getElementById("bg-boys").style.width = (100 - centerPercentage) + "%";
+      document.getElementById("center-line").style.left = centerPercentage + "%";
+    }
+
+    function triggerAnimation(isBrutality) {
+      const arena = document.getElementById("arena");
+      // Remove classes to reset animation if clicking fast
+      arena.classList.remove("arena-hit", "arena-brutality");
+      
+      // Force a tiny delay so the browser registers the class removal before adding it back
+      setTimeout(() => {
+        if (isBrutality) {
+          arena.classList.add("arena-brutality");
+        } else {
+          arena.classList.add("arena-hit");
+        }
+      }, 10);
+    }
+
     function attack(attacker, isBrutality) {
       const announcement = document.getElementById("announcement-text");
-      const feed = document.getElementById("action-feed");
       
+      // Normal hit = 1 damage. Brutality = 10 damage.
+      let damage = isBrutality ? 10 : 1;
       let moveName = "";
-      let damage = isBrutality ? 35 : 12;
 
       if (attacker === 'girl') {
         boyHP = Math.max(0, boyHP - damage);
-        document.getElementById("boy-health").style.width = boyHP + "%";
         moveName = isBrutality ? "GIRLS BRUTALITY!" : girlMoves[Math.floor(Math.random() * girlMoves.length)];
-        
         announcement.className = "announcement annct-girls active";
-        showDamage('boy', damage);
         addFeed("@Admin", "Rose");
-
-        // Animate Girl Avatar
         animateAvatar('avatar-girl');
       } else {
         girlHP = Math.max(0, girlHP - damage);
-        document.getElementById("girl-health").style.width = girlHP + "%";
         moveName = isBrutality ? "BOYS BRUTALITY!" : boyMoves[Math.floor(Math.random() * boyMoves.length)];
-        
         announcement.className = "announcement annct-boys active";
-        showDamage('girl', damage);
         addFeed("@Admin", "TikTok");
-
-        // Animate Boy Avatar
         animateAvatar('avatar-boy');
       }
 
-      announcement.innerText = moveName;
+      // Update everything on screen
+      updateVisuals();
+      triggerAnimation(isBrutality);
 
-      setTimeout(() => {
-        announcement.classList.remove("active");
-      }, 1000);
+      // Show Text
+      announcement.innerText = moveName;
+      setTimeout(() => announcement.classList.remove("active"), 1000);
 
       // Check Win Condition
-      if (girlHP <= 0) {
-        boyWins++;
-        document.getElementById("boy-wins").innerText = boyWins + " W";
-        setTimeout(resetMatch, 1200);
-      } else if (boyHP <= 0) {
-        girlWins++;
-        document.getElementById("girl-wins").innerText = girlWins + " W";
-        setTimeout(resetMatch, 1200);
+      if (girlHP <= 0 || boyHP <= 0) {
+        if (girlHP <= 0) {
+          boyWins++;
+          document.getElementById("boy-wins").innerText = boyWins + " W";
+        } else {
+          girlWins++;
+          document.getElementById("girl-wins").innerText = girlWins + " W";
+        }
+        
+        // Wait longer for the dramatic 'takeover' animation before resetting
+        setTimeout(resetMatch, 2500); 
       }
     }
 
@@ -493,31 +502,13 @@
       setTimeout(() => el.style.transform = "scale(1) translateY(0)", 200);
     }
 
-    function showDamage(target, amount) {
-      const targetEl = document.getElementById(target === 'girl' ? 'avatar-girl' : 'avatar-boy');
-      const rect = targetEl.getBoundingClientRect();
-      const arenaRect = document.querySelector('.arena-wrapper').getBoundingClientRect();
-
-      const popup = document.createElement('div');
-      popup.className = 'damage-popup';
-      popup.innerText = '-' + amount;
-      popup.style.left = (rect.left - arenaRect.left + 20) + 'px';
-      popup.style.top = (rect.top - arenaRect.top) + 'px';
-
-      document.querySelector('.arena-wrapper').appendChild(popup);
-      setTimeout(() => popup.remove(), 800);
-    }
-
     function addFeed(user, gift) {
       const feed = document.getElementById("action-feed");
       const item = document.createElement("div");
       item.className = "feed-item";
       item.innerHTML = `<span style="color:#e855ff; font-weight:bold;">${user}</span> sent <span>${gift}</span>`;
-      
       feed.appendChild(item);
-      if (feed.children.length > 4) {
-        feed.removeChild(feed.children[0]);
-      }
+      if (feed.children.length > 4) feed.removeChild(feed.children[0]);
     }
 
     function switchFighter(side) {
@@ -531,10 +522,9 @@
     }
 
     function resetMatch() {
-      girlHP = 100;
-      boyHP = 100;
-      document.getElementById("girl-health").style.width = "100%";
-      document.getElementById("boy-health").style.width = "100%";
+      girlHP = MAX_HP;
+      boyHP = MAX_HP;
+      updateVisuals();
     }
 
     function resetGame() {
@@ -545,19 +535,18 @@
       document.getElementById("boy-wins").innerText = "0 W";
     }
 
-    // Secret Hide/Show Toggle Feature
     function toggleControls() {
       const panel = document.getElementById("controls-panel");
       panel.classList.toggle("hidden");
     }
 
-    // Keyboard shortcut listener ('H' key toggles settings hide/show)
+    // Keyboard shortcut 'H' hides controls for the streamer
     window.addEventListener("keydown", (e) => {
-      if (e.key === "h" || e.key === "H") {
-        toggleControls();
-      }
+      if (e.key.toLowerCase() === "h") toggleControls();
     });
+
+    // Initialize layout on load
+    updateVisuals();
   </script>
 </body>
 </html>
-
