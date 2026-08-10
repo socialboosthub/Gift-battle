@@ -29,28 +29,29 @@ tiktokLiveConnection.connect().then(state => {
 // Listen for TikTok Live Gifts
 tiktokLiveConnection.on('gift', data => {
     const giftName = data.giftName.toLowerCase().trim();
+    const username = data.uniqueId; // Grabs their @username
     const repeatCount = data.repeatCount || 1;
     
     // Team Boys Gifts
     if (giftName === 'tiktok') {
-        io.emit('action', { team: 'boys', type: 'move', damage: 1 * repeatCount });
+        io.emit('action', { team: 'boys', type: 'move', user: username, gift: 'TikTok', damage: 5 * repeatCount });
     }
     if (giftName === 'mind blown') {
-        io.emit('action', { team: 'boys', type: 'heavy', damage: 10 * repeatCount });
+        io.emit('action', { team: 'boys', type: 'heavy', user: username, gift: 'Mind Blown', damage: 50 * repeatCount });
     }
     if (giftName === 'paper crane' || giftName === 'papercrane') {
-        io.emit('action', { team: 'boys', type: 'switch' });
+        io.emit('action', { team: 'boys', type: 'switch', user: username, gift: 'Paper Crane' });
     }
 
     // Team Girls Gifts
     if (giftName === 'rose') {
-        io.emit('action', { team: 'girls', type: 'move', damage: 1 * repeatCount });
+        io.emit('action', { team: 'girls', type: 'move', user: username, gift: 'Rose', damage: 5 * repeatCount });
     }
     if (giftName === 'rosa') {
-        io.emit('action', { team: 'girls', type: 'heavy', damage: 10 * repeatCount });
+        io.emit('action', { team: 'girls', type: 'heavy', user: username, gift: 'Rosa', damage: 50 * repeatCount });
     }
     if (giftName === 'like-pop' || giftName === 'like pop' || giftName === 'likepop') {
-        io.emit('action', { team: 'girls', type: 'switch' });
+        io.emit('action', { team: 'girls', type: 'switch', user: username, gift: 'Like-Pop' });
     }
 });
 
