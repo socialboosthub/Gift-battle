@@ -1603,6 +1603,208 @@ window.addEventListener(
 
 updateVisuals();
 
+
+// ============================================================
+// TIKTOK LIVE GIFT CONNECTION
+// ============================================================
+
+let giftSocket = null;
+
+function connectTikTokGifts() {
+
+    const protocol =
+        location.protocol === "https:" ? "wss://" : "ws://";
+
+    giftSocket = new WebSocket(
+        protocol + location.host
+    );
+
+    giftSocket.onopen = () => {
+        console.log("🎮 Gift connection established");
+
+        addFeed(
+            "SYSTEM",
+            "TikTok LIVE connected"
+        );
+    };
+
+    giftSocket.onmessage = (event) => {
+
+        try {
+
+            const data = JSON.parse(event.data);
+
+            if (data.type === "status") {
+
+                console.log("TikTok:", data.message);
+
+                return;
+            }
+
+            if (data.type !== "gift") {
+                return;
+            }
+
+            handleTikTokGift(data);
+
+        } catch (error) {
+
+            console.error(
+                "Gift message error:",
+                error
+            );
+        }
+    };
+
+    giftSocket.onclose = () => {
+
+        console.log(
+            "⚠️ Gift connection lost. Reconnecting..."
+        );
+
+        setTimeout(
+            connectTikTokGifts,
+            3000
+        );
+    };
+
+    giftSocket.onerror = (error) => {
+
+        console.error(
+            "Gift WebSocket error:",
+            error
+        );
+    };
+}
+
+
+// ============================================================
+// HANDLE THE EXACT GIFT ACTIONS
+// ============================================================
+
+function handleTikTokGift(data) {
+
+    const username =
+        data.username || "Viewer";
+
+    const gift =
+        data.gift || "Gift";
+
+    const count =
+        Number(data.count || 1);
+
+
+    // --------------------------------------------------------
+    // ROSE → GIRL NORMAL ATTACK
+    // --------------------------------------------------------
+
+    if (data.action === "girlHit") {
+
+        // One Rose = one hit.
+        // 10 Roses = ten hits.
+        for (let i = 0; i < count; i++) {
+
+            setTimeout(() => {
+
+                attack("girl", false);
+
+            }, i * 180);
+        }
+
+        addFeed(
+            "@" + username,
+            `Rose ×${count}`
+        );
+
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // TIKTOK → BOY NORMAL ATTACK
+    // --------------------------------------------------------
+
+    if (data.action === "boyHit") {
+
+        for (let i = 0; i < count; i++) {
+
+            setTimeout(() => {
+
+                attack("boy", false);
+
+            }, i * 180);
+        }
+
+        addFeed(
+            "@" + username,
+            `TikTok ×${count}`
+        );
+
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // MIND BLOWN → BOY 10× ATTACK
+    // --------------------------------------------------------
+
+    if (data.action === "boyBrutality") {
+
+        attack(
+            "boy",
+            true
+        );
+
+        addFeed(
+            "@" + username,
+            "💥 Mind Blown — 10×"
+        );
+
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // LIKE-POP → SWITCH GIRL
+    // --------------------------------------------------------
+
+    if (data.action === "switchGirl") {
+
+        switchFighter("girl");
+
+        addFeed(
+            "@" + username,
+            "👍 Like-Pop → GIRL SWITCH"
+        );
+
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // PAPER CRANE → SWITCH BOY
+    // --------------------------------------------------------
+
+    if (data.action === "switchBoy") {
+
+        switchFighter("boy");
+
+        addFeed(
+            "@" + username,
+            "🪽 Paper Crane → BOY SWITCH"
+        );
+
+        return;
+    }
+}
+
+
+// ============================================================
+// START THE CONNECTION
+// ============================================================
+
+connectTikTokGifts();
+  
 </script>
 
 </body>
