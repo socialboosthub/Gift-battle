@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MK TikTok Live Battle</title>
+    <title>MK TikTok Live Battle - Demo Replica</title>
     <script src="/socket.io/socket.io.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@900&family=Teko:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@900&family=Teko:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         
@@ -19,7 +19,7 @@
             font-family: 'Teko', sans-serif;
         }
         
-        /* 16:9 Canvas Scaler */
+        /* Vertical Mobile/TikTok Canvas Scaler */
         #game-scaler {
             width: 100vw;
             height: 100vh;
@@ -30,11 +30,10 @@
 
         #game-container {
             position: relative;
-            width: 1920px;
-            height: 1080px;
+            width: 1080px;
+            height: 1920px; /* TikTok 9:16 Ratio */
             background: #000;
             overflow: hidden;
-            box-shadow: 0 0 80px rgba(0,0,0,1);
             transform-origin: center center;
         }
 
@@ -43,244 +42,268 @@
             position: absolute; 
             top: 0; 
             bottom: 0; 
+            width: 50%;
             background-size: cover; 
             background-position: center; 
-            transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); 
-        }
-        
-        #bg-boys { 
-            left: 0; 
-            width: 50%; 
-            background-image: linear-gradient(to right, rgba(0,10,30,0.3), rgba(0,0,0,0.7)), url('1000096984.png');
-            z-index: 1; 
         }
         
         #bg-girls { 
-            right: 0; 
-            width: 50%; 
-            background-image: linear-gradient(to left, rgba(30,0,30,0.3), rgba(0,0,0,0.7)), url('1000096985.png');
+            left: 0; 
+            background-image: linear-gradient(to right, rgba(50,0,80,0.5), rgba(0,0,0,0.9)), url('1000096985.png');
+            border-right: 4px solid #fff;
+            box-shadow: 5px 0 30px #a200ff;
             z-index: 1; 
         }
 
-        /* Tug-of-War Battle Divider Line */
-        #center-line {
+        #bg-boys { 
+            right: 0; 
+            background-image: linear-gradient(to left, rgba(80,30,0,0.5), rgba(0,0,0,0.9)), url('1000096984.png');
+            box-shadow: -5px 0 30px #ff6600;
+            z-index: 1; 
+        }
+
+        /* Top HUD (Health Bars & Names) */
+        .hud-container {
             position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            width: 16px;
-            background: #ffffff;
-            z-index: 10;
-            transform: translateX(-50%);
-            transition: left 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            box-shadow: 0 0 30px #ffffff, 0 0 60px #00d2ff, 0 0 60px #ff00cc;
-        }
-
-        /* MK Style Tug Bar Header */
-        .hud-bar {
-            position: absolute;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 50px;
-            background: rgba(0,0,0,0.8);
-            border: 3px solid #d4af37;
-            border-radius: 8px;
-            z-index: 20;
-            display: flex;
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(212,175,55,0.4);
-        }
-
-        .hud-boys { height: 100%; background: linear-gradient(90deg, #00d2ff, #0052d4); width: 50%; transition: width 0.3s ease; }
-        .hud-girls { height: 100%; background: linear-gradient(90deg, #ff007f, #ff00cc); width: 50%; transition: width 0.3s ease; }
-
-        /* Score & Team Labels */
-        .team-title {
-            position: absolute;
-            top: 90px;
-            font-family: 'Cinzel Decorative', cursive;
-            font-size: 48px;
-            font-weight: 900;
-            z-index: 20;
-            text-shadow: 0 0 20px black, 0 0 10px black;
-        }
-        #boys-label { left: 80px; color: #00d2ff; }
-        #girls-label { right: 80px; color: #ff00cc; }
-
-        .score-display {
-            position: absolute;
-            top: 145px;
-            font-size: 60px;
-            z-index: 20;
-            letter-spacing: 2px;
-            text-shadow: 0 0 15px black;
-        }
-        #boys-score { left: 80px; color: #fff; }
-        #girls-score { right: 80px; color: #fff; }
-
-        /* Fighters Container */
-        .fighter-container {
-            position: absolute;
-            bottom: 120px;
-            width: 450px;
-            height: 650px;
-            z-index: 15;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            transition: transform 0.2s ease, filter 0.2s ease;
-        }
-        #boy-box { left: 15%; }
-        #girl-box { right: 15%; }
-
-        /* Fighter Card Display */
-        .fighter-card {
-            width: 100%;
-            height: 100%;
-            border-radius: 20px;
-            border: 4px solid #d4af37;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 40px rgba(0,0,0,0.9);
-            position: relative;
-            overflow: hidden;
-            background: rgba(10, 10, 15, 0.85);
-            backdrop-filter: blur(10px);
-        }
-
-        .boy-theme { border-color: #00d2ff; box-shadow: 0 0 40px rgba(0,210,255,0.4); }
-        .girl-theme { border-color: #ff00cc; box-shadow: 0 0 40px rgba(255,0,204,0.4); }
-
-        .fighter-avatar {
-            font-size: 140px;
-            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
-            margin-bottom: 20px;
-        }
-
-        .fighter-name {
-            font-family: 'Cinzel Decorative', cursive;
-            font-size: 42px;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 0 15px currentColor;
-        }
-
-        .fighter-title {
-            font-size: 28px;
-            color: #d4af37;
-            letter-spacing: 2px;
-        }
-
-        /* Move Overlay Animation FX */
-        .lunge-right { transform: translateX(120px) scale(1.08) !important; }
-        .lunge-left { transform: translateX(-120px) scale(1.08) !important; }
-        
-        .hit-recoil {
-            animation: hitFlash 0.35s ease-in-out;
-        }
-
-        @keyframes hitFlash {
-            0% { filter: brightness(1) drop-shadow(0 0 0px red); transform: scale(1); }
-            50% { filter: brightness(2.5) drop-shadow(0 0 40px #ff0000); transform: scale(0.92) rotate(-3deg); }
-            100% { filter: brightness(1) drop-shadow(0 0 0px red); transform: scale(1); }
-        }
-
-        /* Floating Damage Text Popup */
-        .damage-pop {
-            position: absolute;
-            font-family: 'Cinzel Decorative', cursive;
-            font-weight: 900;
-            font-size: 75px;
-            color: #ff2a2a;
-            text-shadow: 0 0 20px #000, 0 0 10px #ff0000;
-            z-index: 30;
-            pointer-events: none;
-            animation: floatUp 0.9s forwards ease-out;
-        }
-
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(0.8); }
-            50% { transform: translateY(-80px) scale(1.3); }
-            100% { opacity: 0; transform: translateY(-150px) scale(1); }
-        }
-
-        /* Heavy Screen Shake Effect */
-        .heavy-shake { animation: shake 0.4s ease-in-out; }
-        @keyframes shake {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-15px, 10px) rotate(-1deg); }
-            40% { transform: translate(15px, -10px) rotate(1deg); }
-            60% { transform: translate(-10px, -15px) rotate(-1deg); }
-            80% { transform: translate(10px, 15px) rotate(1deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
-        }
-
-        /* Controls / Instructions HUD Footer */
-        .gift-hud {
-            position: absolute;
-            bottom: 20px;
+            top: 100px;
             width: 100%;
             display: flex;
             justify-content: space-between;
-            padding: 0 60px;
+            align-items: center;
+            padding: 0 40px;
             z-index: 20;
-            font-size: 26px;
-            color: rgba(255,255,255,0.85);
-            text-shadow: 0 0 10px black;
         }
 
-        .gift-tag {
-            background: rgba(0,0,0,0.7);
-            padding: 8px 20px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.2);
+        .player-hud {
+            width: 42%;
+            display: flex;
+            flex-direction: column;
         }
+
+        .player-name {
+            font-size: 55px;
+            color: white;
+            text-shadow: 0 0 10px black;
+            letter-spacing: 2px;
+            margin-bottom: -10px;
+            text-transform: uppercase;
+        }
+
+        .health-bar-bg {
+            width: 100%;
+            height: 35px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #fff;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .health-fill {
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s ease-out;
+        }
+
+        #health-girls-fill { background: linear-gradient(90deg, #ff00cc, #a200ff); }
+        #health-boys-fill { background: linear-gradient(90deg, #ffcc00, #ff6600); }
+
+        .score-text {
+            font-size: 50px;
+            color: #ccc;
+            margin-top: 5px;
+        }
+
+        .demo-badge {
+            color: #ffd700;
+            font-size: 40px;
+            text-align: center;
+            text-shadow: 0 0 10px #000;
+        }
+
+        /* Middle Team Logos */
+        .team-logo-container {
+            position: absolute;
+            top: 450px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .team-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 130px;
+            font-weight: 900;
+            text-shadow: 0 0 30px #000, 0 0 15px #000;
+            text-align: center;
+            line-height: 0.9;
+            position: absolute;
+        }
+
+        .team-title.girls { left: 50px; color: #d400ff; }
+        .team-title.boys { right: 50px; color: #ff6600; }
+        .team-title span { color: white; font-size: 100px; display: block; }
+
+        /* Real Character Images */
+        .character-img {
+            position: absolute;
+            bottom: 300px;
+            height: 600px;
+            width: auto;
+            max-width: 450px;
+            z-index: 15;
+            transition: transform 0.1s ease;
+            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
+        }
+
+        #char-girls { left: 50px; transform: scaleX(1); }
+        #char-boys { right: 50px; transform: scaleX(-1); } /* Flips right side to face left */
+
+        /* Animations */
+        .lunge-right { transform: scaleX(1) translateX(100px) scale(1.1) !important; }
+        .lunge-left { transform: scaleX(-1) translateX(100px) scale(1.1) !important; }
+        .hit-recoil { filter: brightness(2) drop-shadow(0 0 40px red) !important; transform: scale(0.95) !important; }
+
+        .heavy-shake { animation: screenShake 0.4s ease-in-out; }
+        @keyframes screenShake {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-20px, 15px); }
+            40% { transform: translate(20px, -15px); }
+            60% { transform: translate(-15px, -20px); }
+            80% { transform: translate(15px, 20px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* Live Gift Feed (Left Side) */
+        #gift-feed {
+            position: absolute;
+            bottom: 400px;
+            left: 30px;
+            width: 350px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 10px;
+            z-index: 30;
+        }
+
+        .gift-alert {
+            background: rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 30px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .gift-alert span { color: #d4af37; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Action Text Overlay (Center) */
+        #action-text-container {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 40;
+            pointer-events: none;
+            text-align: center;
+            width: 100%;
+        }
+
+        .action-text {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 110px;
+            color: #fff;
+            text-shadow: 0 0 30px #ff0000, 0 0 10px #000;
+            animation: popUp 1.2s forwards ease-in-out;
+        }
+
+        @keyframes popUp {
+            0% { opacity: 0; transform: scale(0.3); }
+            15% { opacity: 1; transform: scale(1.2); }
+            30% { transform: scale(1); }
+            80% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.5); }
+        }
+
+        /* Demo Buttons Panel (For testing on PC) */
+        .demo-panel {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 50;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            font-family: 'Teko', sans-serif;
+            font-size: 35px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .btn-girl { background: #d400ff; border: 2px solid #fff; }
+        .btn-boy { background: #ff6600; border: 2px solid #fff; }
+        .btn-switch { background: #333; border: 2px solid #aaa; }
     </style>
 </head>
 <body>
 
     <div id="game-scaler">
         <div id="game-container">
-            <div id="bg-boys" class="bg-layer"></div>
             <div id="bg-girls" class="bg-layer"></div>
-            <div id="center-line"></div>
+            <div id="bg-boys" class="bg-layer"></div>
 
-            <div class="hud-bar">
-                <div id="hud-boys-fill" class="hud-boys"></div>
-                <div id="hud-girls-fill" class="hud-girls"></div>
-            </div>
+            <div class="hud-container">
+                <div class="player-hud" style="align-items: flex-start;">
+                    <div id="name-girls" class="player-name">MILEENA</div>
+                    <div class="health-bar-bg"><div id="health-girls-fill" class="health-fill"></div></div>
+                    <div id="score-girls" class="score-text">0 W</div>
+                </div>
 
-            <div id="boys-label" class="team-title">TEAM BOYS</div>
-            <div id="girls-label" class="team-title">TEAM GIRLS</div>
-            
-            <div id="boys-score" class="score-display">WINS: 0</div>
-            <div id="girls-score" class="score-display">WINS: 0</div>
+                <div class="demo-badge">🔴 LIVE</div>
 
-            <div id="boy-box" class="fighter-container">
-                <div class="fighter-card boy-theme">
-                    <div id="boy-icon" class="fighter-avatar">🦂</div>
-                    <div id="boy-name" class="fighter-name">SCORPION</div>
-                    <div class="fighter-title">REALM OF SHIRAI RYU</div>
+                <div class="player-hud" style="align-items: flex-end;">
+                    <div id="name-boys" class="player-name">SCORPION</div>
+                    <div class="health-bar-bg"><div id="health-boys-fill" class="health-fill"></div></div>
+                    <div id="score-boys" class="score-text">0 W</div>
                 </div>
             </div>
 
-            <div id="girl-box" class="fighter-container">
-                <div class="fighter-card girl-theme">
-                    <div id="girl-icon" class="fighter-avatar">🪭</div>
-                    <div id="girl-name" class="fighter-name">KITANA</div>
-                    <div class="fighter-title">PRINCESS OF EDENIA</div>
-                </div>
+            <div class="team-logo-container">
+                <div class="team-title girls"><span>TEAM</span>GIRLS</div>
+                <div class="team-title boys"><span>TEAM</span>BOYS</div>
             </div>
 
-            <div class="gift-hud">
-                <div class="gift-tag">💙 TikTok = Move (+1) | Mind Blown = Kritical (+10) | Paper Crane = Switch</div>
-                <div class="gift-tag">💖 Rose = Move (+1) | Rosa = Kritical (+10) | Like-Pop = Switch</div>
+            <img id="char-girls" class="character-img" src="https://placehold.co/400x600/a200ff/fff?text=KITANA+PNG" alt="Girl Fighter">
+            <img id="char-boys" class="character-img" src="https://placehold.co/400x600/ff6600/fff?text=SCORPION+PNG" alt="Boy Fighter">
+
+            <div id="gift-feed"></div>
+
+            <div id="action-text-container"></div>
+
+            <div class="demo-panel">
+                <button class="btn btn-girl" onclick="triggerHit('girls', 5, 'Admin', 'Rose')">Girls Hit</button>
+                <button class="btn btn-girl" onclick="triggerHit('girls', 50, 'Admin', 'Rosa')">BRUTALITY!</button>
+                <button class="btn btn-switch" onclick="switchChar('girls')">↻ Girl</button>
+                <button class="btn btn-switch" onclick="switchChar('boys')">↻ Boy</button>
+                <button class="btn btn-boy" onclick="triggerHit('boys', 5, 'Admin', 'TikTok')">Boys Hit</button>
+                <button class="btn btn-boy" onclick="triggerHit('boys', 50, 'Admin', 'Mind Blown')">BRUTALITY!</button>
             </div>
         </div>
     </div>
@@ -288,167 +311,181 @@
     <script>
         const socket = io();
 
-        // Screen Auto-Scaler for 16:9
+        // Screen Auto-Scaler for Mobile Portrait (9:16)
         function fitScreen() {
             const container = document.getElementById('game-container');
-            const scaleX = window.innerWidth / 1920;
-            const scaleY = window.innerHeight / 1080;
+            const scaleX = window.innerWidth / 1080;
+            const scaleY = window.innerHeight / 1920;
             const scale = Math.min(scaleX, scaleY);
             container.style.transform = `scale(${scale})`;
         }
         window.addEventListener('resize', fitScreen);
         fitScreen();
 
-        let position = 0; // -20 (Boys Win) to +20 (Girls Win)
-        let boysWins = 0;
+        // Game State
+        let girlsHealth = 100;
+        let boysHealth = 100;
         let girlsWins = 0;
+        let boysWins = 0;
 
-        // Mortal Kombat Rosters (7 Characters Each)
-        const boyCharacters = [
-            { name: "Scorpion", icon: "🦂", title: "Shirai Ryu Leader" },
-            { name: "Sub-Zero", icon: "❄️", title: "Grandmaster Lin Kuei" },
-            { name: "Raiden", icon: "⚡", title: "God of Thunder" },
-            { name: "Liu Kang", icon: "🔥", title: "God of Fire" },
-            { name: "Johnny Cage", icon: "🕶️", title: "Action Superstar" },
-            { name: "Shang Tsung", icon: "💀", title: "Soul Sorcerer" },
-            { name: "Kung Lao", icon: "🎩", title: "Shaolin Monk" }
+        // EXACT ROSTERS REQUESTED (Replace the 'img' URLs with your downloaded PNG filenames)
+        const girlsRoster = [
+            { name: "SONYA BLADE", img: "https://placehold.co/400x600/a200ff/fff?text=SONYA+PNG" },
+            { name: "KITANA", img: "https://placehold.co/400x600/a200ff/fff?text=KITANA+PNG" },
+            { name: "SINDEL", img: "https://placehold.co/400x600/a200ff/fff?text=SINDEL+PNG" }
         ];
 
-        const girlCharacters = [
-            { name: "Kitana", icon: "🪭", title: "Princess of Edenia" },
-            { name: "Mileena", icon: "⚔️", title: "Empress of Outworld" },
-            { name: "Sonya Blade", icon: "🎖️", title: "Special Forces Commander" },
-            { name: "Jade", icon: "🟢", title: "Edenian Assassin" },
-            { name: "Skarlet", icon: "🩸", title: "Blood Mage" },
-            { name: "Sindel", icon: "👑", title: "Queen of Edenia" },
-            { name: "Cassie Cage", icon: "🎧", title: "Special Forces Leader" }
+        const boysRoster = [
+            { name: "HUMAN SMOKE", img: "https://placehold.co/400x600/ff6600/fff?text=SMOKE+PNG" },
+            { name: "KABAL", img: "https://placehold.co/400x600/ff6600/fff?text=KABAL+PNG" },
+            { name: "SCORPION", img: "https://placehold.co/400x600/ff6600/fff?text=SCORPION+PNG" }
         ];
 
-        let boyIndex = 0;
-        let girlIndex = 0;
+        let girlIndex = 1; // Starts on Kitana
+        let boyIndex = 2;  // Starts on Scorpion
 
-        const container = document.getElementById('game-container');
-        const centerLine = document.getElementById('center-line');
-        const bgBoys = document.getElementById('bg-boys');
-        const bgGirls = document.getElementById('bg-girls');
-        const hudBoys = document.getElementById('hud-boys-fill');
-        const hudGirls = document.getElementById('hud-girls-fill');
+        // Move Text Arrays
+        const girlMoves = ["TELEPORT KICK!", "SAIS STRIKE!", "ENERGY RINGS!"];
+        const boyMoves = ["GET OVER HERE!", "TELEPORT PUNCH!", "SPEED DASH!"];
+        const fatalityTexts = ["FACE BITE FATALITY!", "HELL FIRE!", "DEATH SENTENCE!"];
 
-        const boyBox = document.getElementById('boy-box');
-        const girlBox = document.getElementById('girl-box');
+        // DOM Elements
+        const elGirlsHealth = document.getElementById('health-girls-fill');
+        const elBoysHealth = document.getElementById('health-boys-fill');
+        const elCharGirls = document.getElementById('char-girls');
+        const elCharBoys = document.getElementById('char-boys');
+        const elNameGirls = document.getElementById('name-girls');
+        const elNameBoys = document.getElementById('name-boys');
+        const actionContainer = document.getElementById('action-text-container');
+        const giftFeed = document.getElementById('gift-feed');
+        const gameContainer = document.getElementById('game-container');
 
+        // Load Initial Characters
         function updateFighters() {
-            document.getElementById('boy-icon').innerText = boyCharacters[boyIndex].icon;
-            document.getElementById('boy-name').innerText = boyCharacters[boyIndex].name;
+            elNameGirls.innerText = girlsRoster[girlIndex].name;
+            elCharGirls.src = girlsRoster[girlIndex].img;
             
-            document.getElementById('girl-icon').innerText = girlCharacters[girlIndex].icon;
-            document.getElementById('girl-name').innerText = girlCharacters[girlIndex].name;
+            elNameBoys.innerText = boysRoster[boyIndex].name;
+            elCharBoys.src = boysRoster[boyIndex].img;
         }
         updateFighters();
 
-        // Socket Actions
+        // Socket Listener (From real TikTok gifts)
         socket.on('action', (data) => {
-            if (data.team === 'boys') {
-                if (data.type === 'switch') {
-                    boyIndex = (boyIndex + 1) % boyCharacters.length;
-                    updateFighters();
-                } else {
-                    executeAttack('boys', data.damage || 1);
-                }
-            } else if (data.team === 'girls') {
-                if (data.type === 'switch') {
-                    girlIndex = (girlIndex + 1) % girlCharacters.length;
-                    updateFighters();
-                } else {
-                    executeAttack('girls', data.damage || 1);
-                }
+            if (data.type === 'switch') {
+                switchChar(data.team);
+                addGiftToFeed(data.user, data.gift);
+            } else {
+                triggerHit(data.team, data.damage, data.user, data.gift);
             }
         });
 
-        function executeAttack(attackerTeam, damage) {
-            if (attackerTeam === 'boys') {
-                // Boys attack -> Girls take damage -> Center line moves right (+ position)
-                position -= damage;
-                
-                // Attacker lunge & Defender hit recoil
-                boyBox.classList.add('lunge-right');
-                girlBox.classList.add('hit-recoil');
-                spawnDamageText(girlBox, damage);
-
-                setTimeout(() => {
-                    boyBox.classList.remove('lunge-right');
-                    girlBox.classList.remove('hit-recoil');
-                }, 350);
-
+        // Switch Character Logic
+        function switchChar(team) {
+            if (team === 'girls') {
+                girlIndex = (girlIndex + 1) % girlsRoster.length;
             } else {
-                // Girls attack -> Boys take damage -> Center line moves left (- position)
-                position += damage;
+                boyIndex = (boyIndex + 1) % boysRoster.length;
+            }
+            updateFighters();
+        }
 
-                // Attacker lunge & Defender hit recoil
-                girlBox.classList.add('lunge-left');
-                boyBox.classList.add('hit-recoil');
-                spawnDamageText(boyBox, damage);
+        // Hit & Damage Logic
+        function triggerHit(attackerTeam, damage, username, giftName) {
+            addGiftToFeed(username, giftName);
+
+            let moveText = "";
+
+            if (attackerTeam === 'girls') {
+                boysHealth -= damage;
+                elCharGirls.classList.add('lunge-right');
+                elCharBoys.classList.add('hit-recoil');
+                
+                moveText = damage >= 50 ? getRandomText(fatalityTexts) : getRandomText(girlMoves);
+                
+                setTimeout(() => {
+                    elCharGirls.classList.remove('lunge-right');
+                    elCharBoys.classList.remove('hit-recoil');
+                }, 300);
+            } else {
+                girlsHealth -= damage;
+                elCharBoys.classList.add('lunge-left');
+                elCharGirls.classList.add('hit-recoil');
+                
+                moveText = damage >= 50 ? getRandomText(fatalityTexts) : getRandomText(boyMoves);
 
                 setTimeout(() => {
-                    girlBox.classList.remove('lunge-left');
-                    boyBox.classList.remove('hit-recoil');
-                }, 350);
+                    elCharBoys.classList.remove('lunge-left');
+                    elCharGirls.classList.remove('hit-recoil');
+                }, 300);
             }
 
-            if (damage >= 10) {
-                container.classList.add('heavy-shake');
-                setTimeout(() => container.classList.remove('heavy-shake'), 450);
+            if (damage >= 50) {
+                gameContainer.classList.add('heavy-shake');
+                setTimeout(() => gameContainer.classList.remove('heavy-shake'), 400);
             }
 
-            updateUI();
+            showActionText(moveText, damage >= 50);
+            updateHealthUI();
             checkWin();
         }
 
-        function spawnDamageText(targetEl, dmg) {
-            const pop = document.createElement('div');
-            pop.className = 'damage-pop';
-            pop.innerText = dmg >= 10 ? `KRITICAL -${dmg}!` : `-${dmg}`;
-            
-            const rect = targetEl.getBoundingClientRect();
-            pop.style.left = `${rect.left + rect.width / 2 - 50}px`;
-            pop.style.top = `${rect.top + 100}px`;
-
-            document.body.appendChild(pop);
-            setTimeout(() => pop.remove(), 900);
-        }
-
-        function updateUI() {
-            let clampedPos = Math.max(-20, Math.min(20, position));
-            // Calculate percentage from center (50%)
-            let boysPercent = 50 + (clampedPos * 2.5); // ranges from 0% to 100%
-            let girlsPercent = 100 - boysPercent;
-
-            centerLine.style.left = `${boysPercent}%`;
-            bgBoys.style.width = `${boysPercent}%`;
-            bgGirls.style.width = `${girlsPercent}%`;
-
-            hudBoys.style.width = `${boysPercent}%`;
-            hudGirls.style.width = `${girlsPercent}%`;
+        function updateHealthUI() {
+            elGirlsHealth.style.width = `${Math.max(0, girlsHealth)}%`;
+            elBoysHealth.style.width = `${Math.max(0, boysHealth)}%`;
         }
 
         function checkWin() {
-            if (position <= -20) {
-                boysWins++;
-                document.getElementById('boys-score').innerText = `WINS: ${boysWins}`;
-                resetRound();
-            } else if (position >= 20) {
+            if (boysHealth <= 0) {
                 girlsWins++;
-                document.getElementById('girls-score').innerText = `WINS: ${girlsWins}`;
+                document.getElementById('score-girls').innerText = `${girlsWins} W`;
+                showActionText("TEAM GIRLS WINS!", true);
+                resetRound();
+            } else if (girlsHealth <= 0) {
+                boysWins++;
+                document.getElementById('score-boys').innerText = `${boysWins} W`;
+                showActionText("TEAM BOYS WINS!", true);
                 resetRound();
             }
         }
 
         function resetRound() {
             setTimeout(() => {
-                position = 0;
-                updateUI();
+                girlsHealth = 100;
+                boysHealth = 100;
+                updateHealthUI();
             }, 2000);
+        }
+
+        // Live Feed UI
+        function addGiftToFeed(username, giftName) {
+            const feedItem = document.createElement('div');
+            feedItem.className = 'gift-alert';
+            feedItem.innerHTML = `@${username || 'Admin'} <span>${giftName}</span>`;
+            
+            giftFeed.prepend(feedItem);
+            
+            // Keep only the last 5 gifts on screen so it doesn't overflow
+            if (giftFeed.children.length > 5) {
+                giftFeed.removeChild(giftFeed.lastChild);
+            }
+        }
+
+        // Action Text UI
+        function showActionText(text, isHeavy) {
+            const textEl = document.createElement('div');
+            textEl.className = 'action-text';
+            textEl.innerText = text;
+            if (isHeavy) textEl.style.color = '#ffcc00';
+
+            actionContainer.appendChild(textEl);
+            setTimeout(() => textEl.remove(), 1200);
+        }
+
+        function getRandomText(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
         }
     </script>
 </body>
 </html>
+
