@@ -161,7 +161,7 @@
     }
 
     .team-name {
-      font-size: 32px;
+      font-size: 24px;
       color: #fff;
       padding: 8px 25px;
       display: flex;
@@ -180,7 +180,6 @@
       bottom: 15%;
       height: 45%;
       z-index: 6;
-      /* This transition matches the center line speed */
       transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
     
@@ -199,7 +198,7 @@
       height: 100%;
       width: auto;
       object-fit: contain;
-      transition: transform 0.15s ease-out; /* Smooth attack lunge */
+      transition: transform 0.15s ease-out;
     }
 
     /* Floating Attack Announcement */
@@ -306,12 +305,14 @@
 </head>
 <body>
 
-  <!-- This hidden div PRELOADS the images so they swap instantly with zero delay -->
+  <!-- Preload all character images to ensure instant switching and attack swaps -->
   <div style="display: none;">
-    <img src="kitana_idle.png">
-    <img src="kitana_attack.png">
-    <img src="subzero_idle.png">
-    <img src="subzero_attack.png">
+    <img src="kitana_idle.png"><img src="kitana_attack.png">
+    <img src="mileena_idle.png"><img src="mileena_attack.png">
+    <img src="jade_idle.png"><img src="jade_attack.png">
+    <img src="subzero_idle.png"><img src="subzero_attack.png">
+    <img src="scorpion_idle.png"><img src="scorpion_attack.png">
+    <img src="liukang_idle.png"><img src="liukang_attack.png">
   </div>
 
   <div class="secret-hint">
@@ -326,22 +327,22 @@
     <div class="hud-top">
       <div class="team-score-box team-girls">
         <span class="score-number" id="girl-wins">0</span>
-        <span class="team-name">KITANA</span>
+        <span class="team-name" id="girl-name-label">KITANA</span>
       </div>
 
       <div class="team-score-box team-boys">
-        <span class="team-name">SUB-ZERO</span>
+        <span class="team-name" id="boy-name-label">SUB-ZERO</span>
         <span class="score-number" id="boy-wins">0</span>
       </div>
     </div>
 
     <!-- Avatars wrapped in containers to lock them to the center line -->
     <div class="avatar-wrapper avatar-wrapper-girl" id="wrap-girl">
-      <img src="kitana_idle.png" alt="Kitana" class="avatar" id="avatar-girl">
+      <img src="kitana_idle.png" alt="Girl Fighter" class="avatar" id="avatar-girl">
     </div>
 
     <div class="avatar-wrapper avatar-wrapper-boy" id="wrap-boy">
-      <img src="subzero_idle.png" alt="Sub-Zero" class="avatar" id="avatar-boy">
+      <img src="subzero_idle.png" alt="Boy Fighter" class="avatar" id="avatar-boy">
     </div>
 
     <div class="announcement" id="announcement-text"></div>
@@ -352,13 +353,15 @@
 
   <div class="controls-panel" id="controls-panel">
     <div class="button-group">
-      <button class="btn btn-girl-hit" onclick="attack('girl', false)">Kitana Hit (1)</button>
+      <button class="btn btn-girl-hit" onclick="attack('girl', false)">Girls Hit (1)</button>
       <button class="btn btn-girl-brutal" onclick="attack('girl', true)">BRUTALITY! (10)</button>
-      <button class="btn btn-boy-hit" onclick="attack('boy', false)">Sub-Zero Hit (1)</button>
+      <button class="btn btn-boy-hit" onclick="attack('boy', false)">Boys Hit (1)</button>
       <button class="btn btn-boy-brutal" onclick="attack('boy', true)">BRUTALITY! (10)</button>
     </div>
 
     <div class="button-group">
+      <button class="btn btn-util" onclick="switchCharacter('girl')">⚡ Switch Girl</button>
+      <button class="btn btn-util" onclick="switchCharacter('boy')">⚡ Switch Boy</button>
       <button class="btn btn-util" onclick="resetMatch()">⚡ Reset Match</button>
       <button class="btn btn-util" onclick="resetScores()">🔄 Zero Scores</button>
       <button class="btn btn-util" onclick="toggleControls()">👁 Hide Controls (Press H)</button>
@@ -366,27 +369,29 @@
   </div>
 
   <script>
-    // PURE TUG-OF-WAR LOGIC
     let linePosition = 50; 
     let girlWins = 0;
     let boyWins = 0;
     let isMatchActive = true; 
 
-    // Character Image Config (Make sure your file names match exactly!)
-    const kitanaIdle = "kitana_idle.png";
-    const kitanaAttack = "kitana_attack.png";
-    const subzeroIdle = "subzero_idle.png";
-    const subzeroAttack = "subzero_attack.png";
+    // Character Lists with Idle & Attack paths
+    const girlCharacters = [
+      { name: "KITANA", idle: "kitana_idle.png", attack: "kitana_attack.png" },
+      { name: "MILEENA", idle: "mileena_idle.png", attack: "mileena_attack.png" },
+      { name: "JADE", idle: "jade_idle.png", attack: "jade_attack.png" }
+    ];
 
-    // Preload images in JavaScript too, just to be double safe
-    const preloads = [kitanaIdle, kitanaAttack, subzeroIdle, subzeroAttack];
-    preloads.forEach(src => {
-      const img = new Image();
-      img.src = src;
-    });
+    const boyCharacters = [
+      { name: "SUB-ZERO", idle: "subzero_idle.png", attack: "subzero_attack.png" },
+      { name: "SCORPION", idle: "scorpion_idle.png", attack: "scorpion_attack.png" },
+      { name: "LIU KANG", idle: "liukang_idle.png", attack: "liukang_attack.png" }
+    ];
 
-    const girlMoves = ["FAN THROW!", "SQUARE WAVE!", "ROYAL CUT!", "DEADLY KISS!"];
-    const boyMoves = ["ICE BLAST!", "SLIDE TACKLE!", "SHADOW KICK!", "DEEP FREEZE!"];
+    let currentGirlIndex = 0;
+    let currentBoyIndex = 0;
+
+    const girlMoves = ["FAN THROW!", "SAIS SLASH!", "BOOMERANG STRIKE!", "DEATH SENTENCE!"];
+    const boyMoves = ["ICE BLAST!", "GET OVER HERE!", "BICYCLE KICK!", "DEEP FREEZE!"];
 
     function updateVisuals() {
       let displayPosition = linePosition;
@@ -422,13 +427,13 @@
 
       if (attacker === 'girl') {
         linePosition += powerPush;
-        moveName = isBrutality ? "KITANA WINS!" : girlMoves[Math.floor(Math.random() * girlMoves.length)];
+        moveName = isBrutality ? `${girlCharacters[currentGirlIndex].name} BRUTALITY!` : girlMoves[Math.floor(Math.random() * girlMoves.length)];
         announcement.className = "announcement annct-girls active";
         addFeed("@Admin", "Rose");
         animateCharacter('girl');
       } else {
         linePosition -= powerPush;
-        moveName = isBrutality ? "SUB-ZERO WINS!" : boyMoves[Math.floor(Math.random() * boyMoves.length)];
+        moveName = isBrutality ? `${boyCharacters[currentBoyIndex].name} BRUTALITY!` : boyMoves[Math.floor(Math.random() * boyMoves.length)];
         announcement.className = "announcement annct-boys active";
         addFeed("@Admin", "TikTok");
         animateCharacter('boy');
@@ -457,18 +462,33 @@
     function animateCharacter(fighter) {
       const isGirl = (fighter === 'girl');
       const imgEl = document.getElementById(isGirl ? 'avatar-girl' : 'avatar-boy');
+      const charData = isGirl ? girlCharacters[currentGirlIndex] : boyCharacters[currentBoyIndex];
       
       // Swap to Attack Image immediately
-      imgEl.src = isGirl ? kitanaAttack : subzeroAttack;
+      imgEl.src = charData.attack;
       
-      // Lunge slightly towards the opponent
+      // Lunge slightly towards opponent
       imgEl.style.transform = isGirl ? "scale(1.1) translateX(15px)" : "scale(1.1) translateX(-15px)";
 
-      // Revert back to idle after 600ms (made it slightly longer so it's easier to see)
+      // Revert back to idle after 600ms
       setTimeout(() => {
-        imgEl.src = isGirl ? kitanaIdle : subzeroIdle;
+        imgEl.src = charData.idle;
         imgEl.style.transform = "scale(1) translateX(0)";
       }, 600);
+    }
+
+    function switchCharacter(side) {
+      if (side === 'girl') {
+        currentGirlIndex = (currentGirlIndex + 1) % girlCharacters.length;
+        const char = girlCharacters[currentGirlIndex];
+        document.getElementById("girl-name-label").innerText = char.name;
+        document.getElementById("avatar-girl").src = char.idle;
+      } else {
+        currentBoyIndex = (currentBoyIndex + 1) % boyCharacters.length;
+        const char = boyCharacters[currentBoyIndex];
+        document.getElementById("boy-name-label").innerText = char.name;
+        document.getElementById("avatar-boy").src = char.idle;
+      }
     }
 
     function addFeed(user, gift) {
