@@ -97,6 +97,7 @@
     .bg-girls {
       left: 0;
       width: 50%;
+      background-color: #4a1942; /* Fallback if image missing */
       background-image: url('girls.jpg');
       border-right: 2px solid rgba(255, 255, 255, 0.8);
       box-shadow: 5px 0 20px rgba(176, 38, 255, 0.8);
@@ -106,6 +107,7 @@
     .bg-boys {
       right: 0;
       width: 50%;
+      background-color: #193a4a; /* Fallback if image missing */
       background-image: url('boys.jpg');
       border-left: 2px solid rgba(255, 255, 255, 0.8);
       box-shadow: -5px 0 20px rgba(0, 210, 255, 0.8);
@@ -126,7 +128,7 @@
       transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* Top HUD / Health Bars */
+    /* Top HUD / Video Style Scoreboards */
     .hud-top {
       position: absolute;
       top: 15px;
@@ -138,75 +140,43 @@
       z-index: 10;
     }
 
-    .fighter-hud { width: 38%; }
-
-    .fighter-info {
+    .team-score-box {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 5px;
-      font-size: 22px;
-      letter-spacing: 2px;
-      text-shadow: 2px 2px 4px #000;
-    }
-
-    .girls-hud .fighter-name { color: #e855ff; }
-    .boys-hud .fighter-name { color: #ff9d00; }
-    .win-count { color: #aaa; font-size: 16px; font-family: sans-serif; }
-
-    .health-bar-bg {
-      width: 100%;
-      height: 22px;
-      background: rgba(0, 0, 0, 0.7);
-      border: 2px solid #444;
-      border-radius: 4px;
+      align-items: stretch;
+      border-radius: 8px;
       overflow: hidden;
-      position: relative;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
+      background: #111;
     }
 
-    .health-fill {
-      height: 100%;
-      width: 100%;
-      transition: width 0.3s ease-out;
-    }
-
-    .girls-hud .health-fill {
-      background: linear-gradient(90deg, #d800ff, #e855ff);
-      box-shadow: 0 0 10px #d800ff;
-    }
-
-    .boys-hud .health-fill {
-      background: linear-gradient(90deg, #ff7b00, #ffb700);
-      box-shadow: 0 0 10px #ff7b00;
-      float: right;
-    }
-
-    .center-badge {
+    .score-number {
+      font-size: 32px;
+      color: #fff;
+      padding: 8px 20px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
+      min-width: 70px;
     }
 
-    .demo-tag {
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid #ffcc00;
-      color: #ffcc00;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 14px;
-      letter-spacing: 1px;
+    .team-name {
+      font-size: 24px;
+      color: #fff;
+      padding: 8px 25px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
     }
 
-    .demo-dot {
-      width: 8px;
-      height: 8px;
-      background: #ffcc00;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #ffcc00;
+    .team-girls .team-name {
+      background: linear-gradient(135deg, #ff1e56, #d800ff);
+    }
+
+    .team-boys .team-name {
+      background: linear-gradient(135deg, #0066ff, #00d2ff);
     }
 
     /* Stickman Avatars */
@@ -245,7 +215,7 @@
     }
 
     .annct-girls { color: #fff; text-shadow: 0 0 10px #d800ff, 0 0 20px #d800ff, 4px 4px 0px #000; }
-    .annct-boys { color: #fff; text-shadow: 0 0 10px #ff7b00, 0 0 20px #ff7b00, 4px 4px 0px #000; }
+    .annct-boys { color: #fff; text-shadow: 0 0 10px #0066ff, 0 0 20px #0066ff, 4px 4px 0px #000; }
 
     /* Action Feed Log */
     .action-feed {
@@ -301,9 +271,9 @@
     .btn-girl-hit { background: #8a1ca6; color: #fff; }
     .btn-girl-hit:hover { background: #a624c7; }
     .btn-girl-brutal { background: linear-gradient(135deg, #d800ff, #6200ea); color: #fff; border: 1px solid #ff88ff; }
-    .btn-boy-hit { background: #b85d00; color: #fff; }
-    .btn-boy-hit:hover { background: #d46b00; }
-    .btn-boy-brutal { background: linear-gradient(135deg, #ff7b00, #dd2c00); color: #fff; border: 1px solid #ffaa44; }
+    .btn-boy-hit { background: #005bb5; color: #fff; }
+    .btn-boy-hit:hover { background: #0066cc; }
+    .btn-boy-brutal { background: linear-gradient(135deg, #0066ff, #0022cc); color: #fff; border: 1px solid #44aaff; }
     .btn-util { background: #251d33; color: #ccc; border: 1px solid #44355e; }
     .btn-util:hover { background: #362a4a; color: #fff; }
 
@@ -336,31 +306,20 @@
     <div class="center-divider" id="center-line"></div>
 
     <div class="hud-top">
-      <div class="fighter-hud girls-hud">
-        <div class="fighter-info">
-          <span class="fighter-name" id="girl-name">MILEENA</span>
-          <span class="win-count" id="girl-wins">0 W</span>
-        </div>
-        <div class="health-bar-bg">
-          <div class="health-fill" id="girl-health"></div>
-        </div>
+      <!-- Girls Scoreboard (Like Video) -->
+      <div class="team-score-box team-girls">
+        <span class="score-number" id="girl-wins">0</span>
+        <span class="team-name">GIRLS</span>
       </div>
 
-      <div class="center-badge">
-        <div class="demo-tag"><div class="demo-dot"></div> DEMO</div>
-      </div>
-
-      <div class="fighter-hud boys-hud">
-        <div class="fighter-info">
-          <span class="win-count" id="boy-wins">0 W</span>
-          <span class="fighter-name" id="boy-name">SCORPION</span>
-        </div>
-        <div class="health-bar-bg">
-          <div class="health-fill" id="boy-health"></div>
-        </div>
+      <!-- Boys Scoreboard (Like Video) -->
+      <div class="team-score-box team-boys">
+        <span class="team-name">BOYS</span>
+        <span class="score-number" id="boy-wins">0</span>
       </div>
     </div>
 
+    <!-- Stickman Avatars -->
     <svg class="avatar avatar-left" viewBox="0 0 100 160" id="avatar-girl">
       <circle cx="50" cy="30" r="18" fill="#d800ff" />
       <line x1="50" y1="48" x2="50" y2="100" stroke="#d800ff" stroke-width="8" stroke-linecap="round" />
@@ -371,12 +330,12 @@
     </svg>
 
     <svg class="avatar avatar-right" viewBox="0 0 100 160" id="avatar-boy">
-      <circle cx="50" cy="30" r="18" fill="#ff7b00" />
-      <line x1="50" y1="48" x2="50" y2="100" stroke="#ff7b00" stroke-width="8" stroke-linecap="round" />
-      <line x1="50" y1="65" x2="20" y2="90" stroke="#ff7b00" stroke-width="7" stroke-linecap="round" />
-      <line x1="50" y1="65" x2="80" y2="90" stroke="#ff7b00" stroke-width="7" stroke-linecap="round" />
-      <line x1="50" y1="100" x2="25" y2="150" stroke="#ff7b00" stroke-width="7" stroke-linecap="round" />
-      <line x1="50" y1="100" x2="75" y2="150" stroke="#ff7b00" stroke-width="7" stroke-linecap="round" />
+      <circle cx="50" cy="30" r="18" fill="#0066ff" />
+      <line x1="50" y1="48" x2="50" y2="100" stroke="#0066ff" stroke-width="8" stroke-linecap="round" />
+      <line x1="50" y1="65" x2="20" y2="90" stroke="#0066ff" stroke-width="7" stroke-linecap="round" />
+      <line x1="50" y1="65" x2="80" y2="90" stroke="#0066ff" stroke-width="7" stroke-linecap="round" />
+      <line x1="50" y1="100" x2="25" y2="150" stroke="#0066ff" stroke-width="7" stroke-linecap="round" />
+      <line x1="50" y1="100" x2="75" y2="150" stroke="#0066ff" stroke-width="7" stroke-linecap="round" />
     </svg>
 
     <div class="announcement" id="announcement-text"></div>
@@ -394,36 +353,25 @@
     </div>
 
     <div class="button-group">
-      <button class="btn btn-util" onclick="switchFighter('girl')">↺ Switch Girl</button>
-      <button class="btn btn-util" onclick="switchFighter('boy')">↺ Switch Boy</button>
       <button class="btn btn-util" onclick="resetGame()">⚡ Reset Match</button>
       <button class="btn btn-util" onclick="toggleControls()">👁 Hide Controls (Press H)</button>
     </div>
   </div>
 
   <script>
-    // Max Health points equals total hits needed to win (20)
+    // Max Health points equals total hits needed to push the line all the way (20)
     const MAX_HP = 20;
     let girlHP = MAX_HP;
     let boyHP = MAX_HP;
     let girlWins = 0;
     let boyWins = 0;
 
-    const girlFighters = ["MILEENA", "KITANA", "SKARLET", "SINDEL", "CASSIE CAGE"];
-    const boyFighters = ["SCORPION", "SUB-ZERO", "RAIDEN", "KENSHI", "LIU KANG"];
-    let currentGirlIndex = 0;
-    let currentBoyIndex = 0;
-
     const girlMoves = ["SAIS STRIKE!", "TELEPORT KICK!", "BLOOD CLOT!", "DEATH SENTENCE!"];
-    const boyMoves = ["TELEPORT PUNCH!", "GET OVER HERE!", "HELL FIRE!", "ICE FREEZE!"];
+    const boyMoves = ["ICE BLAST!", "GET OVER HERE!", "SHADOW KICK!", "LIGHTNING!"];
 
-    // Update Visual UI based on current HP
+    // Update Visual UI based on current tug-of-war position
     function updateVisuals() {
-      // 1. Update Health Bars (Percentage)
-      document.getElementById("girl-health").style.width = (girlHP / MAX_HP) * 100 + "%";
-      document.getElementById("boy-health").style.width = (boyHP / MAX_HP) * 100 + "%";
-
-      // 2. Calculate Center Line Shift
+      // Calculate Center Line Shift
       // Starts at 50%. Shifts right (up to 100%) if Girl is winning. Shifts left (down to 0%) if Boy is winning.
       let centerPercentage = 50 + ((MAX_HP - boyHP) * 2.5) - ((MAX_HP - girlHP) * 2.5);
       
@@ -431,7 +379,7 @@
       if (centerPercentage > 100) centerPercentage = 100;
       if (centerPercentage < 0) centerPercentage = 0;
 
-      // 3. Apply the shift to the backgrounds and line
+      // Apply the shift to the backgrounds and line
       document.getElementById("bg-girls").style.width = centerPercentage + "%";
       document.getElementById("bg-boys").style.width = (100 - centerPercentage) + "%";
       document.getElementById("center-line").style.left = centerPercentage + "%";
@@ -473,7 +421,7 @@
         animateAvatar('avatar-boy');
       }
 
-      // Update everything on screen
+      // Update tug-of-war position
       updateVisuals();
       triggerAnimation(isBrutality);
 
@@ -481,17 +429,17 @@
       announcement.innerText = moveName;
       setTimeout(() => announcement.classList.remove("active"), 1000);
 
-      // Check Win Condition
+      // Check Win Condition (If a player is pushed completely off)
       if (girlHP <= 0 || boyHP <= 0) {
         if (girlHP <= 0) {
           boyWins++;
-          document.getElementById("boy-wins").innerText = boyWins + " W";
+          document.getElementById("boy-wins").innerText = boyWins;
         } else {
           girlWins++;
-          document.getElementById("girl-wins").innerText = girlWins + " W";
+          document.getElementById("girl-wins").innerText = girlWins;
         }
         
-        // Wait longer for the dramatic 'takeover' animation before resetting
+        // Wait longer for the dramatic 'takeover' animation before resetting the line to the middle
         setTimeout(resetMatch, 2500); 
       }
     }
@@ -511,16 +459,6 @@
       if (feed.children.length > 4) feed.removeChild(feed.children[0]);
     }
 
-    function switchFighter(side) {
-      if (side === 'girl') {
-        currentGirlIndex = (currentGirlIndex + 1) % girlFighters.length;
-        document.getElementById("girl-name").innerText = girlFighters[currentGirlIndex];
-      } else {
-        currentBoyIndex = (currentBoyIndex + 1) % boyFighters.length;
-        document.getElementById("boy-name").innerText = boyFighters[currentBoyIndex];
-      }
-    }
-
     function resetMatch() {
       girlHP = MAX_HP;
       boyHP = MAX_HP;
@@ -531,8 +469,8 @@
       resetMatch();
       girlWins = 0;
       boyWins = 0;
-      document.getElementById("girl-wins").innerText = "0 W";
-      document.getElementById("boy-wins").innerText = "0 W";
+      document.getElementById("girl-wins").innerText = "0";
+      document.getElementById("boy-wins").innerText = "0";
     }
 
     function toggleControls() {
