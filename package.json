@@ -1,13 +1,15 @@
 {
-  "name": "bokenroo-tiktok-gift-battle",
+  "name": "tiktok-mortal-kombat-live",
   "version": "1.0.0",
+  "description": "TikTok LIVE gift controlled Mortal Kombat battle",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^5.1.0",
-    "ws": "^8.18.3",
-    "tiktok-live-events": "^1.0.0"
+    "socket.io": "^4.8.1",
+    "tiktok-live-connector": "^2.4.3"
   }
 }
