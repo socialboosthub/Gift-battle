@@ -306,13 +306,13 @@
     <div class="center-divider" id="center-line"></div>
 
     <div class="hud-top">
-      <!-- Girls Scoreboard (Like Video) -->
+      <!-- Girls Scoreboard -->
       <div class="team-score-box team-girls">
         <span class="score-number" id="girl-wins">0</span>
         <span class="team-name">GIRLS</span>
       </div>
 
-      <!-- Boys Scoreboard (Like Video) -->
+      <!-- Boys Scoreboard -->
       <div class="team-score-box team-boys">
         <span class="team-name">BOYS</span>
         <span class="score-number" id="boy-wins">0</span>
@@ -353,44 +353,44 @@
     </div>
 
     <div class="button-group">
-      <button class="btn btn-util" onclick="resetGame()">⚡ Reset Match</button>
+      <button class="btn btn-util" onclick="resetMatch()">⚡ Reset Match</button>
+      <button class="btn btn-util" onclick="resetScores()">🔄 Zero Scores</button>
       <button class="btn btn-util" onclick="toggleControls()">👁 Hide Controls (Press H)</button>
     </div>
   </div>
 
   <script>
-    // Max Health points equals total hits needed to push the line all the way (20)
-    const MAX_HP = 20;
-    let girlHP = MAX_HP;
-    let boyHP = MAX_HP;
+    // PURE TUG-OF-WAR LOGIC
+    // The line starts at 50% (the exact center).
+    // 0% means the boys pulled it all the way to their side (Boys Win).
+    // 100% means the girls pulled it all the way to their side (Girls Win).
+    let linePosition = 50; 
     let girlWins = 0;
     let boyWins = 0;
+    
+    // Prevents extra clicks from counting while waiting for the round to reset
+    let isMatchActive = true; 
 
     const girlMoves = ["SAIS STRIKE!", "TELEPORT KICK!", "BLOOD CLOT!", "DEATH SENTENCE!"];
     const boyMoves = ["ICE BLAST!", "GET OVER HERE!", "SHADOW KICK!", "LIGHTNING!"];
 
-    // Update Visual UI based on current tug-of-war position
+    // Update Visuals based strictly on the line's percentage
     function updateVisuals() {
-      // Calculate Center Line Shift
-      // Starts at 50%. Shifts right (up to 100%) if Girl is winning. Shifts left (down to 0%) if Boy is winning.
-      let centerPercentage = 50 + ((MAX_HP - boyHP) * 2.5) - ((MAX_HP - girlHP) * 2.5);
-      
-      // Prevent visual bugs if a massive hit goes way past 0 HP
-      if (centerPercentage > 100) centerPercentage = 100;
-      if (centerPercentage < 0) centerPercentage = 0;
+      // Keep it strictly within 0% to 100% boundaries visually
+      let displayPosition = linePosition;
+      if (displayPosition > 100) displayPosition = 100;
+      if (displayPosition < 0) displayPosition = 0;
 
-      // Apply the shift to the backgrounds and line
-      document.getElementById("bg-girls").style.width = centerPercentage + "%";
-      document.getElementById("bg-boys").style.width = (100 - centerPercentage) + "%";
-      document.getElementById("center-line").style.left = centerPercentage + "%";
+      // Apply the exact percentage to the backgrounds and divider line
+      document.getElementById("bg-girls").style.width = displayPosition + "%";
+      document.getElementById("bg-boys").style.width = (100 - displayPosition) + "%";
+      document.getElementById("center-line").style.left = displayPosition + "%";
     }
 
     function triggerAnimation(isBrutality) {
       const arena = document.getElementById("arena");
-      // Remove classes to reset animation if clicking fast
       arena.classList.remove("arena-hit", "arena-brutality");
       
-      // Force a tiny delay so the browser registers the class removal before adding it back
       setTimeout(() => {
         if (isBrutality) {
           arena.classList.add("arena-brutality");
@@ -401,27 +401,32 @@
     }
 
     function attack(attacker, isBrutality) {
+      if (!isMatchActive) return; // Do nothing if someone already won this round!
+
       const announcement = document.getElementById("announcement-text");
       
-      // Normal hit = 1 damage. Brutality = 10 damage.
-      let damage = isBrutality ? 10 : 1;
+      // Determine how far the line moves
+      // A regular hit moves it 2.5%, a brutality moves it 25%
+      let powerPush = isBrutality ? 25 : 2.5; 
       let moveName = "";
 
       if (attacker === 'girl') {
-        boyHP = Math.max(0, boyHP - damage);
+        // Girls push the line to the right (towards 100%)
+        linePosition += powerPush;
         moveName = isBrutality ? "GIRLS BRUTALITY!" : girlMoves[Math.floor(Math.random() * girlMoves.length)];
         announcement.className = "announcement annct-girls active";
         addFeed("@Admin", "Rose");
         animateAvatar('avatar-girl');
       } else {
-        girlHP = Math.max(0, girlHP - damage);
+        // Boys push the line to the left (towards 0%)
+        linePosition -= powerPush;
         moveName = isBrutality ? "BOYS BRUTALITY!" : boyMoves[Math.floor(Math.random() * boyMoves.length)];
         announcement.className = "announcement annct-boys active";
         addFeed("@Admin", "TikTok");
         animateAvatar('avatar-boy');
       }
 
-      // Update tug-of-war position
+      // Update tug-of-war position on screen
       updateVisuals();
       triggerAnimation(isBrutality);
 
@@ -429,18 +434,20 @@
       announcement.innerText = moveName;
       setTimeout(() => announcement.classList.remove("active"), 1000);
 
-      // Check Win Condition (If a player is pushed completely off)
-      if (girlHP <= 0 || boyHP <= 0) {
-        if (girlHP <= 0) {
-          boyWins++;
-          document.getElementById("boy-wins").innerText = boyWins;
-        } else {
-          girlWins++;
-          document.getElementById("girl-wins").innerText = girlWins;
-        }
-        
-        // Wait longer for the dramatic 'takeover' animation before resetting the line to the middle
-        setTimeout(resetMatch, 2500); 
+      // --- CHECK WIN CONDITION: Edge Detection ---
+      if (linePosition >= 100) {
+        // Line hit the right edge -> Girls Win!
+        girlWins++;
+        document.getElementById("girl-wins").innerText = girlWins;
+        isMatchActive = false; // Lock out controls
+        setTimeout(resetMatch, 2500); // Reset line after 2.5s
+      } 
+      else if (linePosition <= 0) {
+        // Line hit the left edge -> Boys Win!
+        boyWins++;
+        document.getElementById("boy-wins").innerText = boyWins;
+        isMatchActive = false; // Lock out controls
+        setTimeout(resetMatch, 2500); // Reset line after 2.5s
       }
     }
 
@@ -459,13 +466,15 @@
       if (feed.children.length > 4) feed.removeChild(feed.children[0]);
     }
 
+    // Puts the line back to 50% for the next round
     function resetMatch() {
-      girlHP = MAX_HP;
-      boyHP = MAX_HP;
+      linePosition = 50;
+      isMatchActive = true; 
       updateVisuals();
     }
 
-    function resetGame() {
+    // Wipes the scoreboard entirely
+    function resetScores() {
       resetMatch();
       girlWins = 0;
       boyWins = 0;
