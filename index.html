@@ -440,11 +440,19 @@
 
       if (attacker === 'girl') {
         linePosition += powerPush;
-        addFeed('girl', "@Admin", "Rose");
+        addFeed(
+  'girl',
+  username,
+  giftName || (isBrutality ? "Rosa" : "Rose")
+);
         animateCharacter('girl');
       } else {
         linePosition -= powerPush;
-        addFeed('boy', "@Admin", "TikTok");
+        addFeed(
+  'boy',
+  username,
+  giftName || (isBrutality ? "Mind Blown" : "TikTok")
+);
         animateCharacter('boy');
       }
 
