@@ -77,9 +77,10 @@ async function connectTikTok() {
     console.log("------------------------------------");
 
     tiktokConnection = new TikTokLiveConnection(TIKTOK_USERNAME, {
-      enableExtendedGiftInfo: true,
-      processInitialData: false
-    });
+  enableExtendedGiftInfo: true,
+  processInitialData: false,
+  signApiKey: process.env.EULER_API_KEY
+});
 
     tiktokConnection.on(
       WebcastEvent.CONNECTED,
