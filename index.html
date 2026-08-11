@@ -1,1811 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Gift Battle Arena</title>
-
-<style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  user-select:none;
-  font-family:Impact,'Segoe UI',Arial,sans-serif;
-}
-
-body{
-  background:#08060c;
-  color:#fff;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  overflow:hidden;
-}
-
-.secret-hint{
-  font-family:Arial,sans-serif;
-  font-size:13px;
-  color:#666;
-  margin-bottom:10px;
-  text-align:center;
-}
-
-.secret-hint span{
-  background:#222;
-  color:#00ffcc;
-  padding:2px 7px;
-  border-radius:4px;
-  font-weight:bold;
-}
-
-/* ================= ARENA ================= */
-
-.arena-wrapper{
-  width:100%;
-  max-width:960px;
-  aspect-ratio:16/9;
-  position:relative;
-  border:3px solid #2a1f3d;
-  border-radius:12px;
-  overflow:hidden;
-  background:#000;
-  box-shadow:
-    0 0 30px rgba(0,0,0,.9),
-    0 0 20px rgba(176,38,255,.35);
-}
-
-/* Backgrounds - SAME SYSTEM AS YOUR ORIGINAL */
-
-.bg-split{
-  position:absolute;
-  top:0;
-  bottom:0;
-  background-size:cover;
-  background-position:center;
-  transition:width .5s cubic-bezier(.25,1,.5,1);
-}
-
-.bg-girls{
-  left:0;
-  width:50%;
-  background-image:url('girls.jpg');
-  border-right:2px solid rgba(255,255,255,.8);
-  box-shadow:5px 0 20px rgba(176,38,255,.8);
-  z-index:1;
-}
-
-.bg-boys{
-  right:0;
-  width:50%;
-  background-image:url('boys.jpg');
-  border-left:2px solid rgba(255,255,255,.8);
-  box-shadow:-5px 0 20px rgba(0,210,255,.8);
-  z-index:1;
-}
-
-/* dark cinematic overlay */
-
-.arena-overlay{
-  position:absolute;
-  inset:0;
-  z-index:2;
-  pointer-events:none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(0,0,0,.55),
-      transparent 28%,
-      transparent 70%,
-      rgba(0,0,0,.7)
-    );
-}
-
-/* ================= CENTER LINE ================= */
-
-.center-divider{
-  position:absolute;
-  left:50%;
-  top:0;
-  bottom:0;
-  width:5px;
-  background:#fff;
-  transform:translateX(-50%);
-  box-shadow:
-    0 0 12px #fff,
-    0 0 28px #b026ff,
-    0 0 45px #00d2ff;
-  z-index:12;
-  transition:left .5s cubic-bezier(.25,1,.5,1);
-}
-
-/* ================= HUD ================= */
-
-.hud-top{
-  position:absolute;
-  top:15px;
-  left:20px;
-  right:20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  z-index:30;
-}
-
-.fighter-hud{
-  width:38%;
-}
-
-.fighter-info{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:5px;
-  font-size:21px;
-  letter-spacing:2px;
-  text-shadow:2px 2px 5px #000;
-}
-
-.girls-hud .fighter-name{
-  color:#e855ff;
-}
-
-.boys-hud .fighter-name{
-  color:#ff9d00;
-}
-
-.win-count{
-  color:#aaa;
-  font-size:15px;
-  font-family:Arial,sans-serif;
-}
-
-.health-bar-bg{
-  height:23px;
-  width:100%;
-  background:rgba(0,0,0,.8);
-  border:2px solid #444;
-  overflow:hidden;
-  position:relative;
-}
-
-.health-fill{
-  height:100%;
-  width:100%;
-  transition:width .3s ease-out;
-}
-
-.girls-hud .health-fill{
-  background:linear-gradient(90deg,#8c00ff,#f04cff);
-  box-shadow:0 0 15px #d800ff;
-}
-
-.boys-hud .health-fill{
-  float:right;
-  background:linear-gradient(90deg,#ff7b00,#ffd000);
-  box-shadow:0 0 15px #ff7b00;
-}
-
-.center-badge{
-  text-align:center;
-}
-
-.demo-tag{
-  background:rgba(0,0,0,.7);
-  border:1px solid #ffcc00;
-  color:#ffcc00;
-  padding:4px 10px;
-  border-radius:20px;
-  font-size:12px;
-  letter-spacing:1px;
-}
-
-.demo-dot{
-  display:inline-block;
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:#ffcc00;
-  box-shadow:0 0 8px #ffcc00;
-  margin-right:5px;
-}
-
-/* ================= FIGHTERS ================= */
-
-.fighter{
-  position:absolute;
-  bottom:17%;
-  width:130px;
-  height:220px;
-  z-index:15;
-  transition:left .4s,right .4s;
-  filter:drop-shadow(0 15px 12px rgba(0,0,0,.7));
-}
-
-.fighter-girl{
-  left:13%;
-}
-
-.fighter-boy{
-  right:13%;
-}
-
-/* body */
-
-.body{
-  position:absolute;
-  left:43px;
-  top:65px;
-  width:45px;
-  height:80px;
-  border-radius:22px 22px 10px 10px;
-}
-
-.head{
-  position:absolute;
-  left:42px;
-  top:12px;
-  width:48px;
-  height:48px;
-  border-radius:50%;
-  z-index:4;
-}
-
-.eye{
-  position:absolute;
-  width:7px;
-  height:5px;
-  background:#fff;
-  border-radius:50%;
-  top:31px;
-  z-index:6;
-}
-
-.eye.left{left:53px}
-.eye.right{left:70px}
-
-.arm,.leg{
-  position:absolute;
-  transform-origin:top center;
-  border-radius:15px;
-}
-
-.arm{
-  width:15px;
-  height:72px;
-  top:70px;
-}
-
-.leg{
-  width:18px;
-  height:80px;
-  top:135px;
-}
-
-.arm.left{
-  left:32px;
-  transform:rotate(28deg);
-}
-
-.arm.right{
-  left:83px;
-  transform:rotate(-28deg);
-}
-
-.leg.left{
-  left:43px;
-  transform:rotate(8deg);
-}
-
-.leg.right{
-  left:72px;
-  transform:rotate(-8deg);
-}
-
-/* purple fighter */
-
-.fighter-girl .head{
-  background:linear-gradient(135deg,#f5b7ff,#6c0a8c);
-  border:3px solid #e855ff;
-}
-
-.fighter-girl .body,
-.fighter-girl .arm,
-.fighter-girl .leg{
-  background:linear-gradient(90deg,#500060,#d800ff);
-  box-shadow:0 0 10px rgba(216,0,255,.5);
-}
-
-.fighter-girl .body:after{
-  content:"";
-  position:absolute;
-  left:8px;
-  top:10px;
-  width:29px;
-  height:5px;
-  background:#fff;
-  opacity:.25;
-}
-
-/* orange fighter */
-
-.fighter-boy .head{
-  background:linear-gradient(135deg,#ffd09a,#8b3500);
-  border:3px solid #ff8a00;
-}
-
-.fighter-boy .body,
-.fighter-boy .arm,
-.fighter-boy .leg{
-  background:linear-gradient(90deg,#6e2300,#ff7b00);
-  box-shadow:0 0 10px rgba(255,123,0,.5);
-}
-
-.fighter-boy .body:after{
-  content:"";
-  position:absolute;
-  left:8px;
-  top:10px;
-  width:29px;
-  height:5px;
-  background:#fff;
-  opacity:.25;
-}
-
-/* third fighter */
-
-.fighter-third{
-  left:50%;
-  transform:translateX(-50%) scale(.72);
-  opacity:0;
-  pointer-events:none;
-  transition:.4s;
-}
-
-.fighter-third.active{
-  opacity:1;
-  pointer-events:auto;
-}
-
-.fighter-third .head{
-  background:linear-gradient(135deg,#a8ffff,#006b78);
-  border:3px solid #00eaff;
-}
-
-.fighter-third .body,
-.fighter-third .arm,
-.fighter-third .leg{
-  background:linear-gradient(90deg,#003f55,#00d9ff);
-  box-shadow:0 0 12px rgba(0,220,255,.6);
-}
-
-/* ================= FIGHT ANIMATIONS ================= */
-
-.attack-left{
-  animation:attackLeft .42s ease;
-}
-
-.attack-right{
-  animation:attackRight .42s ease;
-}
-
-.block{
-  animation:block .35s ease;
-}
-
-.hit{
-  animation:hit .3s ease;
-}
-
-.special{
-  animation:special .65s cubic-bezier(.2,.8,.2,1);
-}
-
-@keyframes attackLeft{
-  0%{transform:translateX(0) scale(1)}
-  45%{transform:translateX(75px) scale(1.08) rotate(-5deg)}
-  65%{transform:translateX(75px) scale(1.08) rotate(5deg)}
-  100%{transform:translateX(0) scale(1)}
-}
-
-@keyframes attackRight{
-  0%{transform:translateX(0) scale(1)}
-  45%{transform:translateX(-75px) scale(1.08) rotate(5deg)}
-  65%{transform:translateX(-75px) scale(1.08) rotate(-5deg)}
-  100%{transform:translateX(0) scale(1)}
-}
-
-@keyframes block{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(.9) rotate(-4deg)}
-}
-
-@keyframes hit{
-  0%{transform:translateX(0)}
-  30%{transform:translateX(14px) rotate(5deg)}
-  60%{transform:translateX(-9px) rotate(-4deg)}
-  100%{transform:translateX(0)}
-}
-
-@keyframes special{
-  0%{transform:translateY(0) scale(1)}
-  35%{transform:translateY(-45px) scale(1.12)}
-  60%{transform:translateY(-15px) scale(1.08)}
-  100%{transform:translateY(0) scale(1)}
-}
-
-/* ================= IMPACT ================= */
-
-.impact{
-  position:absolute;
-  left:50%;
-  top:54%;
-  width:80px;
-  height:80px;
-  transform:translate(-50%,-50%) scale(.2);
-  border-radius:50%;
-  opacity:0;
-  z-index:25;
-  pointer-events:none;
-}
-
-.impact.active{
-  animation:impact .45s ease-out;
-}
-
-.impact.purple{
-  background:radial-gradient(circle,#fff,#e855ff,transparent 70%);
-}
-
-.impact.orange{
-  background:radial-gradient(circle,#fff,#ff8a00,transparent 70%);
-}
-
-.impact.blue{
-  background:radial-gradient(circle,#fff,#00d9ff,transparent 70%);
-}
-
-@keyframes impact{
-  0%{
-    opacity:1;
-    transform:translate(-50%,-50%) scale(.2);
-  }
-  50%{
-    opacity:1;
-    transform:translate(-50%,-50%) scale(1.5);
-  }
-  100%{
-    opacity:0;
-    transform:translate(-50%,-50%) scale(2.4);
-  }
-}
-
-/* ================= ANNOUNCEMENT ================= */
-
-.announcement{
-  position:absolute;
-  left:50%;
-  top:43%;
-  transform:translate(-50%,-50%) scale(.4) skew(-8deg);
-  font-size:43px;
-  letter-spacing:3px;
-  font-weight:900;
-  opacity:0;
-  z-index:40;
-  white-space:nowrap;
-  pointer-events:none;
-}
-
-.announcement.active{
-  animation:announce .9s cubic-bezier(.17,.67,.3,1.3);
-}
-
-.annct-girls{
-  color:#fff;
-  text-shadow:
-    0 0 10px #d800ff,
-    0 0 25px #d800ff,
-    5px 5px #000;
-}
-
-.annct-boys{
-  color:#fff;
-  text-shadow:
-    0 0 10px #ff7b00,
-    0 0 25px #ff7b00,
-    5px 5px #000;
-}
-
-@keyframes announce{
-  0%{
-    opacity:0;
-    transform:translate(-50%,-50%) scale(.2) skew(-8deg);
-  }
-  25%{
-    opacity:1;
-    transform:translate(-50%,-50%) scale(1.25) skew(-8deg);
-  }
-  70%{
-    opacity:1;
-    transform:translate(-50%,-50%) scale(1) skew(-8deg);
-  }
-  100%{
-    opacity:0;
-    transform:translate(-50%,-50%) scale(1.1) skew(-8deg);
-  }
-}
-
-/* ================= SCREEN SHAKE ================= */
-
-.arena-hit{
-  animation:screenShake .3s;
-}
-
-.arena-special{
-  animation:bigShake .55s;
-}
-
-.arena-finisher{
-  animation:finisherShake 1s;
-  filter:contrast(1.25) saturate(1.35);
-}
-
-@keyframes screenShake{
-  0%,100%{transform:translate(0)}
-  20%{transform:translate(-8px,4px)}
-  40%{transform:translate(8px,-4px)}
-  60%{transform:translate(-4px,3px)}
-  80%{transform:translate(4px,-3px)}
-}
-
-@keyframes bigShake{
-  0%,100%{transform:translate(0)}
-  15%{transform:translate(-12px,7px)}
-  30%{transform:translate(12px,-7px)}
-  45%{transform:translate(-10px,-5px)}
-  60%{transform:translate(10px,5px)}
-  75%{transform:translate(-5px,2px)}
-}
-
-@keyframes finisherShake{
-  0%,100%{transform:translate(0) scale(1)}
-  15%{transform:translate(-15px,8px) scale(1.03)}
-  30%{transform:translate(15px,-8px) scale(1.03)}
-  45%{transform:translate(-12px,-7px) scale(1.02)}
-  60%{transform:translate(12px,7px) scale(1.02)}
-  75%{transform:translate(-6px,3px)}
-}
-
-/* ================= FEED ================= */
-
-.action-feed{
-  position:absolute;
-  bottom:20px;
-  left:15px;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-  z-index:45;
-  pointer-events:none;
-}
-
-.feed-item{
-  background:rgba(0,0,0,.72);
-  border-left:3px solid #d800ff;
-  padding:5px 10px;
-  border-radius:4px;
-  font:13px Arial,sans-serif;
-  animation:feedIn .3s;
-}
-
-@keyframes feedIn{
-  from{opacity:0;transform:translateX(-15px)}
-  to{opacity:1;transform:translateX(0)}
-}
-
-/* ================= FINISHER ================= */
-
-.finisher-screen{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.88);
-  z-index:50;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  pointer-events:none;
-}
-
-.finisher-screen.active{
-  animation:finisherScreen 2.5s forwards;
-}
-
-.finisher-text{
-  text-align:center;
-  transform:scale(.3);
-}
-
-.finisher-title{
-  font-size:65px;
-  letter-spacing:7px;
-  color:#fff;
-  text-shadow:
-    0 0 10px #e855ff,
-    0 0 30px #d800ff,
-    6px 6px #000;
-}
-
-.finisher-sub{
-  margin-top:8px;
-  font:18px Arial,sans-serif;
-  letter-spacing:4px;
-  color:#ddd;
-}
-
-@keyframes finisherScreen{
-  0%{opacity:0}
-  15%{opacity:1}
-  75%{opacity:1}
-  100%{opacity:0}
-}
-
-/* ================= CONTROLS ================= */
-
-.controls-panel{
-  width:100%;
-  max-width:960px;
-  margin-top:15px;
-  background:#120e1a;
-  border:1px solid #2e2440;
-  border-radius:10px;
-  padding:15px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.controls-panel.hidden{
-  display:none!important;
-}
-
-.button-group{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.btn{
-  padding:11px 20px;
-  border:none;
-  border-radius:8px;
-  color:#fff;
-  font-size:15px;
-  font-weight:bold;
-  cursor:pointer;
-  letter-spacing:1px;
-  transition:.15s;
-  box-shadow:0 4px 10px rgba(0,0,0,.4);
-}
-
-.btn:active{
-  transform:scale(.94);
-}
-
-.btn-girl-hit{background:#8a1ca6}
-.btn-girl-special{background:linear-gradient(135deg,#d800ff,#6200ea)}
-.btn-boy-hit{background:#b85d00}
-.btn-boy-special{background:linear-gradient(135deg,#ff7b00,#dd2c00)}
-.btn-third{background:linear-gradient(135deg,#00788c,#00d9ff)}
-.btn-util{background:#251d33;border:1px solid #44355e}
-
-/* hidden gear */
-
-.secret-toggle-btn{
-  position:absolute;
-  bottom:8px;
-  right:8px;
-  width:28px;
-  height:28px;
-  background:transparent;
-  border:none;
-  color:rgba(255,255,255,.25);
-  cursor:pointer;
-  z-index:100;
-}
-
-/* ================= MOBILE ================= */
-
-@media(max-width:650px){
-  body{
-    padding:8px;
-  }
-
-  .secret-hint{
-    font-size:10px;
-  }
-
-  .fighter{
-    transform:scale(.72);
-    transform-origin:bottom center;
-  }
-
-  .fighter-girl{
-    left:5%;
-  }
-
-  .fighter-boy{
-    right:5%;
-  }
-
-  .fighter-third{
-    transform:translateX(-50%) scale(.58);
-  }
-
-  .fighter-info{
-    font-size:12px;
-  }
-
-  .win-count{
-    font-size:10px;
-  }
-
-  .health-bar-bg{
-    height:15px;
-  }
-
-  .announcement{
-    font-size:24px;
-  }
-
-  .finisher-title{
-    font-size:35px;
-  }
-
-  .btn{
-    padding:9px 12px;
-    font-size:12px;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mortal Kombat - Gift Battle</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      font-family: 'Impact', 'Segoe UI', Arial, sans-serif;
+    }
+
+    body {
+      background-color: #08060c;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .secret-hint {
+      font-family: sans-serif;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .secret-hint span {
+      background: #222;
+      color: #00ffcc;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    /* 16:9 Arena Container */
+    .arena-wrapper {
+      width: 100%;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
+      position: relative;
+      border: 3px solid #2a1f3d;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), 0 0 15px rgba(176, 38, 255, 0.3);
+      background: #000;
+    }
+
+    /* Hit & Brutality Animations */
+    .arena-hit {
+      animation: screenShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    
+    .arena-brutality {
+      animation: brutalShake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+      filter: sepia(0.8) hue-rotate(-30deg) saturate(3) contrast(1.2);
+    }
+
+    @keyframes screenShake {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-8px, 5px); }
+      40% { transform: translate(8px, -5px); }
+      60% { transform: translate(-4px, 2px); }
+      80% { transform: translate(4px, -2px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    @keyframes brutalShake {
+      0% { transform: translate(0, 0) scale(1); }
+      10% { transform: translate(-15px, 10px) scale(1.05); }
+      20% { transform: translate(15px, -10px) scale(1.05); }
+      30% { transform: translate(-15px, -10px) scale(1.05); }
+      40% { transform: translate(15px, 10px) scale(1.05); }
+      50% { transform: translate(-10px, 5px) scale(1.02); }
+      70% { transform: translate(10px, -5px) scale(1.01); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    /* Dynamic Split Backgrounds */
+    .bg-split {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background-size: cover;
+      background-position: center;
+      transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .bg-girls {
+      left: 0;
+      width: 50%;
+      background-image: url('girls.jpg');
+      border-right: 2px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 5px 0 20px rgba(176, 38, 255, 0.8);
+      z-index: 2;
+    }
+
+    .bg-boys {
+      right: 0;
+      width: 50%;
+      background-image: url('boys.jpg');
+      border-left: 2px solid rgba(255, 255, 255, 0.8);
+      box-shadow: -5px 0 20px rgba(0, 210, 255, 0.8);
+      z-index: 1;
+    }
+
+    /* Moving Center Divider */
+    .center-divider {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: #ffffff;
+      transform: translateX(-50%);
+      box-shadow: 0 0 15px #fff, 0 0 30px #b026ff, 0 0 45px #00d2ff;
+      z-index: 5;
+      transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* Top HUD / Health Bars */
+    .hud-top {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .fighter-hud { width: 38%; }
+
+    .fighter-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-size: 22px;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 4px #000;
+    }
+
+    .girls-hud .fighter-name { color: #e855ff; }
+    .boys-hud .fighter-name { color: #ff9d00; }
+    .win-count { color: #aaa; font-size: 16px; font-family: sans-serif; }
+
+    .health-bar-bg {
+      width: 100%;
+      height: 22px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #444;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .health-fill {
+      height: 100%;
+      width: 100%;
+      transition: width 0.3s ease-out;
+    }
+
+    .girls-hud .health-fill {
+      background: linear-gradient(90deg, #d800ff, #e855ff);
+      box-shadow: 0 0 10px #d800ff;
+    }
+
+    .boys-hud .health-fill {
+      background: linear-gradient(90deg, #ff7b00, #ffb700);
+      box-shadow: 0 0 10px #ff7b00;
+      float: right;
+    }
+
+    .center-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .demo-tag {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid #ffcc00;
+      color: #ffcc00;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .demo-dot {
+      width: 8px;
+      height: 8px;
+      background: #ffcc00;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #ffcc00;
+    }
+
+    /* Stickman Avatars */
+    .avatar {
+      position: absolute;
+      bottom: 25px;
+      width: 70px;
+      height: 110px;
+      z-index: 6;
+      transition: transform 0.1s;
+    }
+    .avatar-left { left: 15%; }
+    .avatar-right { right: 15%; }
+
+    /* Floating Attack Announcement */
+    .announcement {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      font-size: 42px;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-align: center;
+      letter-spacing: 3px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      white-space: nowrap;
+    }
+
+    .announcement.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .annct-girls { color: #fff; text-shadow: 0 0 10px #d800ff, 0 0 20px #d800ff, 4px 4px 0px #000; }
+    .annct-boys { color: #fff; text-shadow: 0 0 10px #ff7b00, 0 0 20px #ff7b00, 4px 4px 0px #000; }
+
+    /* Action Feed Log */
+    .action-feed {
+      position: absolute;
+      bottom: 20px;
+      left: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 15;
+      pointer-events: none;
+    }
+
+    .feed-item {
+      background: rgba(0, 0, 0, 0.65);
+      border-left: 3px solid #d800ff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Controls Panel */
+    .controls-panel {
+      width: 100%;
+      max-width: 960px;
+      margin-top: 15px;
+      background: #120e1a;
+      border: 1px solid #2e2440;
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .controls-panel.hidden { display: none !important; }
+    .button-group { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; letter-spacing: 1px; transition: all 0.15s ease; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
+    .btn:active { transform: scale(0.95); }
+
+    .btn-girl-hit { background: #8a1ca6; color: #fff; }
+    .btn-girl-hit:hover { background: #a624c7; }
+    .btn-girl-brutal { background: linear-gradient(135deg, #d800ff, #6200ea); color: #fff; border: 1px solid #ff88ff; }
+    .btn-boy-hit { background: #b85d00; color: #fff; }
+    .btn-boy-hit:hover { background: #d46b00; }
+    .btn-boy-brutal { background: linear-gradient(135deg, #ff7b00, #dd2c00); color: #fff; border: 1px solid #ffaa44; }
+    .btn-util { background: #251d33; color: #ccc; border: 1px solid #44355e; }
+    .btn-util:hover { background: #362a4a; color: #fff; }
+
+    /* Hidden Toggle Settings Button */
+    .secret-toggle-btn {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.2);
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 100;
+    }
+    .secret-toggle-btn:hover { color: rgba(255, 255, 255, 0.8); }
+  </style>
 </head>
-
 <body>
 
-<div class="secret-hint">
-  STREAMER MODE — Press <span>H</span> to Hide / Show Controls
-</div>
+  <div class="secret-hint">
+    Streamer Mode Active: Press <span>H</span> key on your keyboard to <b>Hide / Show</b> controls completely!
+  </div>
 
-<div class="arena-wrapper" id="arena">
+  <div class="arena-wrapper" id="arena">
+    <div class="bg-split bg-girls" id="bg-girls"></div>
+    <div class="bg-split bg-boys" id="bg-boys"></div>
+    <div class="center-divider" id="center-line"></div>
 
-  <!-- SAME BACKGROUND IMAGES -->
-  <div class="bg-split bg-girls" id="bg-girls"></div>
-  <div class="bg-split bg-boys" id="bg-boys"></div>
-
-  <div class="arena-overlay"></div>
-
-  <!-- EXACT HP-BASED CENTER DIVIDER -->
-  <div class="center-divider" id="center-line"></div>
-
-  <!-- HUD -->
-  <div class="hud-top">
-
-    <div class="fighter-hud girls-hud">
-      <div class="fighter-info">
-        <span class="fighter-name" id="girl-name">VIOLET</span>
-        <span class="win-count" id="girl-wins">0 W</span>
+    <div class="hud-top">
+      <div class="fighter-hud girls-hud">
+        <div class="fighter-info">
+          <span class="fighter-name" id="girl-name">MILEENA</span>
+          <span class="win-count" id="girl-wins">0 W</span>
+        </div>
+        <div class="health-bar-bg">
+          <div class="health-fill" id="girl-health"></div>
+        </div>
       </div>
 
-      <div class="health-bar-bg">
-        <div class="health-fill" id="girl-health"></div>
-      </div>
-    </div>
-
-    <div class="center-badge">
-      <div class="demo-tag">
-        <span class="demo-dot"></span>
-        LIVE
-      </div>
-    </div>
-
-    <div class="fighter-hud boys-hud">
-      <div class="fighter-info">
-        <span class="win-count" id="boy-wins">0 W</span>
-        <span class="fighter-name" id="boy-name">BLAZE</span>
+      <div class="center-badge">
+        <div class="demo-tag"><div class="demo-dot"></div> DEMO</div>
       </div>
 
-      <div class="health-bar-bg">
-        <div class="health-fill" id="boy-health"></div>
+      <div class="fighter-hud boys-hud">
+        <div class="fighter-info">
+          <span class="win-count" id="boy-wins">0 W</span>
+          <span class="fighter-name" id="boy-name">SCORPION</span>
+        </div>
+        <div class="health-bar-bg">
+          <div class="health-fill" id="boy-health"></div>
+        </div>
       </div>
     </div>
 
+    <svg class="avatar avatar-left" viewBox="0 0 100 160" id="avatar-girl">
+      <circle cx="50" cy="30" r="18" fill="#d800ff" />
+      <line x1="50" y1="48" x2="50" y2="100" stroke="#d800ff" stroke-width="8" stroke-linecap="round" />
+      <line x1="50" y1="65" x2="20" y2="90" stroke="#d800ff" stroke-width="7" stroke-linecap="round" />
+      <line x1="50" y1="65" x2="80" y2="90" stroke="#d800ff" stroke-width="7" stroke-linecap="round" />
+      <line x1="50" y1="100" x2="25" y2="150" stroke="#d800ff" stroke-width="7" stroke-linecap="round" />
+      <line x1="50" y1="100" x2="75" y2="150" stroke="#d800ff" stroke-width="7" stroke-linecap="round" />
+    </svg>
+
+    <svg class="avatar avatar-right" viewBox="0 0 100 160" id="avatar-boy">
+      <circle cx="50" cy="30" r="18" fill="#ff7b00" />
+      <line x1="50" y1="48" x2="50" y2="100" stroke="#ff7b00" stroke-width="8" stroke-linecap="round" />
+      <line x1="50" y1="65" x2="20" y2="90" stroke="#ff7b00" stroke-width="7" stroke-linecap="round" />
+      <line x1="50" y1="65" x2="80" y2="90" stroke="#ff7b00" stroke-width="7" stroke-linecap="round" />
+      <line x1="50" y1="100" x2="25" y2="150" stroke="#ff7b00" stroke-width="7" stroke-linecap="round" />
+      <line x1="50" y1="100" x2="75" y2="150" stroke="#ff7b00" stroke-width="7" stroke-linecap="round" />
+    </svg>
+
+    <div class="announcement" id="announcement-text"></div>
+    <div class="action-feed" id="action-feed"></div>
+
+    <button class="secret-toggle-btn" onclick="toggleControls()" title="Toggle Settings Controls">⚙</button>
   </div>
 
-  <!-- GIRL FIGHTER -->
-  <div class="fighter fighter-girl" id="girl-fighter">
+  <div class="controls-panel" id="controls-panel">
+    <div class="button-group">
+      <button class="btn btn-girl-hit" onclick="attack('girl', false)">Girls Hit (1)</button>
+      <button class="btn btn-girl-brutal" onclick="attack('girl', true)">BRUTALITY! (10)</button>
+      <button class="btn btn-boy-hit" onclick="attack('boy', false)">Boys Hit (1)</button>
+      <button class="btn btn-boy-brutal" onclick="attack('boy', true)">BRUTALITY! (10)</button>
+    </div>
 
-    <div class="head"></div>
-    <div class="eye left"></div>
-    <div class="eye right"></div>
-
-    <div class="body"></div>
-
-    <div class="arm left"></div>
-    <div class="arm right"></div>
-
-    <div class="leg left"></div>
-    <div class="leg right"></div>
-
-  </div>
-
-  <!-- BOY FIGHTER -->
-  <div class="fighter fighter-boy" id="boy-fighter">
-
-    <div class="head"></div>
-    <div class="eye left"></div>
-    <div class="eye right"></div>
-
-    <div class="body"></div>
-
-    <div class="arm left"></div>
-    <div class="arm right"></div>
-
-    <div class="leg left"></div>
-    <div class="leg right"></div>
-
-  </div>
-
-  <!-- THIRD FIGHTER -->
-  <div class="fighter fighter-third" id="third-fighter">
-
-    <div class="head"></div>
-    <div class="eye left"></div>
-    <div class="eye right"></div>
-
-    <div class="body"></div>
-
-    <div class="arm left"></div>
-    <div class="arm right"></div>
-
-    <div class="leg left"></div>
-    <div class="leg right"></div>
-
-  </div>
-
-  <!-- IMPACT EFFECT -->
-  <div class="impact" id="impact"></div>
-
-  <!-- ATTACK TEXT -->
-  <div class="announcement" id="announcement"></div>
-
-  <!-- FEED -->
-  <div class="action-feed" id="action-feed"></div>
-
-  <!-- FINISHER -->
-  <div class="finisher-screen" id="finisher-screen">
-    <div class="finisher-text">
-      <div class="finisher-title" id="finisher-title">
-        FINISH!
-      </div>
-      <div class="finisher-sub" id="finisher-sub">
-        MATCH COMPLETE
-      </div>
+    <div class="button-group">
+      <button class="btn btn-util" onclick="switchFighter('girl')">↺ Switch Girl</button>
+      <button class="btn btn-util" onclick="switchFighter('boy')">↺ Switch Boy</button>
+      <button class="btn btn-util" onclick="resetGame()">⚡ Reset Match</button>
+      <button class="btn btn-util" onclick="toggleControls()">👁 Hide Controls (Press H)</button>
     </div>
   </div>
 
-  <button class="secret-toggle-btn"
-          onclick="toggleControls()">
-    ⚙
-  </button>
-
-</div>
-
-<!-- CONTROLS -->
-
-<div class="controls-panel" id="controls-panel">
-
-  <div class="button-group">
-
-    <button class="btn btn-girl-hit"
-            onclick="attack('girl','hit')">
-      VIOLET HIT
-    </button>
-
-    <button class="btn btn-girl-special"
-            onclick="attack('girl','special')">
-      VIOLET SPECIAL
-    </button>
-
-    <button class="btn btn-boy-hit"
-            onclick="attack('boy','hit')">
-      BLAZE HIT
-    </button>
-
-    <button class="btn btn-boy-special"
-            onclick="attack('boy','special')">
-      BLAZE SPECIAL
-    </button>
-
-    <button class="btn btn-third"
-            onclick="attack('third','special')">
-      CYAN SPECIAL
-    </button>
-
-  </div>
-
-  <div class="button-group">
-
-    <button class="btn btn-util"
-            onclick="blockFighter('girl')">
-      🛡 Violet Block
-    </button>
-
-    <button class="btn btn-util"
-            onclick="blockFighter('boy')">
-      🛡 Blaze Block
-    </button>
-
-    <button class="btn btn-util"
-            onclick="switchThird()">
-      ⚡ 3rd Fighter
-    </button>
-
-    <button class="btn btn-util"
-            onclick="resetGame()">
-      ⚡ Reset Match
-    </button>
-
-    <button class="btn btn-util"
-            onclick="toggleControls()">
-      👁 Hide Controls
-    </button>
-
-  </div>
-
-</div>
-
-<script>
-
-/* =====================================================
-   GAME SETTINGS
-===================================================== */
-
-const MAX_HP = 20;
-
-let girlHP = MAX_HP;
-let boyHP = MAX_HP;
-
-let girlWins = 0;
-let boyWins = 0;
-
-let thirdActive = false;
-let gameLocked = false;
-
-
-/* =====================================================
-   ORIGINAL FIGHTER NAMES
-===================================================== */
-
-const girlNames = [
-  "VIOLET",
-  "NOVA",
-  "RAVEN"
-];
-
-const boyNames = [
-  "BLAZE",
-  "VOLT",
-  "RONIN"
-];
-
-let girlIndex = 0;
-let boyIndex = 0;
-
-
-/* =====================================================
-   MOVES
-===================================================== */
-
-const girlMoves = [
-  "SHADOW STRIKE!",
-  "VIOLET RUSH!",
-  "PHANTOM KICK!",
-  "NIGHTFALL!"
-];
-
-const boyMoves = [
-  "FLAME PUNCH!",
-  "BLAZE RUSH!",
-  "THUNDER KICK!",
-  "FIRE IMPACT!"
-];
-
-const thirdMoves = [
-  "CYAN STORM!",
-  "VOID PULSE!",
-  "ENERGY BREAK!",
-  "PHANTOM BLAST!"
-];
-
-
-/* =====================================================
-   EXACT SAME CENTER-LINE RULE
-   FROM YOUR ORIGINAL CODE
-===================================================== */
-
-function updateVisuals(){
-
-  document.getElementById("girl-health").style.width =
-    (girlHP / MAX_HP) * 100 + "%";
-
-  document.getElementById("boy-health").style.width =
-    (boyHP / MAX_HP) * 100 + "%";
-
-
-  /*
-    SAME FORMULA:
-
-    starts at 50%
-
-    if BOY loses HP:
-    line moves RIGHT
-
-    if GIRL loses HP:
-    line moves LEFT
-  */
-
-  let centerPercentage =
-      50
-      + ((MAX_HP - boyHP) * 2.5)
-      - ((MAX_HP - girlHP) * 2.5);
-
-
-  if(centerPercentage > 100)
-    centerPercentage = 100;
-
-  if(centerPercentage < 0)
-    centerPercentage = 0;
-
-
-  document.getElementById("bg-girls")
-    .style.width = centerPercentage + "%";
-
-  document.getElementById("bg-boys")
-    .style.width = (100-centerPercentage) + "%";
-
-  document.getElementById("center-line")
-    .style.left = centerPercentage + "%";
-}
-
-
-/* =====================================================
-   ATTACK
-===================================================== */
-
-function attack(attacker,type){
-
-  if(gameLocked) return;
-
-  const arena =
-    document.getElementById("arena");
-
-  const announcement =
-    document.getElementById("announcement");
-
-  const impact =
-    document.getElementById("impact");
-
-
-  let damage = type === "special" ? 3 : 1;
-
-  let move;
-
-
-  /* GIRL */
-
-  if(attacker === "girl"){
-
-    move =
-      type === "special"
-      ? girlMoves[Math.floor(Math.random()*girlMoves.length)]
-      : "QUICK STRIKE!";
-
-    boyHP = Math.max(0,boyHP-damage);
-
-    animateFighter(
-      "girl-fighter",
-      "attack-left"
-    );
-
-    animateFighter(
-      "boy-fighter",
-      "hit"
-    );
-
-    showAnnouncement(
-      move,
-      "annct-girls"
-    );
-
-    showImpact("purple");
-
-    addFeed(
-      "@Viewer",
-      "Violet Attack"
-    );
-  }
-
-
-  /* BOY */
-
-  if(attacker === "boy"){
-
-    move =
-      type === "special"
-      ? boyMoves[Math.floor(Math.random()*boyMoves.length)]
-      : "POWER STRIKE!";
-
-    girlHP = Math.max(0,girlHP-damage);
-
-    animateFighter(
-      "boy-fighter",
-      "attack-right"
-    );
-
-    animateFighter(
-      "girl-fighter",
-      "hit"
-    );
-
-    showAnnouncement(
-      move,
-      "annct-boys"
-    );
-
-    showImpact("orange");
-
-    addFeed(
-      "@Viewer",
-      "Blaze Attack"
-    );
-  }
-
-
-  /* THIRD FIGHTER */
-
-  if(attacker === "third"){
-
-    move =
-      thirdMoves[
-        Math.floor(Math.random()*thirdMoves.length)
-      ];
-
-    /*
-      Third fighter attacks whichever side
-      currently has more HP.
-    */
-
-    if(girlHP >= boyHP){
-
-      girlHP = Math.max(0,girlHP-damage);
-
-      animateFighter(
-        "third-fighter",
-        "special"
-      );
-
-      animateFighter(
-        "girl-fighter",
-        "hit"
-      );
-
-    }else{
-
-      boyHP = Math.max(0,boyHP-damage);
-
-      animateFighter(
-        "third-fighter",
-        "special"
-      );
-
-      animateFighter(
-        "boy-fighter",
-        "hit"
-      );
+  <script>
+    // Max Health points equals total hits needed to win (20)
+    const MAX_HP = 20;
+    let girlHP = MAX_HP;
+    let boyHP = MAX_HP;
+    let girlWins = 0;
+    let boyWins = 0;
+
+    const girlFighters = ["MILEENA", "KITANA", "SKARLET", "SINDEL", "CASSIE CAGE"];
+    const boyFighters = ["SCORPION", "SUB-ZERO", "RAIDEN", "KENSHI", "LIU KANG"];
+    let currentGirlIndex = 0;
+    let currentBoyIndex = 0;
+
+    const girlMoves = ["SAIS STRIKE!", "TELEPORT KICK!", "BLOOD CLOT!", "DEATH SENTENCE!"];
+    const boyMoves = ["TELEPORT PUNCH!", "GET OVER HERE!", "HELL FIRE!", "ICE FREEZE!"];
+
+    // Update Visual UI based on current HP
+    function updateVisuals() {
+      // 1. Update Health Bars (Percentage)
+      document.getElementById("girl-health").style.width = (girlHP / MAX_HP) * 100 + "%";
+      document.getElementById("boy-health").style.width = (boyHP / MAX_HP) * 100 + "%";
+
+      // 2. Calculate Center Line Shift
+      // Starts at 50%. Shifts right (up to 100%) if Girl is winning. Shifts left (down to 0%) if Boy is winning.
+      let centerPercentage = 50 + ((MAX_HP - boyHP) * 2.5) - ((MAX_HP - girlHP) * 2.5);
+      
+      // Prevent visual bugs if a massive hit goes way past 0 HP
+      if (centerPercentage > 100) centerPercentage = 100;
+      if (centerPercentage < 0) centerPercentage = 0;
+
+      // 3. Apply the shift to the backgrounds and line
+      document.getElementById("bg-girls").style.width = centerPercentage + "%";
+      document.getElementById("bg-boys").style.width = (100 - centerPercentage) + "%";
+      document.getElementById("center-line").style.left = centerPercentage + "%";
     }
 
-    showAnnouncement(
-      move,
-      "annct-girls"
-    );
-
-    showImpact("blue");
-
-    addFeed(
-      "@Viewer",
-      "Cyan Special"
-    );
-  }
-
-
-  /* UPDATE CENTER LINE */
-
-  updateVisuals();
-
-
-  /* SCREEN EFFECT */
-
-  arena.classList.remove(
-    "arena-hit",
-    "arena-special"
-  );
-
-  void arena.offsetWidth;
-
-  arena.classList.add(
-    type === "special"
-    ? "arena-special"
-    : "arena-hit"
-  );
-
-
-  /* CHECK WIN */
-
-  if(girlHP <= 0 || boyHP <= 0){
-
-    setTimeout(
-      finishMatch,
-      500
-    );
-  }
-}
-
-
-/* =====================================================
-   BLOCKING
-===================================================== */
-
-function blockFighter(side){
-
-  if(gameLocked) return;
-
-  const id =
-    side === "girl"
-    ? "girl-fighter"
-    : "boy-fighter";
-
-  const el =
-    document.getElementById(id);
-
-  el.classList.remove("block");
-
-  void el.offsetWidth;
-
-  el.classList.add("block");
-
-  addFeed(
-    "@Viewer",
-    side === "girl"
-    ? "Violet Blocked"
-    : "Blaze Blocked"
-  );
-}
-
-
-/* =====================================================
-   FINISHER
-===================================================== */
-
-function finishMatch(){
-
-  if(gameLocked) return;
-
-  gameLocked = true;
-
-  const winner =
-    girlHP <= 0
-    ? "BLAZE WINS!"
-    : "VIOLET WINS!";
-
-  if(girlHP <= 0){
-
-    boyWins++;
-
-    document.getElementById("boy-wins")
-      .innerText = boyWins + " W";
-
-  }else{
-
-    girlWins++;
-
-    document.getElementById("girl-wins")
-      .innerText = girlWins + " W";
-  }
-
-
-  const screen =
-    document.getElementById("finisher-screen");
-
-  const title =
-    document.getElementById("finisher-title");
-
-  const sub =
-    document.getElementById("finisher-sub");
-
-
-  title.innerText = winner;
-
-  sub.innerText =
-    "FINAL MOVE • MATCH COMPLETE";
-
-
-  screen.classList.remove("active");
-
-  void screen.offsetWidth;
-
-  screen.classList.add("active");
-
-
-  document.getElementById("arena")
-    .classList.add("arena-finisher");
-
-
-  /*
-    Non-graphic dramatic finisher sequence.
-    No gore/injury imagery.
-  */
-
-  setTimeout(() => {
-
-    resetMatch();
-
-    document.getElementById("arena")
-      .classList.remove("arena-finisher");
-
-    gameLocked = false;
-
-  },2700);
-}
-
-
-/* =====================================================
-   ANIMATIONS
-===================================================== */
-
-function animateFighter(id,animation){
-
-  const el =
-    document.getElementById(id);
-
-  el.classList.remove(
-    "attack-left",
-    "attack-right",
-    "hit",
-    "special",
-    "block"
-  );
-
-  void el.offsetWidth;
-
-  el.classList.add(animation);
-
-  setTimeout(() => {
-
-    el.classList.remove(animation);
-
-  },700);
-}
-
-
-/* =====================================================
-   ANNOUNCEMENT
-===================================================== */
-
-function showAnnouncement(text,style){
-
-  const el =
-    document.getElementById("announcement");
-
-  el.className =
-    "announcement " +
-    style;
-
-  el.innerText = text;
-
-  void el.offsetWidth;
-
-  el.classList.add("active");
-}
-
-
-/* =====================================================
-   IMPACT
-===================================================== */
-
-function showImpact(type){
-
-  const el =
-    document.getElementById("impact");
-
-  el.className =
-    "impact " + type;
-
-  void el.offsetWidth;
-
-  el.classList.add("active");
-}
-
-
-/* =====================================================
-   FEED
-===================================================== */
-
-function addFeed(user,gift){
-
-  const feed =
-    document.getElementById("action-feed");
-
-  const item =
-    document.createElement("div");
-
-  item.className =
-    "feed-item";
-
-  item.innerHTML =
-    `<span style="color:#e855ff;font-weight:bold">
-      ${user}
-    </span>
-    sent
-    <span>${gift}</span>`;
-
-  feed.appendChild(item);
-
-  if(feed.children.length > 4){
-
-    feed.removeChild(
-      feed.children[0]
-    );
-  }
-}
-
-
-/* =====================================================
-   THIRD FIGHTER
-===================================================== */
-
-function switchThird(){
-
-  thirdActive =
-    !thirdActive;
-
-  document
-    .getElementById("third-fighter")
-    .classList.toggle(
-      "active",
-      thirdActive
-    );
-
-  addFeed(
-    "@System",
-    thirdActive
-    ? "CYAN ENTERED"
-    : "CYAN LEFT"
-  );
-}
-
-
-/* =====================================================
-   RESET
-===================================================== */
-
-function resetMatch(){
-
-  girlHP = MAX_HP;
-  boyHP = MAX_HP;
-
-  updateVisuals();
-}
-
-
-function resetGame(){
-
-  girlHP = MAX_HP;
-  boyHP = MAX_HP;
-
-  girlWins = 0;
-  boyWins = 0;
-
-  document.getElementById("girl-wins")
-    .innerText = "0 W";
-
-  document.getElementById("boy-wins")
-    .innerText = "0 W";
-
-  gameLocked = false;
-
-  updateVisuals();
-}
-
-
-/* =====================================================
-   SWITCH CHARACTER NAMES
-===================================================== */
-
-function switchGirl(){
-
-  girlIndex =
-    (girlIndex + 1)
-    % girlNames.length;
-
-  document.getElementById("girl-name")
-    .innerText =
-    girlNames[girlIndex];
-}
-
-
-function switchBoy(){
-
-  boyIndex =
-    (boyIndex + 1)
-    % boyNames.length;
-
-  document.getElementById("boy-name")
-    .innerText =
-    boyNames[boyIndex];
-}
-
-
-/* =====================================================
-   CONTROLS
-===================================================== */
-
-function toggleControls(){
-
-  document
-    .getElementById("controls-panel")
-    .classList.toggle("hidden");
-}
-
-
-window.addEventListener(
-  "keydown",
-  function(e){
-
-    if(
-      e.key.toLowerCase() === "h"
-    ){
-      toggleControls();
-    }
-
-    if(e.key === "1")
-      attack("girl","hit");
-
-    if(e.key === "2")
-      attack("girl","special");
-
-    if(e.key === "3")
-      attack("boy","hit");
-
-    if(e.key === "4")
-      attack("boy","special");
-
-  }
-);
-
-
-/* =====================================================
-   INITIALIZE
-===================================================== */
-
-updateVisuals();
-
-
-// ============================================================
-// TIKTOK LIVE GIFT CONNECTION
-// ============================================================
-
-let giftSocket = null;
-
-function connectTikTokGifts() {
-
-    const protocol =
-        location.protocol === "https:" ? "wss://" : "ws://";
-
-    giftSocket = new WebSocket(
-        protocol + location.host
-    );
-
-    giftSocket.onopen = () => {
-        console.log("🎮 Gift connection established");
-
-        addFeed(
-            "SYSTEM",
-            "TikTok LIVE connected"
-        );
-    };
-
-    giftSocket.onmessage = (event) => {
-
-        try {
-
-            const data = JSON.parse(event.data);
-
-            if (data.type === "status") {
-
-                console.log("TikTok:", data.message);
-
-                return;
-            }
-
-            if (data.type !== "gift") {
-                return;
-            }
-
-            handleTikTokGift(data);
-
-        } catch (error) {
-
-            console.error(
-                "Gift message error:",
-                error
-            );
+    function triggerAnimation(isBrutality) {
+      const arena = document.getElementById("arena");
+      // Remove classes to reset animation if clicking fast
+      arena.classList.remove("arena-hit", "arena-brutality");
+      
+      // Force a tiny delay so the browser registers the class removal before adding it back
+      setTimeout(() => {
+        if (isBrutality) {
+          arena.classList.add("arena-brutality");
+        } else {
+          arena.classList.add("arena-hit");
         }
-    };
+      }, 10);
+    }
 
-    giftSocket.onclose = () => {
+    function attack(attacker, isBrutality) {
+      const announcement = document.getElementById("announcement-text");
+      
+      // Normal hit = 1 damage. Brutality = 10 damage.
+      let damage = isBrutality ? 10 : 1;
+      let moveName = "";
 
-        console.log(
-            "⚠️ Gift connection lost. Reconnecting..."
-        );
+      if (attacker === 'girl') {
+        boyHP = Math.max(0, boyHP - damage);
+        moveName = isBrutality ? "GIRLS BRUTALITY!" : girlMoves[Math.floor(Math.random() * girlMoves.length)];
+        announcement.className = "announcement annct-girls active";
+        addFeed("@Admin", "Rose");
+        animateAvatar('avatar-girl');
+      } else {
+        girlHP = Math.max(0, girlHP - damage);
+        moveName = isBrutality ? "BOYS BRUTALITY!" : boyMoves[Math.floor(Math.random() * boyMoves.length)];
+        announcement.className = "announcement annct-boys active";
+        addFeed("@Admin", "TikTok");
+        animateAvatar('avatar-boy');
+      }
 
-        setTimeout(
-            connectTikTokGifts,
-            3000
-        );
-    };
+      // Update everything on screen
+      updateVisuals();
+      triggerAnimation(isBrutality);
 
-    giftSocket.onerror = (error) => {
+      // Show Text
+      announcement.innerText = moveName;
+      setTimeout(() => announcement.classList.remove("active"), 1000);
 
-        console.error(
-            "Gift WebSocket error:",
-            error
-        );
-    };
-}
-
-
-// ============================================================
-// HANDLE THE EXACT GIFT ACTIONS
-// ============================================================
-
-function handleTikTokGift(data) {
-
-    const username =
-        data.username || "Viewer";
-
-    const gift =
-        data.gift || "Gift";
-
-    const count =
-        Number(data.count || 1);
-
-
-    // --------------------------------------------------------
-    // ROSE → GIRL NORMAL ATTACK
-    // --------------------------------------------------------
-
-    if (data.action === "girlHit") {
-
-        // One Rose = one hit.
-        // 10 Roses = ten hits.
-        for (let i = 0; i < count; i++) {
-
-            setTimeout(() => {
-
-                attack("girl", false);
-
-            }, i * 180);
+      // Check Win Condition
+      if (girlHP <= 0 || boyHP <= 0) {
+        if (girlHP <= 0) {
+          boyWins++;
+          document.getElementById("boy-wins").innerText = boyWins + " W";
+        } else {
+          girlWins++;
+          document.getElementById("girl-wins").innerText = girlWins + " W";
         }
-
-        addFeed(
-            "@" + username,
-            `Rose ×${count}`
-        );
-
-        return;
+        
+        // Wait longer for the dramatic 'takeover' animation before resetting
+        setTimeout(resetMatch, 2500); 
+      }
     }
 
-
-    // --------------------------------------------------------
-    // TIKTOK → BOY NORMAL ATTACK
-    // --------------------------------------------------------
-
-    if (data.action === "boyHit") {
-
-        for (let i = 0; i < count; i++) {
-
-            setTimeout(() => {
-
-                attack("boy", false);
-
-            }, i * 180);
-        }
-
-        addFeed(
-            "@" + username,
-            `TikTok ×${count}`
-        );
-
-        return;
+    function animateAvatar(id) {
+      const el = document.getElementById(id);
+      el.style.transform = "scale(1.2) translateY(-10px)";
+      setTimeout(() => el.style.transform = "scale(1) translateY(0)", 200);
     }
 
-
-    // --------------------------------------------------------
-    // MIND BLOWN → BOY 10× ATTACK
-    // --------------------------------------------------------
-
-    if (data.action === "boyBrutality") {
-
-        attack(
-            "boy",
-            true
-        );
-
-        addFeed(
-            "@" + username,
-            "💥 Mind Blown — 10×"
-        );
-
-        return;
+    function addFeed(user, gift) {
+      const feed = document.getElementById("action-feed");
+      const item = document.createElement("div");
+      item.className = "feed-item";
+      item.innerHTML = `<span style="color:#e855ff; font-weight:bold;">${user}</span> sent <span>${gift}</span>`;
+      feed.appendChild(item);
+      if (feed.children.length > 4) feed.removeChild(feed.children[0]);
     }
 
-
-    // --------------------------------------------------------
-    // LIKE-POP → SWITCH GIRL
-    // --------------------------------------------------------
-
-    if (data.action === "switchGirl") {
-
-        switchFighter("girl");
-
-        addFeed(
-            "@" + username,
-            "👍 Like-Pop → GIRL SWITCH"
-        );
-
-        return;
+    function switchFighter(side) {
+      if (side === 'girl') {
+        currentGirlIndex = (currentGirlIndex + 1) % girlFighters.length;
+        document.getElementById("girl-name").innerText = girlFighters[currentGirlIndex];
+      } else {
+        currentBoyIndex = (currentBoyIndex + 1) % boyFighters.length;
+        document.getElementById("boy-name").innerText = boyFighters[currentBoyIndex];
+      }
     }
 
-
-    // --------------------------------------------------------
-    // PAPER CRANE → SWITCH BOY
-    // --------------------------------------------------------
-
-    if (data.action === "switchBoy") {
-
-        switchFighter("boy");
-
-        addFeed(
-            "@" + username,
-            "🪽 Paper Crane → BOY SWITCH"
-        );
-
-        return;
+    function resetMatch() {
+      girlHP = MAX_HP;
+      boyHP = MAX_HP;
+      updateVisuals();
     }
-}
 
+    function resetGame() {
+      resetMatch();
+      girlWins = 0;
+      boyWins = 0;
+      document.getElementById("girl-wins").innerText = "0 W";
+      document.getElementById("boy-wins").innerText = "0 W";
+    }
 
-// ============================================================
-// START THE CONNECTION
-// ============================================================
+    function toggleControls() {
+      const panel = document.getElementById("controls-panel");
+      panel.classList.toggle("hidden");
+    }
 
-connectTikTokGifts();
-  
-</script>
+    // Keyboard shortcut 'H' hides controls for the streamer
+    window.addEventListener("keydown", (e) => {
+      if (e.key.toLowerCase() === "h") toggleControls();
+    });
 
+    // Initialize layout on load
+    updateVisuals();
+  </script>
 </body>
-  </html>
+</html>
