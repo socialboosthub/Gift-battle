@@ -179,17 +179,19 @@
       background: linear-gradient(135deg, #0066ff, #00d2ff);
     }
 
-    /* Stickman Avatars */
+    /* Custom PNG Avatars */
     .avatar {
       position: absolute;
-      bottom: 25px;
-      width: 70px;
-      height: 110px;
+      bottom: 15%;
+      height: 45%; /* Makes them large like the video */
+      width: auto;
+      object-fit: contain;
       z-index: 6;
       transition: transform 0.1s;
     }
-    .avatar-left { left: 15%; }
-    .avatar-right { right: 15%; }
+    
+    .avatar-left { left: 20%; }
+    .avatar-right { right: 20%; }
 
     /* Floating Attack Announcement */
     .announcement {
@@ -319,24 +321,9 @@
       </div>
     </div>
 
-    <!-- Stickman Avatars -->
-    <svg class="avatar avatar-left" viewBox="0 0 100 160" id="avatar-girl">
-      <circle cx="50" cy="30" r="18" fill="#d800ff" />
-      <line x1="50" y1="48" x2="50" y2="100" stroke="#d800ff" stroke-width="8" stroke-linecap="round" />
-      <line x1="50" y1="65" x2="20" y2="90" stroke="#d800ff" stroke-width="7" stroke-linecap="round" />
-      <line x1="50" y1="65" x2="80" y2="90" stroke="#d800ff" stroke-width="7" stroke-linecap="round" />
-      <line x1="50" y1="100" x2="25" y2="150" stroke="#d800ff" stroke-width="7" stroke-linecap="round" />
-      <line x1="50" y1="100" x2="75" y2="150" stroke="#d800ff" stroke-width="7" stroke-linecap="round" />
-    </svg>
-
-    <svg class="avatar avatar-right" viewBox="0 0 100 160" id="avatar-boy">
-      <circle cx="50" cy="30" r="18" fill="#0066ff" />
-      <line x1="50" y1="48" x2="50" y2="100" stroke="#0066ff" stroke-width="8" stroke-linecap="round" />
-      <line x1="50" y1="65" x2="20" y2="90" stroke="#0066ff" stroke-width="7" stroke-linecap="round" />
-      <line x1="50" y1="65" x2="80" y2="90" stroke="#0066ff" stroke-width="7" stroke-linecap="round" />
-      <line x1="50" y1="100" x2="25" y2="150" stroke="#0066ff" stroke-width="7" stroke-linecap="round" />
-      <line x1="50" y1="100" x2="75" y2="150" stroke="#0066ff" stroke-width="7" stroke-linecap="round" />
-    </svg>
+    <!-- Replace the SVGs with proper PNG Images. Ensure these files are in the same folder as your HTML! -->
+    <img src="girl.png" alt="Girl Fighter" class="avatar avatar-left" id="avatar-girl">
+    <img src="boy.png" alt="Boy Fighter" class="avatar avatar-right" id="avatar-boy">
 
     <div class="announcement" id="announcement-text"></div>
     <div class="action-feed" id="action-feed"></div>
@@ -440,20 +427,21 @@
         girlWins++;
         document.getElementById("girl-wins").innerText = girlWins;
         isMatchActive = false; // Lock out controls
-        setTimeout(resetMatch, 2500); // Reset line after 2.5s
+        setTimeout(resetMatch, 500); // Reset line after 0.5s (FAST RESET)
       } 
       else if (linePosition <= 0) {
         // Line hit the left edge -> Boys Win!
         boyWins++;
         document.getElementById("boy-wins").innerText = boyWins;
         isMatchActive = false; // Lock out controls
-        setTimeout(resetMatch, 2500); // Reset line after 2.5s
+        setTimeout(resetMatch, 500); // Reset line after 0.5s (FAST RESET)
       }
     }
 
+    // This now smoothly bounces your actual PNG image up and down slightly
     function animateAvatar(id) {
       const el = document.getElementById(id);
-      el.style.transform = "scale(1.2) translateY(-10px)";
+      el.style.transform = "scale(1.1) translateY(-15px)";
       setTimeout(() => el.style.transform = "scale(1) translateY(0)", 200);
     }
 
