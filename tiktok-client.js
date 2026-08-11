@@ -1,32 +1,93 @@
 (function () {
 
-  const socket = io();
+  const SERVER_URL = "https://gift-battle-o0kv.onrender.com";
 
-  socket.on("connect", () => {
-    console.log("✅ Connected to TikTok game server");
+  const socket = io(SERVER_URL, {
+    transports: ["websocket", "polling"],
+    reconnection: true
   });
 
-  socket.on("disconnect", () => {
-    console.log("❌ Disconnected from TikTok game server");
+  function showStatus(message) {
+    console.log(message);
+
+    let box = document.getElementById("tiktok-debug");
+
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "tiktok-debug";
+
+      box.style.position = "fixed";
+      box.style.top = "5px";
+      box.style.left = "5px";
+      box.style.right = "5px";
+      box.style.zIndex = "99999";
+      box.style.padding = "8px";
+      box.style.background = "rgba(0,0,0,0.9)";
+      box.style.color = "#00ff00";
+      box.style.fontFamily = "Arial";
+      box.style.fontSize = "12px";
+      box.style.border = "1px solid #00ff00";
+      box.style.borderRadius = "5px";
+
+      document.body.appendChild(box);
+    }
+
+    box.innerText = message;
+  }
+
+  socket.on("connect", () => {
+
+    showStatus(
+      "🟢 GAME CONNECTED TO SERVER | Socket: " +
+      socket.id
+    );
+
+  });
+
+  socket.on("connect_error", (error) => {
+
+    showStatus(
+      "🔴 CONNECTION ERROR: " +
+      error.message
+    );
+
+  });
+
+  socket.on("disconnect", (reason) => {
+
+    showStatus(
+      "🔴 DISCONNECTED: " +
+      reason
+    );
+
   });
 
   socket.on("tiktokStatus", (status) => {
 
     if (status.connected) {
-      console.log("🟢 TikTok LIVE connected");
+
+      showStatus(
+        "🟢 SERVER + TIKTOK LIVE CONNECTED"
+      );
+
     } else {
-      console.log("🔴 TikTok LIVE disconnected");
+
+      showStatus(
+        "🟠 SERVER CONNECTED BUT TIKTOK IS NOT CONNECTED"
+      );
+
     }
 
   });
 
   socket.on("gameCommand", (command) => {
 
-    console.log("🎮 TikTok command:", command);
-
-    // ==========================================
-    // ATTACK
-    // ==========================================
+    showStatus(
+      "🎁 RECEIVED: " +
+      command.username +
+      " → " +
+      command.gift
+    );
 
     if (command.type === "attack") {
 
@@ -39,10 +100,6 @@
 
       return;
     }
-
-    // ==========================================
-    // SWITCH CHARACTER
-    // ==========================================
 
     if (command.type === "switchCharacter") {
 
