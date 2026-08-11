@@ -433,7 +433,7 @@
       }, 10);
     }
 
-    function attack(attacker, isBrutality) {
+    function attack(attacker, isBrutality, username = "@Admin", giftName = null) {
       if (!isMatchActive) return; 
 
       let powerPush = isBrutality ? 25 : 2.5; 
@@ -503,18 +503,39 @@
       }, 600);
     }
 
-    function switchCharacter(side) {
-      if (side === 'girl') {
-        currentGirlIndex = (currentGirlIndex + 1) % girlCharacters.length;
-        const char = girlCharacters[currentGirlIndex];
-        document.getElementById("girl-name-label").innerText = char.name;
-        document.getElementById("avatar-girl").src = char.idle;
-      } else {
-        currentBoyIndex = (currentBoyIndex + 1) % boyCharacters.length;
-        const char = boyCharacters[currentBoyIndex];
-        document.getElementById("boy-name-label").innerText = char.name;
-        document.getElementById("avatar-boy").src = char.idle;
-      }
+    function switchCharacter(side, username = "@Admin", giftName = null) {
+  if (side === 'girl') {
+
+    currentGirlIndex =
+      (currentGirlIndex + 1) % girlCharacters.length;
+
+    const char = girlCharacters[currentGirlIndex];
+
+    document.getElementById("girl-name-label").innerText = char.name;
+    document.getElementById("avatar-girl").src = char.idle;
+
+    addFeed(
+      'girl',
+      username,
+      giftName || "Like-Pop"
+    );
+
+  } else {
+
+    currentBoyIndex =
+      (currentBoyIndex + 1) % boyCharacters.length;
+
+    const char = boyCharacters[currentBoyIndex];
+
+    document.getElementById("boy-name-label").innerText = char.name;
+    document.getElementById("avatar-boy").src = char.idle;
+
+    addFeed(
+      'boy',
+      username,
+      giftName || "Paper Crane"
+    );
+  }
     }
 
     function addFeed(side, user, gift) {
