@@ -178,7 +178,7 @@
     .avatar-wrapper {
       position: absolute;
       bottom: 15%;
-      height: 60%;
+      height: 65%;
       z-index: 6;
       transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
@@ -199,6 +199,44 @@
       width: auto;
       object-fit: contain;
       transition: transform 0.15s ease-out;
+    }
+
+    /* Flip girl avatar so she faces right towards the opponent */
+    #avatar-girl {
+      transform: scaleX(-1);
+    }
+
+    /* Win Announcement Text */
+    .announcement {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.3);
+      font-size: 64px;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-align: center;
+      letter-spacing: 4px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      white-space: nowrap;
+    }
+
+    .announcement.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .annct-girls { 
+      color: #fff; 
+      text-shadow: 0 0 10px #d800ff, 0 0 25px #d800ff, 0 0 40px #ff007f, 4px 4px 0px #000; 
+    }
+    
+    .annct-boys { 
+      color: #fff; 
+      text-shadow: 0 0 10px #00d2ff, 0 0 25px #00d2ff, 0 0 40px #0066ff, 4px 4px 0px #000; 
     }
 
     /* Action Feed Log */
@@ -342,6 +380,9 @@
       <img src="subzero_idle.png" alt="Boy Fighter" class="avatar" id="avatar-boy">
     </div>
 
+    <!-- Win Announcement Banner -->
+    <div class="announcement" id="announcement-text"></div>
+
     <!-- Split Action Feeds -->
     <div class="action-feed action-feed-girls" id="action-feed-girls"></div>
     <div class="action-feed action-feed-boys" id="action-feed-boys"></div>
@@ -413,6 +454,12 @@
       }, 10);
     }
 
+    function showWinBanner(text, team) {
+      const ann = document.getElementById("announcement-text");
+      ann.innerText = text;
+      ann.className = `announcement active annct-${team}`;
+    }
+
     function attack(attacker, isBrutality) {
       if (!isMatchActive) return; 
 
@@ -435,13 +482,15 @@
         girlWins++;
         document.getElementById("girl-wins").innerText = girlWins;
         isMatchActive = false; 
-        setTimeout(resetMatch, 500); 
+        showWinBanner("GIRLS WIN!", "girls");
+        setTimeout(resetMatch, 1500); 
       } 
       else if (linePosition <= 0) {
         boyWins++;
         document.getElementById("boy-wins").innerText = boyWins;
         isMatchActive = false; 
-        setTimeout(resetMatch, 500); 
+        showWinBanner("BOYS WIN!", "boys");
+        setTimeout(resetMatch, 1500); 
       }
     }
 
@@ -453,13 +502,17 @@
       // Swap to Attack Image immediately
       imgEl.src = charData.attack;
       
-      // Lunge slightly towards opponent
-      imgEl.style.transform = isGirl ? "scale(1.1) translateX(15px)" : "scale(1.1) translateX(-15px)";
+      // Lunge slightly towards opponent (girl preserves flipped scaleX(-1))
+      if (isGirl) {
+        imgEl.style.transform = "scaleX(-1) scale(1.1) translateX(-15px)";
+      } else {
+        imgEl.style.transform = "scale(1.1) translateX(-15px)";
+      }
 
       // Revert back to idle after 600ms
       setTimeout(() => {
         imgEl.src = charData.idle;
-        imgEl.style.transform = "scale(1) translateX(0)";
+        imgEl.style.transform = isGirl ? "scaleX(-1)" : "scale(1) translateX(0)";
       }, 600);
     }
 
@@ -499,6 +552,8 @@
     function resetMatch() {
       linePosition = 50;
       isMatchActive = true; 
+      const ann = document.getElementById("announcement-text");
+      if (ann) ann.className = "announcement";
       updateVisuals();
     }
 
