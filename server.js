@@ -228,11 +228,19 @@ async function connectTikTok() {
         // ==================================
 
         const streak =
-          giftTracker.process(data);
+  giftTracker.process(data);
 
-        console.log(
-          `🎁 ${username} sent ${giftName}`
-        );
+// ⛔ Ignore gift until streak is finished
+if (!streak.isFinal) {
+  console.log(
+    "⏳ Gift streak still running - waiting for final event..."
+  );
+  return;
+}
+
+console.log(
+  `🎁 ${username} sent ${giftName}`
+);
 
         console.log(
           "Gift count:",
