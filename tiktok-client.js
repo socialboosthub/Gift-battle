@@ -8,12 +8,15 @@
   });
 
   function showStatus(message) {
+
     console.log(message);
 
     let box = document.getElementById("tiktok-debug");
 
     if (!box) {
+
       box = document.createElement("div");
+
       box.id = "tiktok-debug";
 
       box.style.position = "fixed";
@@ -35,60 +38,71 @@
     box.innerText = message;
   }
 
+
+  // SERVER CONNECTED
   socket.on("connect", () => {
 
     showStatus(
-      "🟢 GAME CONNECTED TO SERVER | Socket: " +
-      socket.id
+      "🟢 GAME CONNECTED | SERVER ONLINE"
     );
 
   });
 
+
+  // SERVER ERROR
   socket.on("connect_error", (error) => {
 
     showStatus(
-      "🔴 CONNECTION ERROR: " +
+      "🔴 SERVER ERROR: " +
       error.message
     );
 
   });
 
+
+  // DISCONNECTED
   socket.on("disconnect", (reason) => {
 
     showStatus(
-      "🔴 DISCONNECTED: " +
+      "🔴 SERVER DISCONNECTED: " +
       reason
     );
 
   });
 
+
+  // TIKTOK STATUS
   socket.on("tiktokStatus", (status) => {
 
     if (status.connected) {
 
       showStatus(
-        "🟢 SERVER + TIKTOK LIVE CONNECTED"
+        "🟢 TIKTOK LIVE CONNECTED"
       );
 
     } else {
 
       showStatus(
-        "🟠 SERVER CONNECTED BUT TIKTOK IS NOT CONNECTED"
+        "🟠 SERVER ONLINE / TIKTOK OFFLINE"
       );
 
     }
 
   });
 
+
+  // GAME COMMAND
   socket.on("gameCommand", (command) => {
 
     showStatus(
-      "🎁 RECEIVED: " +
+      "🎁 " +
       command.username +
       " → " +
       command.gift
     );
 
+
+    // ATTACK
     if (command.type === "attack") {
 
       attack(
@@ -101,9 +115,15 @@
       return;
     }
 
+
+    // CHARACTER SWITCH
     if (command.type === "switchCharacter") {
 
       switchCharacter(
+        command.side
+      );
+
+      addFeed(
         command.side,
         command.username,
         command.gift
