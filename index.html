@@ -201,37 +201,10 @@
       transition: transform 0.15s ease-out;
     }
 
-    /* Floating Attack Announcement */
-    .announcement {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.5);
-      font-size: 42px;
-      font-weight: 900;
-      text-transform: uppercase;
-      text-align: center;
-      letter-spacing: 3px;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 20;
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      white-space: nowrap;
-    }
-
-    .announcement.active {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.1);
-    }
-
-    .annct-girls { color: #fff; text-shadow: 0 0 10px #d800ff, 0 0 20px #d800ff, 4px 4px 0px #000; }
-    .annct-boys { color: #fff; text-shadow: 0 0 10px #0066ff, 0 0 20px #0066ff, 4px 4px 0px #000; }
-
     /* Action Feed Log */
     .action-feed {
       position: absolute;
       bottom: 20px;
-      left: 15px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -239,9 +212,18 @@
       pointer-events: none;
     }
 
+    .action-feed-girls {
+      left: 15px;
+      align-items: flex-start;
+    }
+
+    .action-feed-boys {
+      right: 15px;
+      align-items: flex-end;
+    }
+
     .feed-item {
       background: rgba(0, 0, 0, 0.65);
-      border-left: 3px solid #d800ff;
       padding: 4px 10px;
       border-radius: 4px;
       font-size: 13px;
@@ -249,11 +231,26 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      animation: fadeIn 0.3s ease;
     }
 
-    @keyframes fadeIn {
+    .feed-item-girl {
+      border-left: 3px solid #d800ff;
+      animation: fadeInLeft 0.3s ease;
+    }
+
+    .feed-item-boy {
+      border-right: 3px solid #00d2ff;
+      animation: fadeInRight 0.3s ease;
+      flex-direction: row-reverse;
+    }
+
+    @keyframes fadeInLeft {
       from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(10px); }
       to { opacity: 1; transform: translateX(0); }
     }
 
@@ -345,8 +342,9 @@
       <img src="subzero_idle.png" alt="Boy Fighter" class="avatar" id="avatar-boy">
     </div>
 
-    <div class="announcement" id="announcement-text"></div>
-    <div class="action-feed" id="action-feed"></div>
+    <!-- Split Action Feeds -->
+    <div class="action-feed action-feed-girls" id="action-feed-girls"></div>
+    <div class="action-feed action-feed-boys" id="action-feed-boys"></div>
 
     <button class="secret-toggle-btn" onclick="toggleControls()" title="Toggle Settings Controls">⚙</button>
   </div>
@@ -390,10 +388,6 @@
     let currentGirlIndex = 0;
     let currentBoyIndex = 0;
 
-    const girlMoves = ["FAN THROW!", "SAIS SLASH!", "BOOMERANG STRIKE!", "DEATH SENTENCE!"];
-    const boyMoves = ["ICE BLAST!", "GET OVER HERE!", "BICYCLE KICK!", "DEEP FREEZE!"];
-
-
     function updateVisuals() {
       let displayPosition = linePosition;
       if (displayPosition > 100) displayPosition = 100;
@@ -422,29 +416,20 @@
     function attack(attacker, isBrutality) {
       if (!isMatchActive) return; 
 
-      const announcement = document.getElementById("announcement-text");
       let powerPush = isBrutality ? 25 : 2.5; 
-      let moveName = "";
 
       if (attacker === 'girl') {
         linePosition += powerPush;
-        moveName = isBrutality ? `${girlCharacters[currentGirlIndex].name} BRUTALITY!` : girlMoves[Math.floor(Math.random() * girlMoves.length)];
-        announcement.className = "announcement annct-girls active";
-        addFeed("@Admin", "Rose");
+        addFeed("@Admin", "Rose", 'girl');
         animateCharacter('girl');
       } else {
         linePosition -= powerPush;
-        moveName = isBrutality ? `${boyCharacters[currentBoyIndex].name} BRUTALITY!` : boyMoves[Math.floor(Math.random() * boyMoves.length)];
-        announcement.className = "announcement annct-boys active";
-        addFeed("@Admin", "TikTok");
+        addFeed("@Admin", "TikTok", 'boy');
         animateCharacter('boy');
       }
 
       updateVisuals();
       triggerAnimation(isBrutality);
-
-      announcement.innerText = moveName;
-      setTimeout(() => announcement.classList.remove("active"), 1000);
 
       if (linePosition >= 100) {
         girlWins++;
@@ -492,13 +477,23 @@
       }
     }
 
-    function addFeed(user, gift) {
-      const feed = document.getElementById("action-feed");
+    function addFeed(user, gift, side) {
+      const isGirl = (side === 'girl');
+      const feedId = isGirl ? "action-feed-girls" : "action-feed-boys";
+      const feed = document.getElementById(feedId);
+      
       const item = document.createElement("div");
-      item.className = "feed-item";
-      item.innerHTML = `<span style="color:#e855ff; font-weight:bold;">${user}</span> sent <span>${gift}</span>`;
+      item.className = `feed-item ${isGirl ? 'feed-item-girl' : 'feed-item-boy'}`;
+      
+      const nameColor = isGirl ? "#e855ff" : "#00d2ff";
+      
+      item.innerHTML = `<span style="color:${nameColor}; font-weight:bold;">${user}</span> sent <span>${gift}</span>`;
       feed.appendChild(item);
-      if (feed.children.length > 4) feed.removeChild(feed.children[0]);
+      
+      // Keep maximum at exactly 3 items per side
+      if (feed.children.length > 3) {
+        feed.removeChild(feed.children[0]);
+      }
     }
 
     function resetMatch() {
