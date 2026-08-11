@@ -178,7 +178,7 @@
     .avatar-wrapper {
       position: absolute;
       bottom: 15%;
-      height: 65%;
+      height: 45%;
       z-index: 6;
       transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
@@ -201,45 +201,33 @@
       transition: transform 0.15s ease-out;
     }
 
-    /* Flip girl avatar so she faces right towards the opponent */
-    #avatar-girl {
-      transform: scaleX(-1);
-    }
-
-    /* Win Announcement Text */
+    /* Win Announcement */
     .announcement {
       position: absolute;
-      top: 45%;
+      top: 40%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(0.3);
-      font-size: 64px;
+      transform: translate(-50%, -50%) scale(0.5);
+      font-size: 56px;
       font-weight: 900;
       text-transform: uppercase;
       text-align: center;
-      letter-spacing: 4px;
+      letter-spacing: 3px;
       opacity: 0;
       pointer-events: none;
       z-index: 20;
-      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       white-space: nowrap;
     }
 
     .announcement.active {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+      transform: translate(-50%, -50%) scale(1.1);
     }
 
-    .annct-girls { 
-      color: #fff; 
-      text-shadow: 0 0 10px #d800ff, 0 0 25px #d800ff, 0 0 40px #ff007f, 4px 4px 0px #000; 
-    }
-    
-    .annct-boys { 
-      color: #fff; 
-      text-shadow: 0 0 10px #00d2ff, 0 0 25px #00d2ff, 0 0 40px #0066ff, 4px 4px 0px #000; 
-    }
+    .annct-girls { color: #fff; text-shadow: 0 0 10px #d800ff, 0 0 20px #d800ff, 4px 4px 0px #000; }
+    .annct-boys { color: #fff; text-shadow: 0 0 10px #0066ff, 0 0 20px #0066ff, 4px 4px 0px #000; }
 
-    /* Action Feed Log */
+    /* Action Feed Log Containers */
     .action-feed {
       position: absolute;
       bottom: 20px;
@@ -252,12 +240,10 @@
 
     .action-feed-girls {
       left: 15px;
-      align-items: flex-start;
     }
 
     .action-feed-boys {
       right: 15px;
-      align-items: flex-end;
     }
 
     .feed-item {
@@ -269,27 +255,22 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      text-align: left;
+      direction: ltr;
+      animation: fadeIn 0.3s ease;
     }
 
     .feed-item-girl {
       border-left: 3px solid #d800ff;
-      animation: fadeInLeft 0.3s ease;
     }
 
     .feed-item-boy {
-      border-right: 3px solid #00d2ff;
-      animation: fadeInRight 0.3s ease;
-      flex-direction: row-reverse;
+      border-left: 3px solid #00d2ff;
     }
 
-    @keyframes fadeInLeft {
-      from { opacity: 0; transform: translateX(-10px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes fadeInRight {
-      from { opacity: 0; transform: translateX(10px); }
-      to { opacity: 1; transform: translateX(0); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Controls Panel */
@@ -340,7 +321,7 @@
 </head>
 <body>
 
-  <!-- Preload all character images to ensure instant switching and attack swaps -->
+  <!-- Preload character images -->
   <div style="display: none;">
     <img src="kitana_idle.png"><img src="kitana_attack.png">
     <img src="mileena_idle.png"><img src="mileena_attack.png">
@@ -371,7 +352,7 @@
       </div>
     </div>
 
-    <!-- Avatars wrapped in containers to lock them to the center line -->
+    <!-- Avatars wrapped in containers -->
     <div class="avatar-wrapper avatar-wrapper-girl" id="wrap-girl">
       <img src="kitana_idle.png" alt="Girl Fighter" class="avatar" id="avatar-girl">
     </div>
@@ -380,12 +361,11 @@
       <img src="subzero_idle.png" alt="Boy Fighter" class="avatar" id="avatar-boy">
     </div>
 
-    <!-- Win Announcement Banner -->
     <div class="announcement" id="announcement-text"></div>
-
-    <!-- Split Action Feeds -->
-    <div class="action-feed action-feed-girls" id="action-feed-girls"></div>
-    <div class="action-feed action-feed-boys" id="action-feed-boys"></div>
+    
+    <!-- Action feeds for both sides -->
+    <div class="action-feed action-feed-girls" id="feed-girls"></div>
+    <div class="action-feed action-feed-boys" id="feed-boys"></div>
 
     <button class="secret-toggle-btn" onclick="toggleControls()" title="Toggle Settings Controls">⚙</button>
   </div>
@@ -413,7 +393,6 @@
     let boyWins = 0;
     let isMatchActive = true; 
 
-    // Character Lists with Idle & Attack paths
     const girlCharacters = [
       { name: "KITANA", idle: "kitana_idle.png", attack: "kitana_attack.png" },
       { name: "MILEENA", idle: "mileena_idle.png", attack: "mileena_attack.png" },
@@ -454,12 +433,6 @@
       }, 10);
     }
 
-    function showWinBanner(text, team) {
-      const ann = document.getElementById("announcement-text");
-      ann.innerText = text;
-      ann.className = `announcement active annct-${team}`;
-    }
-
     function attack(attacker, isBrutality) {
       if (!isMatchActive) return; 
 
@@ -467,30 +440,44 @@
 
       if (attacker === 'girl') {
         linePosition += powerPush;
-        addFeed("@Admin", "Rose", 'girl');
+        addFeed('girl', "@Admin", "Rose");
         animateCharacter('girl');
       } else {
         linePosition -= powerPush;
-        addFeed("@Admin", "TikTok", 'boy');
+        addFeed('boy', "@Admin", "TikTok");
         animateCharacter('boy');
       }
 
       updateVisuals();
       triggerAnimation(isBrutality);
 
+      const announcement = document.getElementById("announcement-text");
+
       if (linePosition >= 100) {
         girlWins++;
         document.getElementById("girl-wins").innerText = girlWins;
         isMatchActive = false; 
-        showWinBanner("GIRLS WIN!", "girls");
-        setTimeout(resetMatch, 1500); 
+        
+        announcement.className = "announcement annct-girls active";
+        announcement.innerText = "GIRLS WIN!";
+        
+        setTimeout(() => {
+          announcement.classList.remove("active");
+          resetMatch();
+        }, 500); 
       } 
       else if (linePosition <= 0) {
         boyWins++;
         document.getElementById("boy-wins").innerText = boyWins;
         isMatchActive = false; 
-        showWinBanner("BOYS WIN!", "boys");
-        setTimeout(resetMatch, 1500); 
+        
+        announcement.className = "announcement annct-boys active";
+        announcement.innerText = "BOYS WIN!";
+        
+        setTimeout(() => {
+          announcement.classList.remove("active");
+          resetMatch();
+        }, 500); 
       }
     }
 
@@ -499,20 +486,12 @@
       const imgEl = document.getElementById(isGirl ? 'avatar-girl' : 'avatar-boy');
       const charData = isGirl ? girlCharacters[currentGirlIndex] : boyCharacters[currentBoyIndex];
       
-      // Swap to Attack Image immediately
       imgEl.src = charData.attack;
-      
-      // Lunge slightly towards opponent (girl preserves flipped scaleX(-1))
-      if (isGirl) {
-        imgEl.style.transform = "scaleX(-1) scale(1.1) translateX(-15px)";
-      } else {
-        imgEl.style.transform = "scale(1.1) translateX(-15px)";
-      }
+      imgEl.style.transform = isGirl ? "scale(1.1) translateX(15px)" : "scale(1.1) translateX(-15px)";
 
-      // Revert back to idle after 600ms
       setTimeout(() => {
         imgEl.src = charData.idle;
-        imgEl.style.transform = isGirl ? "scaleX(-1)" : "scale(1) translateX(0)";
+        imgEl.style.transform = "scale(1) translateX(0)";
       }, 600);
     }
 
@@ -530,30 +509,23 @@
       }
     }
 
-    function addFeed(user, gift, side) {
-      const isGirl = (side === 'girl');
-      const feedId = isGirl ? "action-feed-girls" : "action-feed-boys";
-      const feed = document.getElementById(feedId);
-      
+    function addFeed(side, user, gift) {
+      const feed = document.getElementById(side === 'girl' ? "feed-girls" : "feed-boys");
       const item = document.createElement("div");
-      item.className = `feed-item ${isGirl ? 'feed-item-girl' : 'feed-item-boy'}`;
       
-      const nameColor = isGirl ? "#e855ff" : "#00d2ff";
+      const sideClass = side === 'girl' ? 'feed-item-girl' : 'feed-item-boy';
+      const nameColor = side === 'girl' ? '#e855ff' : '#00d2ff';
       
+      item.className = `feed-item ${sideClass}`;
       item.innerHTML = `<span style="color:${nameColor}; font-weight:bold;">${user}</span> sent <span>${gift}</span>`;
-      feed.appendChild(item);
       
-      // Keep maximum at exactly 3 items per side
-      if (feed.children.length > 3) {
-        feed.removeChild(feed.children[0]);
-      }
+      feed.appendChild(item);
+      if (feed.children.length > 3) feed.removeChild(feed.children[0]);
     }
 
     function resetMatch() {
       linePosition = 50;
       isMatchActive = true; 
-      const ann = document.getElementById("announcement-text");
-      if (ann) ann.className = "announcement";
       updateVisuals();
     }
 
@@ -578,3 +550,4 @@
   </script>
 </body>
 </html>
+
