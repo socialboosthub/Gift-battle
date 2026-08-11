@@ -433,7 +433,7 @@
       }, 10);
     }
 
-    function attack(attacker, isBrutality, username = "@Admin", giftName = null) {
+    function attack(attacker, isBrutality, username = "Unknown", giftName = "") {
       if (!isMatchActive) return; 
 
       let powerPush = isBrutality ? 25 : 2.5; 
