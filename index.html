@@ -1,587 +1,2241 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mortal Kombat - Gift Battle</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      font-family: 'Impact', 'Segoe UI', Arial, sans-serif;
-    }
 
-    body {
-      background-color: #08060c;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
 
-    .secret-hint {
-      font-family: sans-serif;
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 10px;
-      text-align: center;
-    }
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-    .secret-hint span {
-      background: #222;
-      color: #00ffcc;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: bold;
-    }
+<title>Mortal Kombat - Gift Battle</title>
 
-    /* 16:9 Arena Container */
-    .arena-wrapper {
-      width: 100%;
-      max-width: 960px;
-      aspect-ratio: 16 / 9;
-      position: relative;
-      border: 3px solid #2a1f3d;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), 0 0 15px rgba(176, 38, 255, 0.3);
-      background: #000;
-    }
+<style>
 
-    /* Hit & Brutality Animations */
-    .arena-hit {
-      animation: screenShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
-    }
-    
-    .arena-brutality {
-      animation: brutalShake 0.6s cubic-bezier(.36,.07,.19,.97) both;
-      filter: sepia(0.8) hue-rotate(-30deg) saturate(3) contrast(1.2);
-    }
+/* =====================================================
+   GLOBAL
+===================================================== */
 
-    @keyframes screenShake {
-      0% { transform: translate(0, 0); }
-      20% { transform: translate(-8px, 5px); }
-      40% { transform: translate(8px, -5px); }
-      60% { transform: translate(-4px, 2px); }
-      80% { transform: translate(4px, -2px); }
-      100% { transform: translate(0, 0); }
-    }
+* {
 
-    @keyframes brutalShake {
-      0% { transform: translate(0, 0) scale(1); }
-      10% { transform: translate(-15px, 10px) scale(1.05); }
-      20% { transform: translate(15px, -10px) scale(1.05); }
-      30% { transform: translate(-15px, -10px) scale(1.05); }
-      40% { transform: translate(15px, 10px) scale(1.05); }
-      50% { transform: translate(-10px, 5px) scale(1.02); }
-      70% { transform: translate(10px, -5px) scale(1.01); }
-      100% { transform: translate(0, 0) scale(1); }
-    }
+  box-sizing: border-box;
 
-    /* Dynamic Split Backgrounds */
-    .bg-split {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      background-size: cover;
-      background-position: center;
-      transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-    }
+  margin: 0;
 
-    .bg-girls {
-      left: 0;
-      width: 50%;
-      background-color: #4a1942;
-      background-image: url('girls.jpg');
-      border-right: 2px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 5px 0 20px rgba(176, 38, 255, 0.8);
-      z-index: 2;
-    }
+  padding: 0;
 
-    .bg-boys {
-      right: 0;
-      width: 50%;
-      background-color: #193a4a;
-      background-image: url('boys.jpg');
-      border-left: 2px solid rgba(255, 255, 255, 0.8);
-      box-shadow: -5px 0 20px rgba(0, 210, 255, 0.8);
-      z-index: 1;
-    }
+  user-select: none;
 
-    /* Moving Center Divider */
-    .center-divider {
-      position: absolute;
-      left: 50%;
-      top: 0;
-      bottom: 0;
-      width: 6px;
-      background: #ffffff;
-      transform: translateX(-50%);
-      box-shadow: 0 0 15px #fff, 0 0 30px #b026ff, 0 0 45px #00d2ff;
-      z-index: 5;
-      transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-    }
+  font-family:
+    Impact,
+    'Segoe UI',
+    Arial,
+    sans-serif;
 
-    /* Top HUD Scoreboards */
-    .hud-top {
-      position: absolute;
-      top: 15px;
-      left: 20px;
-      right: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 10;
-    }
+}
 
-    .team-score-box {
-      display: flex;
-      align-items: stretch;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6);
-      background: #111;
-    }
+body {
 
-    .score-number {
-      font-size: 32px;
-      color: #fff;
-      padding: 8px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 70px;
-    }
+  background-color: #08060c;
 
-    .team-name {
-      font-size: 28px;
-      color: #fff;
-      padding: 8px 25px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      letter-spacing: 2px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    }
+  color: #fff;
 
-    .team-girls .team-name { background: linear-gradient(135deg, #ff1e56, #d800ff); }
-    .team-boys .team-name { background: linear-gradient(135deg, #0066ff, #00d2ff); }
+  display: flex;
 
-    /* Moving Avatar Wrappers (Glued to center line) */
-    .avatar-wrapper {
-      position: absolute;
-      bottom: 15%;
-      height: 60%;
-      z-index: 6;
-      transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-    
-    .avatar-wrapper-girl {
-      transform: translateX(-100%);
-      padding-right: 30px;
-    }
+  flex-direction: column;
 
-    .avatar-wrapper-boy {
-      transform: translateX(0);
-      padding-left: 30px;
-    }
+  align-items: center;
 
-    /* Actual Character Images */
-    .avatar {
-      height: 100%;
-      width: auto;
-      object-fit: contain;
-      transition: transform 0.15s ease-out;
-    }
+  justify-content: center;
 
-    /* Win Announcement */
-    .announcement {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.5);
-      font-size: 56px;
-      font-weight: 900;
-      text-transform: uppercase;
-      text-align: center;
-      letter-spacing: 3px;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 20;
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      white-space: nowrap;
-    }
+  min-height: 100vh;
 
-    .announcement.active {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.1);
-    }
+  padding: 20px;
 
-    .annct-girls { color: #fff; text-shadow: 0 0 10px #d800ff, 0 0 20px #d800ff, 4px 4px 0px #000; }
-    .annct-boys { color: #fff; text-shadow: 0 0 10px #0066ff, 0 0 20px #0066ff, 4px 4px 0px #000; }
+  overflow: hidden;
 
-    /* Action Feed Log Containers */
-    .action-feed {
-      position: absolute;
-      bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 15;
-      pointer-events: none;
-    }
+}
 
-    .action-feed-girls {
-      left: 15px;
-    }
 
-    .action-feed-boys {
-      right: 15px;
-    }
+/* =====================================================
+   SECRET HINT
+===================================================== */
 
-    .feed-item {
-      background: rgba(0, 0, 0, 0.65);
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 13px;
-      font-family: sans-serif;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-align: left;
-      direction: ltr;
-      animation: fadeIn 0.3s ease;
-    }
+.secret-hint {
 
-    .feed-item-girl {
-      border-left: 3px solid #d800ff;
-    }
+  font-family: sans-serif;
 
-    .feed-item-boy {
-      border-left: 3px solid #00d2ff;
-    }
+  font-size: 13px;
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+  color: #666;
 
-    /* Controls Panel */
-    .controls-panel {
-      width: 100%;
-      max-width: 960px;
-      margin-top: 15px;
-      background: #120e1a;
-      border: 1px solid #2e2440;
-      border-radius: 10px;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-      transition: opacity 0.3s, transform 0.3s;
-    }
+  margin-bottom: 10px;
 
-    .controls-panel.hidden { display: none !important; }
-    .button-group { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-    .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; letter-spacing: 1px; transition: all 0.15s ease; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
-    .btn:active { transform: scale(0.95); }
+  text-align: center;
 
-    .btn-girl-hit { background: #8a1ca6; color: #fff; }
-    .btn-girl-hit:hover { background: #a624c7; }
-    .btn-girl-brutal { background: linear-gradient(135deg, #d800ff, #6200ea); color: #fff; border: 1px solid #ff88ff; }
-    .btn-boy-hit { background: #005bb5; color: #fff; }
-    .btn-boy-hit:hover { background: #0066cc; }
-    .btn-boy-brutal { background: linear-gradient(135deg, #0066ff, #0022cc); color: #fff; border: 1px solid #44aaff; }
-    .btn-util { background: #251d33; color: #ccc; border: 1px solid #44355e; }
-    .btn-util:hover { background: #362a4a; color: #fff; }
+}
 
-    .secret-toggle-btn {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 24px;
-      height: 24px;
-      background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.2);
-      font-size: 16px;
-      cursor: pointer;
-      z-index: 100;
-    }
-    .secret-toggle-btn:hover { color: rgba(255, 255, 255, 0.8); }
-  </style>
+.secret-hint span {
+
+  background: #222;
+
+  color: #00ffcc;
+
+  padding: 2px 6px;
+
+  border-radius: 4px;
+
+  font-weight: bold;
+
+}
+
+
+/* =====================================================
+   ARENA
+===================================================== */
+
+.arena-wrapper {
+
+  width: 100%;
+
+  max-width: 960px;
+
+  aspect-ratio: 16 / 9;
+
+  position: relative;
+
+  border: 3px solid #2a1f3d;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 0 30px rgba(0,0,0,0.9),
+    0 0 15px rgba(176,38,255,0.3);
+
+  background: #000;
+
+}
+
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+.arena-hit {
+
+  animation:
+    screenShake
+    0.3s
+    cubic-bezier(.36,.07,.19,.97)
+    both;
+
+}
+
+.arena-brutality {
+
+  animation:
+    brutalShake
+    0.6s
+    cubic-bezier(.36,.07,.19,.97)
+    both;
+
+  filter:
+    sepia(0.8)
+    hue-rotate(-30deg)
+    saturate(3)
+    contrast(1.2);
+
+}
+
+@keyframes screenShake {
+
+  0% {
+    transform: translate(0,0);
+  }
+
+  20% {
+    transform: translate(-8px,5px);
+  }
+
+  40% {
+    transform: translate(8px,-5px);
+  }
+
+  60% {
+    transform: translate(-4px,2px);
+  }
+
+  80% {
+    transform: translate(4px,-2px);
+  }
+
+  100% {
+    transform: translate(0,0);
+  }
+
+}
+
+@keyframes brutalShake {
+
+  0% {
+    transform: translate(0,0) scale(1);
+  }
+
+  10% {
+    transform: translate(-15px,10px) scale(1.05);
+  }
+
+  20% {
+    transform: translate(15px,-10px) scale(1.05);
+  }
+
+  30% {
+    transform: translate(-15px,-10px) scale(1.05);
+  }
+
+  40% {
+    transform: translate(15px,10px) scale(1.05);
+  }
+
+  50% {
+    transform: translate(-10px,5px) scale(1.02);
+  }
+
+  70% {
+    transform: translate(10px,-5px) scale(1.01);
+  }
+
+  100% {
+    transform: translate(0,0) scale(1);
+  }
+
+}
+
+
+/* =====================================================
+   BACKGROUNDS
+===================================================== */
+
+.bg-split {
+
+  position: absolute;
+
+  top: 0;
+
+  bottom: 0;
+
+  background-size: cover;
+
+  background-position: center;
+
+  transition:
+    width
+    0.5s
+    cubic-bezier(0.25,1,0.5,1);
+
+}
+
+.bg-girls {
+
+  left: 0;
+
+  width: 50%;
+
+  background-color: #4a1942;
+
+  background-image:
+    url('girls.jpg');
+
+  border-right:
+    2px solid rgba(255,255,255,0.8);
+
+  box-shadow:
+    5px 0 20px rgba(176,38,255,0.8);
+
+  z-index: 2;
+
+}
+
+.bg-boys {
+
+  right: 0;
+
+  width: 50%;
+
+  background-color: #193a4a;
+
+  background-image:
+    url('boys.jpg');
+
+  border-left:
+    2px solid rgba(255,255,255,0.8);
+
+  box-shadow:
+    -5px 0 20px rgba(0,210,255,0.8);
+
+  z-index: 1;
+
+}
+
+
+/* =====================================================
+   CENTER LINE
+===================================================== */
+
+.center-divider {
+
+  position: absolute;
+
+  left: 50%;
+
+  top: 0;
+
+  bottom: 0;
+
+  width: 6px;
+
+  background: #fff;
+
+  transform:
+    translateX(-50%);
+
+  box-shadow:
+    0 0 15px #fff,
+    0 0 30px #b026ff,
+    0 0 45px #00d2ff;
+
+  z-index: 5;
+
+  transition:
+    left
+    0.5s
+    cubic-bezier(0.25,1,0.5,1);
+
+}
+
+
+/* =====================================================
+   TOP HUD
+===================================================== */
+
+.hud-top {
+
+  position: absolute;
+
+  top: 15px;
+
+  left: 20px;
+
+  right: 20px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  z-index: 10;
+
+}
+
+.team-score-box {
+
+  display: flex;
+
+  align-items: stretch;
+
+  border-radius: 8px;
+
+  overflow: hidden;
+
+  border:
+    2px solid rgba(255,255,255,0.3);
+
+  box-shadow:
+    0 6px 15px rgba(0,0,0,0.6);
+
+  background: #111;
+
+}
+
+.score-number {
+
+  font-size: 32px;
+
+  color: #fff;
+
+  padding: 8px 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 70px;
+
+}
+
+.team-name {
+
+  font-size: 28px;
+
+  color: #fff;
+
+  padding: 8px 25px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  letter-spacing: 2px;
+
+  text-shadow:
+    1px 1px 3px rgba(0,0,0,0.5);
+
+}
+
+.team-girls .team-name {
+
+  background:
+    linear-gradient(
+      135deg,
+      #ff1e56,
+      #d800ff
+    );
+
+}
+
+.team-boys .team-name {
+
+  background:
+    linear-gradient(
+      135deg,
+      #0066ff,
+      #00d2ff
+    );
+
+}
+
+
+/* =====================================================
+   CHARACTERS
+===================================================== */
+
+.avatar-wrapper {
+
+  position: absolute;
+
+  bottom: 15%;
+
+  height: 60%;
+
+  z-index: 6;
+
+  transition:
+    left
+    0.5s
+    cubic-bezier(0.25,1,0.5,1);
+
+}
+
+.avatar-wrapper-girl {
+
+  transform:
+    translateX(-100%);
+
+  padding-right: 30px;
+
+}
+
+.avatar-wrapper-boy {
+
+  transform:
+    translateX(0);
+
+  padding-left: 30px;
+
+}
+
+.avatar {
+
+  height: 100%;
+
+  width: auto;
+
+  object-fit: contain;
+
+  transition:
+    transform
+    0.15s
+    ease-out;
+
+}
+
+
+/* =====================================================
+   ANNOUNCEMENT
+===================================================== */
+
+.announcement {
+
+  position: absolute;
+
+  top: 40%;
+
+  left: 50%;
+
+  transform:
+    translate(-50%,-50%)
+    scale(0.5);
+
+  font-size: 56px;
+
+  font-weight: 900;
+
+  text-transform: uppercase;
+
+  text-align: center;
+
+  letter-spacing: 3px;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  z-index: 20;
+
+  transition:
+    all
+    0.2s
+    cubic-bezier(
+      0.175,
+      0.885,
+      0.32,
+      1.275
+    );
+
+  white-space: nowrap;
+
+}
+
+.announcement.active {
+
+  opacity: 1;
+
+  transform:
+    translate(-50%,-50%)
+    scale(1.1);
+
+}
+
+.annct-girls {
+
+  color: #fff;
+
+  text-shadow:
+    0 0 10px #d800ff,
+    0 0 20px #d800ff,
+    4px 4px 0 #000;
+
+}
+
+.annct-boys {
+
+  color: #fff;
+
+  text-shadow:
+    0 0 10px #0066ff,
+    0 0 20px #0066ff,
+    4px 4px 0 #000;
+
+}
+
+
+/* =====================================================
+   FEED
+===================================================== */
+
+.action-feed {
+
+  position: absolute;
+
+  bottom: 20px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  z-index: 15;
+
+  pointer-events: none;
+
+}
+
+.action-feed-girls {
+
+  left: 15px;
+
+}
+
+.action-feed-boys {
+
+  right: 15px;
+
+}
+
+.feed-item {
+
+  background:
+    rgba(0,0,0,0.65);
+
+  padding:
+    4px 10px;
+
+  border-radius: 4px;
+
+  font-size: 13px;
+
+  font-family: sans-serif;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  text-align: left;
+
+  direction: ltr;
+
+  animation:
+    fadeIn
+    0.3s
+    ease;
+
+}
+
+.feed-item-girl {
+
+  border-left:
+    3px solid #d800ff;
+
+}
+
+.feed-item-boy {
+
+  border-left:
+    3px solid #00d2ff;
+
+}
+
+@keyframes fadeIn {
+
+  from {
+
+    opacity: 0;
+
+    transform:
+      translateY(5px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+  }
+
+}
+
+
+/* =====================================================
+   BATTLE POSITION COUNTER
+===================================================== */
+
+.battle-counter {
+
+  width: 100%;
+
+  max-width: 960px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 18px;
+
+  margin-top: 8px;
+
+  font-family: Arial, sans-serif;
+
+  font-weight: bold;
+
+}
+
+.counter-box {
+
+  min-width: 70px;
+
+  padding: 4px 10px;
+
+  border-radius: 6px;
+
+  background:
+    rgba(15,15,20,0.95);
+
+  border:
+    1px solid rgba(255,255,255,0.18);
+
+  text-align: center;
+
+  box-shadow:
+    0 3px 10px rgba(0,0,0,0.5);
+
+}
+
+.counter-number {
+
+  display: block;
+
+  font-family: Impact, sans-serif;
+
+  font-size: 20px;
+
+  line-height: 20px;
+
+}
+
+.counter-label {
+
+  display: block;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 9px;
+
+  letter-spacing: 1px;
+
+  opacity: 0.7;
+
+  margin-top: 2px;
+
+}
+
+.counter-girl {
+
+  color: #e855ff;
+
+  text-shadow:
+    0 0 8px rgba(216,0,255,0.5);
+
+}
+
+.counter-boy {
+
+  color: #00d2ff;
+
+  text-shadow:
+    0 0 8px rgba(0,210,255,0.5);
+
+}
+
+.counter-middle {
+
+  font-family: Arial, sans-serif;
+
+  font-size: 11px;
+
+  color: #777;
+
+}
+
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+.controls-panel {
+
+  width: 100%;
+
+  max-width: 960px;
+
+  margin-top: 10px;
+
+  background: #120e1a;
+
+  border:
+    1px solid #2e2440;
+
+  border-radius: 10px;
+
+  padding: 15px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+
+  box-shadow:
+    0 5px 20px rgba(0,0,0,0.5);
+
+}
+
+.controls-panel.hidden {
+
+  display: none !important;
+
+}
+
+.button-group {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  flex-wrap: wrap;
+
+}
+
+.btn {
+
+  padding:
+    12px 24px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  font-size: 16px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  letter-spacing: 1px;
+
+  transition:
+    all
+    0.15s
+    ease;
+
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.4);
+
+}
+
+.btn:active {
+
+  transform:
+    scale(0.95);
+
+}
+
+.btn-girl-hit {
+
+  background: #8a1ca6;
+
+  color: #fff;
+
+}
+
+.btn-girl-brutal {
+
+  background:
+    linear-gradient(
+      135deg,
+      #d800ff,
+      #6200ea
+    );
+
+  color: #fff;
+
+  border:
+    1px solid #ff88ff;
+
+}
+
+.btn-boy-hit {
+
+  background: #005bb5;
+
+  color: #fff;
+
+}
+
+.btn-boy-brutal {
+
+  background:
+    linear-gradient(
+      135deg,
+      #0066ff,
+      #0022cc
+    );
+
+  color: #fff;
+
+  border:
+    1px solid #44aaff;
+
+}
+
+.btn-util {
+
+  background: #251d33;
+
+  color: #ccc;
+
+  border:
+    1px solid #44355e;
+
+}
+
+
+/* =====================================================
+   SECRET BUTTON
+===================================================== */
+
+.secret-toggle-btn {
+
+  position: absolute;
+
+  bottom: 8px;
+
+  right: 8px;
+
+  width: 24px;
+
+  height: 24px;
+
+  background: transparent;
+
+  border: none;
+
+  color:
+    rgba(255,255,255,0.2);
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  z-index: 100;
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 600px) {
+
+  body {
+
+    padding: 8px;
+
+  }
+
+  .secret-hint {
+
+    font-size: 10px;
+
+  }
+
+  .team-name {
+
+    font-size: 16px;
+
+    padding:
+      5px 10px;
+
+  }
+
+  .score-number {
+
+    font-size: 20px;
+
+    padding:
+      5px 10px;
+
+    min-width: 40px;
+
+  }
+
+  .hud-top {
+
+    left: 8px;
+
+    right: 8px;
+
+    top: 8px;
+
+  }
+
+  .counter-box {
+
+    min-width: 60px;
+
+  }
+
+  .counter-number {
+
+    font-size: 17px;
+
+  }
+
+}
+
+
+/* =====================================================
+   PRELOAD
+===================================================== */
+
+.preload {
+
+  display: none;
+
+}
+
+</style>
+
 </head>
+
+
 <body>
 
-  <!-- Preload character images -->
-  <div style="display: none;">
-    <img src="kitana_idle.png"><img src="kitana_attack.png">
-    <img src="mileena_idle.png"><img src="mileena_attack.png">
-    <img src="jade_idle.png"><img src="jade_attack.png">
-    <img src="subzero_idle.png"><img src="subzero_attack.png">
-    <img src="scorpion_idle.png"><img src="scorpion_attack.png">
-    <img src="liukang_idle.png"><img src="liukang_attack.png">
+
+<!-- =====================================================
+     PRELOAD CHARACTERS
+===================================================== -->
+
+<div class="preload">
+
+  <img src="kitana_idle.png">
+
+  <img src="kitana_attack.png">
+
+  <img src="mileena_idle.png">
+
+  <img src="mileena_attack.png">
+
+  <img src="jade_idle.png">
+
+  <img src="jade_attack.png">
+
+  <img src="subzero_idle.png">
+
+  <img src="subzero_attack.png">
+
+  <img src="scorpion_idle.png">
+
+  <img src="scorpion_attack.png">
+
+  <img src="liukang_idle.png">
+
+  <img src="liukang_attack.png">
+
+</div>
+
+
+<div class="secret-hint">
+
+  Streamer Mode Active:
+  Press <span>H</span>
+  to Hide / Show controls
+
+</div>
+
+
+<!-- =====================================================
+     ARENA
+===================================================== -->
+
+<div
+  class="arena-wrapper"
+  id="arena"
+>
+
+
+  <div
+    class="bg-split bg-girls"
+    id="bg-girls"
+  ></div>
+
+
+  <div
+    class="bg-split bg-boys"
+    id="bg-boys"
+  ></div>
+
+
+  <div
+    class="center-divider"
+    id="center-line"
+  ></div>
+
+
+  <!-- TOP HUD -->
+
+  <div class="hud-top">
+
+
+    <div class="team-score-box team-girls">
+
+      <span
+        class="score-number"
+        id="girl-wins"
+      >
+        0
+      </span>
+
+      <span
+        class="team-name"
+        id="girl-name-label"
+      >
+        KITANA
+      </span>
+
+    </div>
+
+
+    <div class="team-score-box team-boys">
+
+      <span
+        class="team-name"
+        id="boy-name-label"
+      >
+        SUB-ZERO
+      </span>
+
+      <span
+        class="score-number"
+        id="boy-wins"
+      >
+        0
+      </span>
+
+    </div>
+
+
   </div>
 
-  <div class="secret-hint">
-    Streamer Mode Active: Press <span>H</span> key on your keyboard to <b>Hide / Show</b> controls completely!
+
+  <!-- GIRL -->
+
+  <div
+    class="avatar-wrapper avatar-wrapper-girl"
+    id="wrap-girl"
+  >
+
+    <img
+      src="kitana_idle.png"
+      alt="Girl Fighter"
+      class="avatar"
+      id="avatar-girl"
+    >
+
   </div>
 
-  <div class="arena-wrapper" id="arena">
-    <div class="bg-split bg-girls" id="bg-girls"></div>
-    <div class="bg-split bg-boys" id="bg-boys"></div>
-    <div class="center-divider" id="center-line"></div>
 
-    <div class="hud-top">
-      <div class="team-score-box team-girls">
-        <span class="score-number" id="girl-wins">0</span>
-        <span class="team-name" id="girl-name-label">KITANA</span>
-      </div>
+  <!-- BOY -->
 
-      <div class="team-score-box team-boys">
-        <span class="team-name" id="boy-name-label">SUB-ZERO</span>
-        <span class="score-number" id="boy-wins">0</span>
-      </div>
-    </div>
+  <div
+    class="avatar-wrapper avatar-wrapper-boy"
+    id="wrap-boy"
+  >
 
-    <!-- Avatars wrapped in containers -->
-    <div class="avatar-wrapper avatar-wrapper-girl" id="wrap-girl">
-      <img src="kitana_idle.png" alt="Girl Fighter" class="avatar" id="avatar-girl">
-    </div>
+    <img
+      src="subzero_idle.png"
+      alt="Boy Fighter"
+      class="avatar"
+      id="avatar-boy"
+    >
 
-    <div class="avatar-wrapper avatar-wrapper-boy" id="wrap-boy">
-      <img src="subzero_idle.png" alt="Boy Fighter" class="avatar" id="avatar-boy">
-    </div>
-
-    <div class="announcement" id="announcement-text"></div>
-    
-    <!-- Action feeds for both sides -->
-    <div class="action-feed action-feed-girls" id="feed-girls"></div>
-    <div class="action-feed action-feed-boys" id="feed-boys"></div>
-
-    <button class="secret-toggle-btn" onclick="toggleControls()" title="Toggle Settings Controls">⚙</button>
   </div>
 
-  <div class="controls-panel" id="controls-panel">
-    <div class="button-group">
-      <button class="btn btn-girl-hit" onclick="attack('girl', false)">Girls Hit (1)</button>
-      <button class="btn btn-girl-brutal" onclick="attack('girl', true)">BRUTALITY! (10)</button>
-      <button class="btn btn-boy-hit" onclick="attack('boy', false)">Boys Hit (1)</button>
-      <button class="btn btn-boy-brutal" onclick="attack('boy', true)">BRUTALITY! (10)</button>
-    </div>
 
-    <div class="button-group">
-      <button class="btn btn-util" onclick="switchCharacter('girl')">⚡ Switch Girl</button>
-      <button class="btn btn-util" onclick="switchCharacter('boy')">⚡ Switch Boy</button>
-      <button class="btn btn-util" onclick="resetMatch()">⚡ Reset Match</button>
-      <button class="btn btn-util" onclick="resetScores()">🔄 Zero Scores</button>
-      <button class="btn btn-util" onclick="toggleControls()">👁 Hide Controls (Press H)</button>
-    </div>
+  <!-- ANNOUNCEMENT -->
+
+  <div
+    class="announcement"
+    id="announcement-text"
+  ></div>
+
+
+  <!-- FEEDS -->
+
+  <div
+    class="action-feed action-feed-girls"
+    id="feed-girls"
+  ></div>
+
+
+  <div
+    class="action-feed action-feed-boys"
+    id="feed-boys"
+  ></div>
+
+
+  <!-- SETTINGS -->
+
+  <button
+    class="secret-toggle-btn"
+    onclick="toggleControls()"
+    title="Toggle Settings Controls"
+  >
+    ⚙
+  </button>
+
+
+</div>
+
+
+<!-- =====================================================
+     BATTLE COUNTER
+===================================================== -->
+
+<div class="battle-counter">
+
+
+  <div class="counter-box counter-girl">
+
+    <span
+      class="counter-number counter-girl"
+      id="girl-position"
+    >
+      20
+    </span>
+
+    <span class="counter-label">
+      GIRLS
+    </span>
+
   </div>
 
-  <script>
-    let linePosition = 50; 
-    let girlWins = 0;
-    let boyWins = 0;
-    let isMatchActive = true; 
 
-    const girlCharacters = [
-      { name: "KITANA", idle: "kitana_idle.png", attack: "kitana_attack.png" },
-      { name: "MILEENA", idle: "mileena_idle.png", attack: "mileena_attack.png" },
-      { name: "JADE", idle: "jade_idle.png", attack: "jade_attack.png" }
-    ];
+  <div class="counter-middle">
+    BATTLE POSITION / 40
+  </div>
 
-    const boyCharacters = [
-      { name: "SUB-ZERO", idle: "subzero_idle.png", attack: "subzero_attack.png" },
-      { name: "SCORPION", idle: "scorpion_idle.png", attack: "scorpion_attack.png" },
-      { name: "LIU KANG", idle: "liukang_idle.png", attack: "liukang_attack.png" }
-    ];
 
-    let currentGirlIndex = 0;
-    let currentBoyIndex = 0;
+  <div class="counter-box counter-boy">
 
-    function updateVisuals() {
-      let displayPosition = linePosition;
-      if (displayPosition > 100) displayPosition = 100;
-      if (displayPosition < 0) displayPosition = 0;
+    <span
+      class="counter-number counter-boy"
+      id="boy-position"
+    >
+      20
+    </span>
 
-      document.getElementById("bg-girls").style.width = displayPosition + "%";
-      document.getElementById("bg-boys").style.width = (100 - displayPosition) + "%";
-      document.getElementById("center-line").style.left = displayPosition + "%";
+    <span class="counter-label">
+      BOYS
+    </span>
 
-      document.getElementById("wrap-girl").style.left = displayPosition + "%";
-      document.getElementById("wrap-boy").style.left = displayPosition + "%";
-    }
+  </div>
 
-    function triggerAnimation(isBrutality) {
-      const arena = document.getElementById("arena");
-      arena.classList.remove("arena-hit", "arena-brutality");
-      setTimeout(() => {
-        if (isBrutality) {
-          arena.classList.add("arena-brutality");
-        } else {
-          arena.classList.add("arena-hit");
-        }
-      }, 10);
-    }
 
-    function attack(attacker, isBrutality, username = "Unknown", giftName = "") {
-      if (!isMatchActive) return; 
+</div>
 
-      let powerPush = isBrutality ? 25 : 2.5; 
 
-      if (attacker === 'girl') {
-        linePosition += powerPush;
-        addFeed(
-  'girl',
-  username,
-  giftName || (isBrutality ? "Rosa" : "Rose")
-);
-        animateCharacter('girl');
-      } else {
-        linePosition -= powerPush;
-        addFeed(
-  'boy',
-  username,
-  giftName || (isBrutality ? "Mind Blown" : "TikTok")
-);
-        animateCharacter('boy');
-      }
+<!-- =====================================================
+     CONTROLS
+===================================================== -->
 
-      updateVisuals();
-      triggerAnimation(isBrutality);
+<div
+  class="controls-panel"
+  id="controls-panel"
+>
 
-      const announcement = document.getElementById("announcement-text");
 
-      if (linePosition >= 100) {
-        girlWins++;
-        document.getElementById("girl-wins").innerText = girlWins;
-        isMatchActive = false; 
-        
-        announcement.className = "announcement annct-girls active";
-        announcement.innerText = "GIRLS WIN!";
-        
-        setTimeout(() => {
-          announcement.classList.remove("active");
-          resetMatch();
-        }, 500); 
-      } 
-      else if (linePosition <= 0) {
-        boyWins++;
-        document.getElementById("boy-wins").innerText = boyWins;
-        isMatchActive = false; 
-        
-        announcement.className = "announcement annct-boys active";
-        announcement.innerText = "BOYS WIN!";
-        
-        setTimeout(() => {
-          announcement.classList.remove("active");
-          resetMatch();
-        }, 500); 
-      }
-    }
+  <div class="button-group">
 
-    function animateCharacter(fighter) {
-      const isGirl = (fighter === 'girl');
-      const imgEl = document.getElementById(isGirl ? 'avatar-girl' : 'avatar-boy');
-      const charData = isGirl ? girlCharacters[currentGirlIndex] : boyCharacters[currentBoyIndex];
-      
-      imgEl.src = charData.attack;
-      imgEl.style.transform = isGirl ? "scale(1.1) translateX(15px)" : "scale(1.1) translateX(-15px)";
 
-      setTimeout(() => {
-        imgEl.src = charData.idle;
-        imgEl.style.transform = "scale(1) translateX(0)";
-      }, 600);
-    }
+    <button
+      class="btn btn-girl-hit"
+      onclick="attack('girl', false)"
+    >
+      Girls Hit (1)
+    </button>
 
-    function switchCharacter(side, username = "@Admin", giftName = null) {
-  if (side === 'girl') {
 
-    currentGirlIndex =
-      (currentGirlIndex + 1) % girlCharacters.length;
+    <button
+      class="btn btn-girl-brutal"
+      onclick="attack('girl', true)"
+    >
+      BRUTALITY! (10)
+    </button>
 
-    const char = girlCharacters[currentGirlIndex];
 
-    document.getElementById("girl-name-label").innerText = char.name;
-    document.getElementById("avatar-girl").src = char.idle;
+    <button
+      class="btn btn-boy-hit"
+      onclick="attack('boy', false)"
+    >
+      Boys Hit (1)
+    </button>
 
-    addFeed(
-      'girl',
-      username,
-      giftName || "Like-Pop"
-    );
 
-  } else {
+    <button
+      class="btn btn-boy-brutal"
+      onclick="attack('boy', true)"
+    >
+      BRUTALITY! (10)
+    </button>
 
-    currentBoyIndex =
-      (currentBoyIndex + 1) % boyCharacters.length;
 
-    const char = boyCharacters[currentBoyIndex];
+  </div>
 
-    document.getElementById("boy-name-label").innerText = char.name;
-    document.getElementById("avatar-boy").src = char.idle;
 
-    addFeed(
-      'boy',
-      username,
-      giftName || "Paper Crane"
-    );
+  <div class="button-group">
+
+
+    <button
+      class="btn btn-util"
+      onclick="switchCharacter('girl')"
+    >
+      ⚡ Switch Girl
+    </button>
+
+
+    <button
+      class="btn btn-util"
+      onclick="switchCharacter('boy')"
+    >
+      ⚡ Switch Boy
+    </button>
+
+
+    <button
+      class="btn btn-util"
+      onclick="resetMatch()"
+    >
+      ⚡ Reset Match
+    </button>
+
+
+    <button
+      class="btn btn-util"
+      onclick="resetScores()"
+    >
+      🔄 Zero Scores
+    </button>
+
+
+    <button
+      class="btn btn-util"
+      onclick="toggleControls()"
+    >
+      👁 Hide Controls
+    </button>
+
+
+  </div>
+
+
+</div>
+
+
+<!-- =====================================================
+     SOCKET.IO
+===================================================== -->
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+
+<script>
+
+/* =====================================================
+   SOCKET CONNECTION
+===================================================== */
+
+const socket = io();
+
+
+socket.on("connect", () => {
+
+  console.log(
+    "🟢 Connected to Mortal Kombat server:",
+    socket.id
+  );
+
+});
+
+
+socket.on("disconnect", () => {
+
+  console.log(
+    "🔴 Disconnected from Mortal Kombat server"
+  );
+
+});
+
+
+socket.on("serverStatus", (data) => {
+
+  console.log(
+    "Server status:",
+    data
+  );
+
+});
+
+
+socket.on("tiktokStatus", (data) => {
+
+  console.log(
+    "TikTok status:",
+    data
+  );
+
+});
+
+
+/* =====================================================
+   GAME STATE
+===================================================== */
+
+/*
+   The entire battlefield is 40 units.
+
+   0  = Boys completely win
+   20 = Center
+   40 = Girls completely win
+
+   linePosition itself is still 0-100%
+   because the arena uses percentages.
+*/
+
+let linePosition = 50;
+
+let girlWins = 0;
+
+let boyWins = 0;
+
+let isMatchActive = true;
+
+
+/* =====================================================
+   CHARACTERS
+===================================================== */
+
+const girlCharacters = [
+
+  {
+    name: "KITANA",
+    idle: "kitana_idle.png",
+    attack: "kitana_attack.png"
+  },
+
+  {
+    name: "MILEENA",
+    idle: "mileena_idle.png",
+    attack: "mileena_attack.png"
+  },
+
+  {
+    name: "JADE",
+    idle: "jade_idle.png",
+    attack: "jade_attack.png"
   }
+
+];
+
+
+const boyCharacters = [
+
+  {
+    name: "SUB-ZERO",
+    idle: "subzero_idle.png",
+    attack: "subzero_attack.png"
+  },
+
+  {
+    name: "SCORPION",
+    idle: "scorpion_idle.png",
+    attack: "scorpion_attack.png"
+  },
+
+  {
+    name: "LIU KANG",
+    idle: "liukang_idle.png",
+    attack: "liukang_attack.png"
+  }
+
+];
+
+
+let currentGirlIndex = 0;
+
+let currentBoyIndex = 0;
+
+
+/* =====================================================
+   UPDATE POSITION COUNTER
+===================================================== */
+
+function updatePositionCounter() {
+
+  /*
+    Convert 0-100% into 0-40 battle units.
+
+    Center:
+
+      50% = 20 / 20
+
+    Girls win:
+
+      100% = 40 / 0
+
+    Boys win:
+
+      0% = 0 / 40
+  */
+
+  const girlPosition =
+    Math.round(
+      linePosition * 0.4
+    );
+
+  const boyPosition =
+    40 - girlPosition;
+
+
+  document.getElementById(
+    "girl-position"
+  ).innerText =
+    girlPosition;
+
+
+  document.getElementById(
+    "boy-position"
+  ).innerText =
+    boyPosition;
+
+}
+
+
+/* =====================================================
+   UPDATE VISUALS
+===================================================== */
+
+function updateVisuals() {
+
+  let displayPosition =
+    linePosition;
+
+
+  if (displayPosition > 100) {
+
+    displayPosition = 100;
+
+  }
+
+
+  if (displayPosition < 0) {
+
+    displayPosition = 0;
+
+  }
+
+
+  document.getElementById(
+    "bg-girls"
+  ).style.width =
+    displayPosition + "%";
+
+
+  document.getElementById(
+    "bg-boys"
+  ).style.width =
+    (100 - displayPosition) + "%";
+
+
+  document.getElementById(
+    "center-line"
+  ).style.left =
+    displayPosition + "%";
+
+
+  document.getElementById(
+    "wrap-girl"
+  ).style.left =
+    displayPosition + "%";
+
+
+  document.getElementById(
+    "wrap-boy"
+  ).style.left =
+    displayPosition + "%";
+
+
+  updatePositionCounter();
+
+}
+
+
+/* =====================================================
+   SCREEN ANIMATION
+===================================================== */
+
+function triggerAnimation(isBrutality) {
+
+  const arena =
+    document.getElementById(
+      "arena"
+    );
+
+
+  arena.classList.remove(
+    "arena-hit",
+    "arena-brutality"
+  );
+
+
+  setTimeout(() => {
+
+    if (isBrutality) {
+
+      arena.classList.add(
+        "arena-brutality"
+      );
+
+    } else {
+
+      arena.classList.add(
+        "arena-hit"
+      );
+
     }
 
-    function addFeed(side, user, gift) {
-      const feed = document.getElementById(side === 'girl' ? "feed-girls" : "feed-boys");
-      const item = document.createElement("div");
-      
-      const sideClass = side === 'girl' ? 'feed-item-girl' : 'feed-item-boy';
-      const nameColor = side === 'girl' ? '#e855ff' : '#00d2ff';
-      
-      item.className = `feed-item ${sideClass}`;
-      item.innerHTML = `<span style="color:${nameColor}; font-weight:bold;">${user}</span> sent <span>${gift}</span>`;
-      
-      feed.appendChild(item);
-      if (feed.children.length > 3) feed.removeChild(feed.children[0]);
-    }
+  }, 10);
 
-    function resetMatch() {
-      linePosition = 50;
-      isMatchActive = true; 
-      updateVisuals();
-    }
+}
 
-    function resetScores() {
-      resetMatch();
-      girlWins = 0;
-      boyWins = 0;
-      document.getElementById("girl-wins").innerText = "0";
-      document.getElementById("boy-wins").innerText = "0";
-    }
 
-    function toggleControls() {
-      const panel = document.getElementById("controls-panel");
-      panel.classList.toggle("hidden");
-    }
+/* =====================================================
+   ATTACK
+===================================================== */
 
-    window.addEventListener("keydown", (e) => {
-      if (e.key.toLowerCase() === "h") toggleControls();
-    });
+function attack(
+  attacker,
+  isBrutality,
+  username = "Unknown",
+  giftName = "",
+  repeatCount = 1
+) {
+
+  if (!isMatchActive) {
+
+    return;
+
+  }
+
+
+  /*
+    One normal attack = 1 battle unit.
+
+    One brutality = 10 battle units.
+
+    The arena has 40 units total.
+
+    Since 100% / 40 = 2.5%,
+    each battle unit moves the line 2.5%.
+  */
+
+  const safeRepeatCount =
+    Math.max(
+      1,
+      Number(repeatCount) || 1
+    );
+
+
+  const movementUnits =
+    (
+      isBrutality
+        ? 10
+        : 1
+    ) * safeRepeatCount;
+
+
+  const movementPercent =
+    movementUnits * 2.5;
+
+
+  /* GIRLS */
+
+  if (attacker === "girl") {
+
+    linePosition +=
+      movementPercent;
+
+
+    addFeed(
+      "girl",
+      username,
+      giftName ||
+        (
+          isBrutality
+            ? "Rosa"
+            : "Rose"
+        ),
+      safeRepeatCount
+    );
+
+
+    animateCharacter(
+      "girl"
+    );
+
+  }
+
+
+  /* BOYS */
+
+  else {
+
+    linePosition -=
+      movementPercent;
+
+
+    addFeed(
+      "boy",
+      username,
+      giftName ||
+        (
+          isBrutality
+            ? "Mind Blown"
+            : "TikTok"
+        ),
+      safeRepeatCount
+    );
+
+
+    animateCharacter(
+      "boy"
+    );
+
+  }
+
+
+  updateVisuals();
+
+
+  triggerAnimation(
+    isBrutality
+  );
+
+
+  const announcement =
+    document.getElementById(
+      "announcement-text"
+    );
+
+
+  /* ===================================================
+     GIRLS WIN
+  =================================================== */
+
+  if (linePosition >= 100) {
+
+    linePosition = 100;
 
     updateVisuals();
-  </script>
 
 
-  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-<script src="tiktok-client.js"></script>
-  
+    girlWins++;
+
+
+    document.getElementById(
+      "girl-wins"
+    ).innerText =
+      girlWins;
+
+
+    isMatchActive = false;
+
+
+    announcement.className =
+      "announcement annct-girls active";
+
+
+    announcement.innerText =
+      "GIRLS WIN!";
+
+
+    setTimeout(() => {
+
+      announcement.classList.remove(
+        "active"
+      );
+
+
+      resetMatch();
+
+    }, 1000);
+
+  }
+
+
+  /* ===================================================
+     BOYS WIN
+  =================================================== */
+
+  else if (linePosition <= 0) {
+
+    linePosition = 0;
+
+    updateVisuals();
+
+
+    boyWins++;
+
+
+    document.getElementById(
+      "boy-wins"
+    ).innerText =
+      boyWins;
+
+
+    isMatchActive = false;
+
+
+    announcement.className =
+      "announcement annct-boys active";
+
+
+    announcement.innerText =
+      "BOYS WIN!";
+
+
+    setTimeout(() => {
+
+      announcement.classList.remove(
+        "active"
+      );
+
+
+      resetMatch();
+
+    }, 1000);
+
+  }
+
+}
+
+
+/* =====================================================
+   CHARACTER ANIMATION
+===================================================== */
+
+function animateCharacter(
+  fighter
+) {
+
+  const isGirl =
+    fighter === "girl";
+
+
+  const imgEl =
+    document.getElementById(
+      isGirl
+        ? "avatar-girl"
+        : "avatar-boy"
+    );
+
+
+  const charData =
+    isGirl
+      ? girlCharacters[
+          currentGirlIndex
+        ]
+      : boyCharacters[
+          currentBoyIndex
+        ];
+
+
+  imgEl.src =
+    charData.attack;
+
+
+  imgEl.style.transform =
+    isGirl
+      ? "scale(1.1) translateX(15px)"
+      : "scale(1.1) translateX(-15px)";
+
+
+  setTimeout(() => {
+
+    imgEl.src =
+      charData.idle;
+
+
+    imgEl.style.transform =
+      "scale(1) translateX(0)";
+
+  }, 600);
+
+}
+
+
+/* =====================================================
+   CHARACTER SWITCH
+===================================================== */
+
+function switchCharacter(
+  side,
+  username = "@Admin",
+  giftName = null
+) {
+
+
+  if (side === "girl") {
+
+
+    currentGirlIndex =
+      (
+        currentGirlIndex + 1
+      ) %
+      girlCharacters.length;
+
+
+    const char =
+      girlCharacters[
+        currentGirlIndex
+      ];
+
+
+    document.getElementById(
+      "girl-name-label"
+    ).innerText =
+      char.name;
+
+
+    document.getElementById(
+      "avatar-girl"
+    ).src =
+      char.idle;
+
+
+    addFeed(
+      "girl",
+      username,
+      giftName ||
+        "Like-Pop"
+    );
+
+
+  }
+
+
+  else {
+
+
+    currentBoyIndex =
+      (
+        currentBoyIndex + 1
+      ) %
+      boyCharacters.length;
+
+
+    const char =
+      boyCharacters[
+        currentBoyIndex
+      ];
+
+
+    document.getElementById(
+      "boy-name-label"
+    ).innerText =
+      char.name;
+
+
+    document.getElementById(
+      "avatar-boy"
+    ).src =
+      char.idle;
+
+
+    addFeed(
+      "boy",
+      username,
+      giftName ||
+        "Paper Crane"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   FEED
+===================================================== */
+
+function addFeed(
+  side,
+  user,
+  gift,
+  repeatCount = 1
+) {
+
+  const feed =
+    document.getElementById(
+      side === "girl"
+        ? "feed-girls"
+        : "feed-boys"
+    );
+
+
+  const item =
+    document.createElement(
+      "div"
+    );
+
+
+  const sideClass =
+    side === "girl"
+      ? "feed-item-girl"
+      : "feed-item-boy";
+
+
+  const nameColor =
+    side === "girl"
+      ? "#e855ff"
+      : "#00d2ff";
+
+
+  const countText =
+    repeatCount > 1
+      ? ` x${repeatCount}`
+      : "";
+
+
+  item.className =
+    `feed-item ${sideClass}`;
+
+
+  item.innerHTML =
+
+    `<span style="
+      color:${nameColor};
+      font-weight:bold;
+    ">${escapeHtml(user)}</span>
+
+    sent
+
+    <span>
+      ${escapeHtml(gift)}
+      ${countText}
+    </span>`;
+
+
+  feed.appendChild(
+    item
+  );
+
+
+  if (
+    feed.children.length > 3
+  ) {
+
+    feed.removeChild(
+      feed.children[0]
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   HTML ESCAPE
+===================================================== */
+
+function escapeHtml(
+  value
+) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+/* =====================================================
+   RESET MATCH
+===================================================== */
+
+function resetMatch() {
+
+  linePosition = 50;
+
+  isMatchActive = true;
+
+  updateVisuals();
+
+}
+
+
+/* =====================================================
+   RESET EVERYTHING
+===================================================== */
+
+function resetScores() {
+
+  resetMatch();
+
+
+  girlWins = 0;
+
+  boyWins = 0;
+
+
+  document.getElementById(
+    "girl-wins"
+  ).innerText = "0";
+
+
+  document.getElementById(
+    "boy-wins"
+  ).innerText = "0";
+
+}
+
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+function toggleControls() {
+
+  const panel =
+    document.getElementById(
+      "controls-panel"
+    );
+
+
+  panel.classList.toggle(
+    "hidden"
+  );
+
+}
+
+
+window.addEventListener(
+  "keydown",
+  (e) => {
+
+    if (
+      e.key.toLowerCase() === "h"
+    ) {
+
+      toggleControls();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   RECEIVE GAME COMMAND FROM SERVER
+===================================================== */
+
+socket.on(
+  "gameCommand",
+  (command) => {
+
+    console.log(
+      "🎮 GAME COMMAND RECEIVED:",
+      command
+    );
+
+
+    /* ATTACK */
+
+    if (
+      command.type === "attack"
+    ) {
+
+      attack(
+
+        command.side,
+
+        Boolean(
+          command.brutality
+        ),
+
+        command.username ||
+          "Unknown",
+
+        command.gift ||
+          "",
+
+        command.repeatCount ||
+          1
+
+      );
+
+      return;
+
+    }
+
+
+    /* CHARACTER SWITCH */
+
+    if (
+      command.type ===
+      "switchCharacter"
+    ) {
+
+      switchCharacter(
+
+        command.side,
+
+        command.username ||
+          "Unknown",
+
+        command.gift ||
+          null
+
+      );
+
+      return;
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   START
+===================================================== */
+
+updateVisuals();
+
+</script>
+
 </body>
-</html>
 
+</html>
