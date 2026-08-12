@@ -434,19 +434,17 @@
     }
 
         // Added repeatCount = 1 at the end of the parameters
-    function attack(attacker, isBrutality, username = "Unknown", giftName = "", repeatCount = 1) {
+      function attack(attacker, isBrutality, username = "Unknown", giftName = "") {
       if (!isMatchActive) return; 
 
-      // Multiply the power by the amount of gifts sent in the combo!
-      let powerPush = (isBrutality ? 25 : 2.5) * repeatCount; 
+      let powerPush = isBrutality ? 25 : 2.5; 
 
       if (attacker === 'girl') {
         linePosition += powerPush;
         addFeed(
           'girl',
           username,
-          // This adds the "x5" to the text feed so stream sees it
-          (giftName || (isBrutality ? "Rosa" : "Rose")) + (repeatCount > 1 ? ` x${repeatCount}` : "")
+          giftName || (isBrutality ? "Paper Crane" : "Rose")
         );
         animateCharacter('girl');
       } else {
@@ -454,7 +452,7 @@
         addFeed(
           'boy',
           username,
-          (giftName || (isBrutality ? "Mind Blown" : "TikTok")) + (repeatCount > 1 ? ` x${repeatCount}` : "")
+          giftName || (isBrutality ? "Mind Blown" : "TikTok")
         );
         animateCharacter('boy');
       }
@@ -491,6 +489,7 @@
         }, 500); 
       }
     }
+    
 
     function animateCharacter(fighter) {
       const isGirl = (fighter === 'girl');
