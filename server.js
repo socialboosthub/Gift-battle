@@ -3,8 +3,7 @@ import http from "http";
 import { Server } from "socket.io";
 import {
   TikTokLiveClient,
-  EventType,
-  GiftStreakTracker
+  EventType
 } from "piratetok-live-js";
 
 const app = express();
@@ -96,8 +95,360 @@ let tiktokConnected = false;
 
 let tiktokClient = null;
 
-const giftTracker =
-  new GiftStreakTracker();
+// ==========================================
+// IMPORTANT:
+// Tracks the current TikTok gift combo.
+// TikTok sends repeatCount as a CUMULATIVE number.
+//
+// Example:
+//
+// Event 1 = repeatCount 1
+// Event 2 = repeatCount 2
+// Event 3 = repeatCount 3
+// Event 4 = repeatCount 4
+//
+// We calculate the difference so the game
+// receives exactly one attack for each gift.
+//
+// A direct ×50 gift gives repeatCount 50,
+// so it produces 50 attacks.
+// ==========================================
+
+const activeGiftCombos = new Map();
+
+function getComboKey(data) {
+
+  const userId =
+    data.user?.id ||
+    data.user?.uniqueId ||
+    data.user?.nickname ||
+    "unknown";
+
+  const giftId =
+    data.gift?.id ||
+    data.giftId ||
+    data.gift?.name ||
+    "unknown";
+
+  const groupId =
+    data.groupId ||
+    "no-group";
+
+  return `${userId}:${giftId}:${groupId}`;
+}
+
+function getGiftCount(data) {
+
+  const repeatCount =
+    Number(data.repeatCount);
+
+  if (
+    Number.isFinite(repeatCount) &&
+    repeatCount > 0
+  ) {
+    return repeatCount;
+  }
+
+  const comboCount =
+    Number(data.comboCount);
+
+  if (
+    Number.isFinite(comboCount) &&
+    comboCount > 0
+  ) {
+    return comboCount;
+  }
+
+  return 1;
+}
+
+// ==========================================
+// PROCESS GIFT
+// ==========================================
+
+function processGift(data) {
+
+  const username =
+    data.user?.uniqueId ||
+    data.user?.nickname ||
+    "Unknown";
+
+  const nickname =
+    data.user?.nickname ||
+    username;
+
+  const giftName =
+    data.gift?.name ||
+    "";
+
+  const normalizedGift =
+    giftName
+      .trim()
+      .toLowerCase();
+
+  const currentCount =
+    getGiftCount(data);
+
+  const key =
+    getComboKey(data);
+
+  // ========================================
+  // Calculate how many NEW gifts arrived
+  // ========================================
+
+  const previousCount =
+    activeGiftCombos.get(key) || 0;
+
+  let newGiftCount =
+    currentCount - previousCount;
+
+  // If TikTok sends an unusual reset,
+  // treat it as one new gift rather than
+  // accidentally sending a negative number.
+  if (newGiftCount < 1) {
+    newGiftCount = 1;
+  }
+
+  activeGiftCombos.set(
+    key,
+    currentCount
+  );
+
+  // ========================================
+  // Clean finished combo
+  // ========================================
+
+  if (data.repeatEnd === 1) {
+
+    setTimeout(() => {
+
+      const savedCount =
+        activeGiftCombos.get(key);
+
+      if (
+        savedCount === currentCount
+      ) {
+        activeGiftCombos.delete(key);
+      }
+
+    }, 1000);
+
+  }
+
+  console.log(
+    `🎁 ${username} sent ${giftName}`
+  );
+
+  console.log(
+    `📦 TikTok repeatCount: ${currentCount}`
+  );
+
+  console.log(
+    `➕ NEW gifts this event: ${newGiftCount}`
+  );
+
+  // ========================================
+  // ROSE
+  // GIRL NORMAL ATTACK
+  // ========================================
+
+  if (
+    normalizedGift === "rose"
+  ) {
+
+    sendGameCommand({
+
+      type: "attack",
+
+      side: "girl",
+
+      brutality: false,
+
+      power: 1,
+
+      username: username,
+
+      nickname: nickname,
+
+      gift: giftName,
+
+      repeatCount: newGiftCount
+
+    });
+
+    return;
+  }
+
+  // ========================================
+  // ROSA
+  // GIRL BRUTALITY
+  // ========================================
+
+  if (
+    normalizedGift === "rosa"
+  ) {
+
+    sendGameCommand({
+
+      type: "attack",
+
+      side: "girl",
+
+      brutality: true,
+
+      power: 10,
+
+      username: username,
+
+      nickname: nickname,
+
+      gift: giftName,
+
+      repeatCount: newGiftCount
+
+    });
+
+    return;
+  }
+
+  // ========================================
+  // TIKTOK
+  // BOY NORMAL ATTACK
+  // ========================================
+
+  if (
+    normalizedGift === "tiktok"
+  ) {
+
+    sendGameCommand({
+
+      type: "attack",
+
+      side: "boy",
+
+      brutality: false,
+
+      power: 1,
+
+      username: username,
+
+      nickname: nickname,
+
+      gift: giftName,
+
+      repeatCount: newGiftCount
+
+    });
+
+    return;
+  }
+
+  // ========================================
+  // MIND BLOWN
+  // BOY BRUTALITY
+  // ========================================
+
+  if (
+    normalizedGift === "mind blown" ||
+    normalizedGift === "mindblown"
+  ) {
+
+    sendGameCommand({
+
+      type: "attack",
+
+      side: "boy",
+
+      brutality: true,
+
+      power: 10,
+
+      username: username,
+
+      nickname: nickname,
+
+      gift: giftName,
+
+      repeatCount: newGiftCount
+
+    });
+
+    return;
+  }
+
+  // ========================================
+  // LIKE-POP
+  // GIRL CHARACTER SWITCH
+  // ========================================
+
+  if (
+    normalizedGift === "like-pop" ||
+    normalizedGift === "like pop" ||
+    normalizedGift === "likepop"
+  ) {
+
+    sendGameCommand({
+
+      type: "switchCharacter",
+
+      side: "girl",
+
+      username: username,
+
+      nickname: nickname,
+
+      gift: giftName,
+
+      repeatCount: newGiftCount
+
+    });
+
+    return;
+  }
+
+  // ========================================
+  // PAPER CRANE
+  // BOY CHARACTER SWITCH
+  // ========================================
+
+  if (
+    normalizedGift === "paper crane" ||
+    normalizedGift === "papercrane"
+  ) {
+
+    sendGameCommand({
+
+      type: "switchCharacter",
+
+      side: "boy",
+
+      username: username,
+
+      nickname: nickname,
+
+      gift: giftName,
+
+      repeatCount: newGiftCount
+
+    });
+
+    return;
+  }
+
+  // ========================================
+  // UNKNOWN GIFT
+  // ========================================
+
+  console.log(
+    "ℹ️ No action configured for:",
+    giftName
+  );
+
+}
+
+// ==========================================
+// TIKTOK CONNECTION
+// ==========================================
 
 async function connectTikTok() {
 
@@ -123,7 +474,7 @@ async function connectTikTok() {
 
     tiktokClient.on(
       EventType.connected,
-      (data) => {
+      () => {
 
         tiktokConnected = true;
 
@@ -202,267 +553,7 @@ async function connectTikTok() {
           "===================================="
         );
 
-        // ==================================
-        // USER
-        // ==================================
-
-        const username =
-          data.user?.uniqueId ||
-          data.user?.nickname ||
-          "Unknown";
-
-        const nickname =
-          data.user?.nickname ||
-          username;
-
-        // ==================================
-        // GIFT
-        // ==================================
-
-        const giftName =
-          data.gift?.name ||
-          "";
-
-        // ==================================
-        // STREAK
-        // ==================================
-
-        const streak =
-  giftTracker.process(data);
-
-// ⛔ Ignore gift until streak is finished
-if (!streak.isFinal) {
-  console.log(
-    "⏳ Gift streak still running - waiting for final event..."
-  );
-  return;
-}
-
-console.log(
-  `🎁 ${username} sent ${giftName}`
-);
-
-        console.log(
-          "Gift count:",
-          streak.eventGiftCount
-        );
-
-        console.log(
-          "Final:",
-          streak.isFinal
-        );
-
-        // ==================================
-        // NORMALIZE
-        // ==================================
-
-        const normalizedGift =
-          giftName
-            .trim()
-            .toLowerCase();
-
-        // ==================================
-        // ROSE
-        // GIRL NORMAL ATTACK
-        // ==================================
-
-        if (
-          normalizedGift === "rose"
-        ) {
-
-          sendGameCommand({
-
-            type: "attack",
-
-            side: "girl",
-
-            brutality: false,
-
-            power: 1,
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
-          return;
-        }
-
-        // ==================================
-        // ROSA
-        // GIRL BRUTALITY
-        // ==================================
-
-        if (
-          normalizedGift === "rosa"
-        ) {
-
-          sendGameCommand({
-
-            type: "attack",
-
-            side: "girl",
-
-            brutality: true,
-
-            power: 10,
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
-          return;
-        }
-
-        // ==================================
-        // TIKTOK
-        // BOY NORMAL ATTACK
-        // ==================================
-
-        if (
-          normalizedGift === "tiktok"
-        ) {
-
-          sendGameCommand({
-
-            type: "attack",
-
-            side: "boy",
-
-            brutality: false,
-
-            power: 1,
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
-          return;
-        }
-
-        // ==================================
-        // MIND BLOWN
-        // BOY BRUTALITY
-        // ==================================
-
-        if (
-          normalizedGift === "mind blown" ||
-          normalizedGift === "mindblown"
-        ) {
-
-          sendGameCommand({
-
-            type: "attack",
-
-            side: "boy",
-
-            brutality: true,
-
-            power: 10,
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
-          return;
-        }
-
-        // ==================================
-        // LIKE-POP
-        // GIRL SWITCH
-        // ==================================
-
-        if (
-          normalizedGift === "like-pop" ||
-          normalizedGift === "like pop" ||
-          normalizedGift === "likepop"
-        ) {
-
-          sendGameCommand({
-
-            type: "switchCharacter",
-
-            side: "girl",
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
-          return;
-        }
-
-        // ==================================
-        // PAPER CRANE
-        // BOY SWITCH
-        // ==================================
-
-        if (
-          normalizedGift === "paper crane" ||
-          normalizedGift === "papercrane"
-        ) {
-
-          sendGameCommand({
-
-            type: "switchCharacter",
-
-            side: "boy",
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
-          return;
-        }
-
-        // ==================================
-        // UNKNOWN GIFT
-        // ==================================
-
-        console.log(
-          "ℹ️ No action configured for:",
-          giftName
-        );
+        processGift(data);
 
       }
     );
@@ -513,6 +604,7 @@ server.listen(
   () => {
 
     console.log("");
+
     console.log(
       "===================================="
     );
