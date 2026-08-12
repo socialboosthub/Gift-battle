@@ -178,280 +178,77 @@ async function connectTikTok() {
       }
     );
 
-    // ======================================
-    // GIFTS
-    // ======================================
+        // ==========================================
+    // TIKTOK GIFT RECEIVED
+    // ==========================================
 
     tiktokClient.on(
       EventType.gift,
       (data) => {
 
-        console.log(
-          "===================================="
-        );
-
-        console.log(
-          "🎁 RAW GIFT EVENT"
-        );
-
-        console.log(
-          JSON.stringify(data)
-        );
-
-        console.log(
-          "===================================="
-        );
-
-        // ==================================
-        // USER
-        // ==================================
-
         const username =
-          data.user?.uniqueId ||
-          data.user?.nickname ||
-          "Unknown";
-
-        const nickname =
-          data.user?.nickname ||
-          username;
-
-        // ==================================
-        // GIFT
-        // ==================================
+          data.uniqueId ||
+          data.nickname ||
+          "Supporter";
 
         const giftName =
-          data.gift?.name ||
-          "";
+          data.giftName ||
+          data.giftDetails?.giftName ||
+          "Gift";
 
-        // ==================================
-        // STREAK
-        // ==================================
-
-        const streak =
-  giftTracker.process(data);
-
-// ⛔ Ignore gift until streak is finished
-if (!streak.isFinal) {
-  console.log(
-    "⏳ Gift streak still running - waiting for final event..."
-  );
-  return;
-}
-
-console.log(
-  `🎁 ${username} sent ${giftName}`
-);
+        // Read how many gifts were sent in this combo
+        const count = data.repeatCount || data.combo || 1;
 
         console.log(
-          "Gift count:",
-          streak.eventGiftCount
+          `🎁 ${username} sent ${giftName} (Count: ${count})`
         );
 
-        console.log(
-          "Final:",
-          streak.isFinal
-        );
+        // Function that loops 'count' times so every gift triggers individually
+        const triggerAttack = (side, brutality) => {
+          for (let i = 0; i < count; i++) {
+            io.emit("gameCommand", {
+              type: "attack",
+              side: side,
+              brutality: brutality,
+              username: username,
+              gift: giftName
+            });
+          }
+        };
 
         // ==================================
-        // NORMALIZE
+        // GIRL GIFTS (Left Side)
         // ==================================
 
-        const normalizedGift =
-          giftName
-            .trim()
-            .toLowerCase();
+        if (giftName === "Rose" || giftName === "Rosa") {
+          triggerAttack("girl", false);
+          return;
+        }
 
-        // ==================================
-        // ROSE
-        // GIRL NORMAL ATTACK
-        // ==================================
-
-        if (
-          normalizedGift === "rose"
-        ) {
-
-          sendGameCommand({
-
-            type: "attack",
-
-            side: "girl",
-
-            brutality: false,
-
-            power: 1,
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
+        if (giftName === "Paper Crane" || giftName === "Finger Heart") {
+          triggerAttack("girl", true);
           return;
         }
 
         // ==================================
-        // ROSA
-        // GIRL BRUTALITY
+        // BOY GIFTS (Right Side)
         // ==================================
 
         if (
-          normalizedGift === "rosa"
+          giftName === "TikTok" ||
+          giftName === "Ice Cream" ||
+          giftName === "GG"
         ) {
-
-          sendGameCommand({
-
-            type: "attack",
-
-            side: "girl",
-
-            brutality: true,
-
-            power: 10,
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
+          triggerAttack("boy", false);
           return;
         }
 
-        // ==================================
-        // TIKTOK
-        // BOY NORMAL ATTACK
-        // ==================================
-
         if (
-          normalizedGift === "tiktok"
+          giftName === "Doughnut" ||
+          giftName === "Mind Blown" ||
+          giftName === "Cap"
         ) {
-
-          sendGameCommand({
-
-            type: "attack",
-
-            side: "boy",
-
-            brutality: false,
-
-            power: 1,
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
-          return;
-        }
-
-        // ==================================
-        // MIND BLOWN
-        // BOY BRUTALITY
-        // ==================================
-
-        if (
-          normalizedGift === "mind blown" ||
-          normalizedGift === "mindblown"
-        ) {
-
-          sendGameCommand({
-
-            type: "attack",
-
-            side: "boy",
-
-            brutality: true,
-
-            power: 10,
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
-          return;
-        }
-
-        // ==================================
-        // LIKE-POP
-        // GIRL SWITCH
-        // ==================================
-
-        if (
-          normalizedGift === "like-pop" ||
-          normalizedGift === "like pop" ||
-          normalizedGift === "likepop"
-        ) {
-
-          sendGameCommand({
-
-            type: "switchCharacter",
-
-            side: "girl",
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
-          return;
-        }
-
-        // ==================================
-        // PAPER CRANE
-        // BOY SWITCH
-        // ==================================
-
-        if (
-          normalizedGift === "paper crane" ||
-          normalizedGift === "papercrane"
-        ) {
-
-          sendGameCommand({
-
-            type: "switchCharacter",
-
-            side: "boy",
-
-            username: username,
-
-            nickname: nickname,
-
-            gift: giftName,
-
-            repeatCount:
-              streak.eventGiftCount || 1
-
-          });
-
+          triggerAttack("boy", true);
           return;
         }
 
@@ -466,6 +263,11 @@ console.log(
 
       }
     );
+
+
+            
+            
+          
 
     // ======================================
     // CONNECT
