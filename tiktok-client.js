@@ -103,18 +103,19 @@
 
 
       // ATTACK
+        // ATTACK
     if (command.type === "attack") {
 
       attack(
         command.side,
         command.brutality,
         command.username,
-        command.gift,
-        command.repeatCount // <--- JUST ADD THIS LINE BRO
+        command.gift
       );
 
       return;
     }
+
 
 
 
