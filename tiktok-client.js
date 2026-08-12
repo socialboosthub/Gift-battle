@@ -102,8 +102,7 @@
     );
 
 
-      // ATTACK
-        // ATTACK
+    // ATTACK
     if (command.type === "attack") {
 
       attack(
@@ -115,8 +114,6 @@
 
       return;
     }
-
-
 
 
     // CHARACTER SWITCH

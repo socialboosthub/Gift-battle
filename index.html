@@ -433,8 +433,7 @@
       }, 10);
     }
 
-        // Added repeatCount = 1 at the end of the parameters
-      function attack(attacker, isBrutality, username = "Unknown", giftName = "") {
+    function attack(attacker, isBrutality, username = "Unknown", giftName = "") {
       if (!isMatchActive) return; 
 
       let powerPush = isBrutality ? 25 : 2.5; 
@@ -442,18 +441,18 @@
       if (attacker === 'girl') {
         linePosition += powerPush;
         addFeed(
-          'girl',
-          username,
-          giftName || (isBrutality ? "Paper Crane" : "Rose")
-        );
+  'girl',
+  username,
+  giftName || (isBrutality ? "Rosa" : "Rose")
+);
         animateCharacter('girl');
       } else {
         linePosition -= powerPush;
         addFeed(
-          'boy',
-          username,
-          giftName || (isBrutality ? "Mind Blown" : "TikTok")
-        );
+  'boy',
+  username,
+  giftName || (isBrutality ? "Mind Blown" : "TikTok")
+);
         animateCharacter('boy');
       }
 
@@ -489,9 +488,8 @@
         }, 500); 
       }
     }
-    
 
-     function animateCharacter(fighter) {
+    function animateCharacter(fighter) {
       const isGirl = (fighter === 'girl');
       const imgEl = document.getElementById(isGirl ? 'avatar-girl' : 'avatar-boy');
       const charData = isGirl ? girlCharacters[currentGirlIndex] : boyCharacters[currentBoyIndex];
@@ -499,13 +497,11 @@
       imgEl.src = charData.attack;
       imgEl.style.transform = isGirl ? "scale(1.1) translateX(15px)" : "scale(1.1) translateX(-15px)";
 
-      // Change this from 600 to 200 so they reset fast enough for the next punch!
       setTimeout(() => {
         imgEl.src = charData.idle;
         imgEl.style.transform = "scale(1) translateX(0)";
-      }, 200); 
+      }, 600);
     }
-
 
     function switchCharacter(side, username = "@Admin", giftName = null) {
   if (side === 'girl') {

@@ -60,10 +60,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+
     console.log(
       "Mortal Kombat page disconnected:",
       socket.id
     );
+
   });
 
 });
@@ -73,14 +75,17 @@ io.on("connection", (socket) => {
 // ==========================================
 
 function sendGameCommand(command) {
+
   console.log(
     "🎮 GAME COMMAND:",
     JSON.stringify(command)
   );
+
   io.emit(
     "gameCommand",
     command
   );
+
 }
 
 // ==========================================
@@ -88,13 +93,16 @@ function sendGameCommand(command) {
 // ==========================================
 
 let tiktokConnected = false;
+
 let tiktokClient = null;
 
-const giftTracker = new GiftStreakTracker();
+const giftTracker =
+  new GiftStreakTracker();
 
 async function connectTikTok() {
 
   try {
+
     console.log("");
     console.log("------------------------------------");
     console.log("Connecting to TikTok LIVE...");
@@ -104,7 +112,10 @@ async function connectTikTok() {
     );
     console.log("------------------------------------");
 
-    tiktokClient = new TikTokLiveClient(TIKTOK_USERNAME);
+    tiktokClient =
+      new TikTokLiveClient(
+        TIKTOK_USERNAME
+      );
 
     // ======================================
     // CONNECTED
@@ -113,13 +124,33 @@ async function connectTikTok() {
     tiktokClient.on(
       EventType.connected,
       (data) => {
-        tiktokConnected = true;
-        console.log("====================================");
-        console.log("✅ TIKTOK LIVE CONNECTED!");
-        console.log("Username:", TIKTOK_USERNAME);
-        console.log("====================================");
 
-        io.emit("tiktokStatus", { connected: true });
+        tiktokConnected = true;
+
+        console.log(
+          "===================================="
+        );
+
+        console.log(
+          "✅ TIKTOK LIVE CONNECTED!"
+        );
+
+        console.log(
+          "Username:",
+          TIKTOK_USERNAME
+        );
+
+        console.log(
+          "===================================="
+        );
+
+        io.emit(
+          "tiktokStatus",
+          {
+            connected: true
+          }
+        );
+
       }
     );
 
@@ -130,93 +161,297 @@ async function connectTikTok() {
     tiktokClient.on(
       EventType.disconnected,
       () => {
+
         tiktokConnected = false;
-        console.log("🔴 TikTok LIVE disconnected.");
-        io.emit("tiktokStatus", { connected: false });
+
+        console.log(
+          "🔴 TikTok LIVE disconnected."
+        );
+
+        io.emit(
+          "tiktokStatus",
+          {
+            connected: false
+          }
+        );
+
       }
     );
 
-    // ==========================================
-    // TIKTOK GIFT RECEIVED
-    // ==========================================
-
-    // 1. Tracker to calculate the exact number of new taps in a combo
-    const comboTracker = new Map();
+    // ======================================
+    // GIFTS
+    // ======================================
 
     tiktokClient.on(
       EventType.gift,
       (data) => {
 
-        const username = data.uniqueId || data.nickname || "Supporter";
-        const giftName = data.giftName || data.giftDetails?.giftName || "Gift";
+        console.log(
+          "===================================="
+        );
 
-        // 2. Fix the math so it only counts the NEW taps in a combo streak
-        const groupId = data.groupId;
-        const currentCount = data.repeatCount || data.combo || 1;
-        let hitsToExecute = currentCount;
+        console.log(
+          "🎁 RAW GIFT EVENT"
+        );
 
-        if (groupId) {
-            const previousCount = comboTracker.get(groupId) || 0;
-            hitsToExecute = currentCount - previousCount;
-            comboTracker.set(groupId, currentCount);
+        console.log(
+          JSON.stringify(data)
+        );
 
-            // Clear it out after a bit so it doesn't leak memory
-            setTimeout(() => comboTracker.delete(groupId), 10000);
-        }
-
-        if (hitsToExecute <= 0) return; // Prevent any double-firing bugs
-
-        console.log(`🎁 ${username} sent ${giftName} (Executing ${hitsToExecute} hits!)`);
-
-        // 3. Make this async and add a delay so they don't fire instantly
-        const triggerAttack = async (side, brutality) => {
-          for (let i = 0; i < hitsToExecute; i++) {
-            io.emit("gameCommand", {
-              type: "attack",
-              side: side,
-              brutality: brutality,
-              username: username,
-              gift: giftName
-            });
-
-            // BRO THIS IS THE MAGIC SAUCE: Wait 250ms between each hit
-            await new Promise(resolve => setTimeout(resolve, 250));
-          }
-        };
+        console.log(
+          "===================================="
+        );
 
         // ==================================
-        // GIRL GIFTS (Left Side)
+        // USER
         // ==================================
 
-        if (giftName === "Rose" || giftName === "Rosa") {
-          triggerAttack("girl", false);
-          return;
-        }
+        const username =
+          data.user?.uniqueId ||
+          data.user?.nickname ||
+          "Unknown";
 
-        if (giftName === "Paper Crane" || giftName === "Finger Heart") {
-          triggerAttack("girl", true);
-          return;
-        }
+        const nickname =
+          data.user?.nickname ||
+          username;
 
         // ==================================
-        // BOY GIFTS (Right Side)
+        // GIFT
+        // ==================================
+
+        const giftName =
+          data.gift?.name ||
+          "";
+
+        // ==================================
+        // STREAK
+        // ==================================
+
+        const streak =
+  giftTracker.process(data);
+
+// ⛔ Ignore gift until streak is finished
+if (!streak.isFinal) {
+  console.log(
+    "⏳ Gift streak still running - waiting for final event..."
+  );
+  return;
+}
+
+console.log(
+  `🎁 ${username} sent ${giftName}`
+);
+
+        console.log(
+          "Gift count:",
+          streak.eventGiftCount
+        );
+
+        console.log(
+          "Final:",
+          streak.isFinal
+        );
+
+        // ==================================
+        // NORMALIZE
+        // ==================================
+
+        const normalizedGift =
+          giftName
+            .trim()
+            .toLowerCase();
+
+        // ==================================
+        // ROSE
+        // GIRL NORMAL ATTACK
         // ==================================
 
         if (
-          giftName === "TikTok" ||
-          giftName === "Ice Cream" ||
-          giftName === "GG"
+          normalizedGift === "rose"
         ) {
-          triggerAttack("boy", false);
+
+          sendGameCommand({
+
+            type: "attack",
+
+            side: "girl",
+
+            brutality: false,
+
+            power: 1,
+
+            username: username,
+
+            nickname: nickname,
+
+            gift: giftName,
+
+            repeatCount:
+              streak.eventGiftCount || 1
+
+          });
+
           return;
         }
 
+        // ==================================
+        // ROSA
+        // GIRL BRUTALITY
+        // ==================================
+
         if (
-          giftName === "Doughnut" ||
-          giftName === "Mind Blown" ||
-          giftName === "Cap"
+          normalizedGift === "rosa"
         ) {
-          triggerAttack("boy", true);
+
+          sendGameCommand({
+
+            type: "attack",
+
+            side: "girl",
+
+            brutality: true,
+
+            power: 10,
+
+            username: username,
+
+            nickname: nickname,
+
+            gift: giftName,
+
+            repeatCount:
+              streak.eventGiftCount || 1
+
+          });
+
+          return;
+        }
+
+        // ==================================
+        // TIKTOK
+        // BOY NORMAL ATTACK
+        // ==================================
+
+        if (
+          normalizedGift === "tiktok"
+        ) {
+
+          sendGameCommand({
+
+            type: "attack",
+
+            side: "boy",
+
+            brutality: false,
+
+            power: 1,
+
+            username: username,
+
+            nickname: nickname,
+
+            gift: giftName,
+
+            repeatCount:
+              streak.eventGiftCount || 1
+
+          });
+
+          return;
+        }
+
+        // ==================================
+        // MIND BLOWN
+        // BOY BRUTALITY
+        // ==================================
+
+        if (
+          normalizedGift === "mind blown" ||
+          normalizedGift === "mindblown"
+        ) {
+
+          sendGameCommand({
+
+            type: "attack",
+
+            side: "boy",
+
+            brutality: true,
+
+            power: 10,
+
+            username: username,
+
+            nickname: nickname,
+
+            gift: giftName,
+
+            repeatCount:
+              streak.eventGiftCount || 1
+
+          });
+
+          return;
+        }
+
+        // ==================================
+        // LIKE-POP
+        // GIRL SWITCH
+        // ==================================
+
+        if (
+          normalizedGift === "like-pop" ||
+          normalizedGift === "like pop" ||
+          normalizedGift === "likepop"
+        ) {
+
+          sendGameCommand({
+
+            type: "switchCharacter",
+
+            side: "girl",
+
+            username: username,
+
+            nickname: nickname,
+
+            gift: giftName,
+
+            repeatCount:
+              streak.eventGiftCount || 1
+
+          });
+
+          return;
+        }
+
+        // ==================================
+        // PAPER CRANE
+        // BOY SWITCH
+        // ==================================
+
+        if (
+          normalizedGift === "paper crane" ||
+          normalizedGift === "papercrane"
+        ) {
+
+          sendGameCommand({
+
+            type: "switchCharacter",
+
+            side: "boy",
+
+            username: username,
+
+            nickname: nickname,
+
+            gift: giftName,
+
+            repeatCount:
+              streak.eventGiftCount || 1
+
+          });
+
           return;
         }
 
@@ -224,7 +459,11 @@ async function connectTikTok() {
         // UNKNOWN GIFT
         // ==================================
 
-        console.log("ℹ️ No action configured for:", giftName);
+        console.log(
+          "ℹ️ No action configured for:",
+          giftName
+        );
+
       }
     );
 
@@ -235,18 +474,34 @@ async function connectTikTok() {
     await tiktokClient.connect();
 
   } catch (error) {
+
     tiktokConnected = false;
-    console.error("❌ FAILED TO CONNECT TO TIKTOK LIVE");
+
+    console.error(
+      "❌ FAILED TO CONNECT TO TIKTOK LIVE"
+    );
+
     console.error(error);
 
-    io.emit("tiktokStatus", {
-      connected: false,
-      error: String(error)
-    });
+    io.emit(
+      "tiktokStatus",
+      {
+        connected: false,
+        error: String(error)
+      }
+    );
 
-    console.log("Retrying in 10 seconds...");
-    setTimeout(connectTikTok, 10000);
+    console.log(
+      "Retrying in 10 seconds..."
+    );
+
+    setTimeout(
+      connectTikTok,
+      10000
+    );
+
   }
+
 }
 
 // ==========================================
@@ -256,15 +511,35 @@ async function connectTikTok() {
 server.listen(
   PORT,
   () => {
+
     console.log("");
-    console.log("====================================");
-    console.log("MORTAL KOMBAT TIKTOK SERVER");
-    console.log("====================================");
-    console.log(`Server running on port ${PORT}`);
-    console.log(`TikTok: @${TIKTOK_USERNAME}`);
-    console.log("====================================");
+    console.log(
+      "===================================="
+    );
+
+    console.log(
+      "MORTAL KOMBAT TIKTOK SERVER"
+    );
+
+    console.log(
+      "===================================="
+    );
+
+    console.log(
+      `Server running on port ${PORT}`
+    );
+
+    console.log(
+      `TikTok: @${TIKTOK_USERNAME}`
+    );
+
+    console.log(
+      "===================================="
+    );
+
     console.log("");
 
     connectTikTok();
+
   }
 );
