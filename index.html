@@ -433,26 +433,29 @@
       }, 10);
     }
 
-    function attack(attacker, isBrutality, username = "Unknown", giftName = "") {
+        // Added repeatCount = 1 at the end of the parameters
+    function attack(attacker, isBrutality, username = "Unknown", giftName = "", repeatCount = 1) {
       if (!isMatchActive) return; 
 
-      let powerPush = isBrutality ? 25 : 2.5; 
+      // Multiply the power by the amount of gifts sent in the combo!
+      let powerPush = (isBrutality ? 25 : 2.5) * repeatCount; 
 
       if (attacker === 'girl') {
         linePosition += powerPush;
         addFeed(
-  'girl',
-  username,
-  giftName || (isBrutality ? "Rosa" : "Rose")
-);
+          'girl',
+          username,
+          // This adds the "x5" to the text feed so stream sees it
+          (giftName || (isBrutality ? "Rosa" : "Rose")) + (repeatCount > 1 ? ` x${repeatCount}` : "")
+        );
         animateCharacter('girl');
       } else {
         linePosition -= powerPush;
         addFeed(
-  'boy',
-  username,
-  giftName || (isBrutality ? "Mind Blown" : "TikTok")
-);
+          'boy',
+          username,
+          (giftName || (isBrutality ? "Mind Blown" : "TikTok")) + (repeatCount > 1 ? ` x${repeatCount}` : "")
+        );
         animateCharacter('boy');
       }
 
