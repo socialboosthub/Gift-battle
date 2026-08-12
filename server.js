@@ -20,7 +20,7 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 3000;
 
 const TIKTOK_USERNAME =
-  process.env.TIKTOK_USERNAME || "lxkt16";
+  process.env.TIKTOK_USERNAME || "yaboysavage_";
 
 // ==========================================
 // EXPRESS
