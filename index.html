@@ -863,10 +863,17 @@ let lastAttackTime = {
 /* ============================================================
    GIFT POWER
 ============================================================ */
-
 const giftActions = {
 
-    /* GIRL */
+    /* GIRLS */
+
+    like:{
+        side:"girl",
+        damage:1,
+        knockback:1,
+        type:"normal",
+        label:"LIKE ATTACK"
+    },
 
     rose:{
         side:"girl",
@@ -884,15 +891,16 @@ const giftActions = {
         label:"ROSA SPECIAL"
     },
 
-    like:{
-        side:"girl",
-        damage:2,
-        knockback:1,
-        type:"normal",
-        label:"QUICK HIT"
-    },
 
-    /* BOY */
+    /* BOYS */
+
+    follow:{
+        side:"boy",
+        damage:3,
+        knockback:2,
+        type:"normal",
+        label:"FOLLOW ATTACK"
+    },
 
     tiktok:{
         side:"boy",
@@ -908,14 +916,6 @@ const giftActions = {
         knockback:8,
         type:"special",
         label:"MIND BLOWN"
-    },
-
-    papercrane:{
-        side:"boy",
-        damage:2,
-        knockback:1,
-        type:"normal",
-        label:"QUICK HIT"
     }
 
 };
