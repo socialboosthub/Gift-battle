@@ -3,8 +3,7 @@ import http from "http";
 import { Server } from "socket.io";
 import {
   TikTokLiveClient,
-  EventType,
-  GiftStreakTracker
+  EventType
 } from "piratetok-live-js";
 
 const app = express();
@@ -95,9 +94,6 @@ function sendGameCommand(command) {
 let tiktokConnected = false;
 
 let tiktokClient = null;
-
-const giftTracker =
-  new GiftStreakTracker();
 
 async function connectTikTok() {
 
@@ -224,33 +220,65 @@ async function connectTikTok() {
           "";
 
         // ==================================
-        // STREAK
+        // GIFT COUNT
         // ==================================
 
-        const streak =
-  giftTracker.process(data);
+        // TikTok already tells us the actual
+        // number of gifts in repeatCount.
+        //
+        // Example:
+        // Rose x1  -> repeatCount = 1
+        // Rose x5  -> repeatCount = 5
+        // Rose x31 -> repeatCount = 31
+        // Rose x50 -> repeatCount = 50
 
-// ⛔ Ignore gift until streak is finished
-if (!streak.isFinal) {
-  console.log(
-    "⏳ Gift streak still running - waiting for final event..."
-  );
-  return;
-}
+        const giftCount =
+          Number(data.repeatCount) || 1;
 
-console.log(
-  `🎁 ${username} sent ${giftName}`
-);
+        const isFinal =
+          data.repeatEnd === 1;
+
+        console.log(
+          `🎁 ${username} sent ${giftName}`
+        );
 
         console.log(
           "Gift count:",
-          streak.eventGiftCount
+          giftCount
         );
 
         console.log(
           "Final:",
-          streak.isFinal
+          isFinal
         );
+
+        // ==================================
+        // WAIT FOR COMBO TO FINISH
+        // ==================================
+
+        // Only wait for gifts that are actually
+        // combo/streak gifts.
+        //
+        // Normal gifts are processed immediately.
+        //
+        // Combo example:
+        // x1 -> wait
+        // x2 -> wait
+        // x3 -> wait
+        // ...
+        // final event -> process
+
+        if (
+          data.gift?.combo === true &&
+          data.repeatEnd !== 1
+        ) {
+
+          console.log(
+            "⏳ Gift streak still running - waiting for final event..."
+          );
+
+          return;
+        }
 
         // ==================================
         // NORMALIZE
@@ -287,7 +315,7 @@ console.log(
             gift: giftName,
 
             repeatCount:
-              streak.eventGiftCount || 1
+              giftCount
 
           });
 
@@ -320,7 +348,7 @@ console.log(
             gift: giftName,
 
             repeatCount:
-              streak.eventGiftCount || 1
+              giftCount
 
           });
 
@@ -353,7 +381,7 @@ console.log(
             gift: giftName,
 
             repeatCount:
-              streak.eventGiftCount || 1
+              giftCount
 
           });
 
@@ -387,7 +415,7 @@ console.log(
             gift: giftName,
 
             repeatCount:
-              streak.eventGiftCount || 1
+              giftCount
 
           });
 
@@ -418,7 +446,7 @@ console.log(
             gift: giftName,
 
             repeatCount:
-              streak.eventGiftCount || 1
+              giftCount
 
           });
 
@@ -448,7 +476,7 @@ console.log(
             gift: giftName,
 
             repeatCount:
-              streak.eventGiftCount || 1
+              giftCount
 
           });
 
@@ -513,6 +541,7 @@ server.listen(
   () => {
 
     console.log("");
+
     console.log(
       "===================================="
     );
