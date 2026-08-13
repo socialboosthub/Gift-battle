@@ -70,6 +70,7 @@
       document.body.appendChild(
         box
       );
+
     }
 
     box.innerText =
@@ -132,7 +133,9 @@
     "tiktokStatus",
     (status) => {
 
-      if (status.connected) {
+      if (
+        status.connected
+      ) {
 
         showStatus(
           "🟢 TIKTOK LIVE CONNECTED"
@@ -183,16 +186,8 @@
           );
 
         console.log(
-          `⚔️ ${command.gift} = ${count} attack(s)`
+          `⚔️ ${command.gift} = ${count} attack(s) | power ${command.power || "default"}`
         );
-
-        // IMPORTANT:
-        // One TikTok gift = one attack.
-        // ×50 = fifty attacks.
-        //
-        // Small delay makes the repeated
-        // attacks visible instead of
-        // happening in one instant.
 
         let attackNumber = 0;
 
@@ -201,7 +196,9 @@
           if (
             attackNumber >= count
           ) {
+
             return;
+
           }
 
           attackNumber++;
@@ -210,32 +207,35 @@
             command.side,
             command.brutality,
             command.username,
-            command.gift
+            command.gift,
+            command.power,
+            command.actionLabel || ""
           );
 
-          // If the match ended, don't keep
-          // attacking after the winner.
+          // Stop if somebody has already won.
           if (
             typeof isMatchActive !==
               "undefined" &&
             !isMatchActive
           ) {
+
             return;
+
           }
 
-          // Fast enough to feel like a combo,
-          // but still shows the individual hits.
           setTimeout(
             doNextAttack,
             command.brutality
               ? 80
               : 70
           );
+
         }
 
         doNextAttack();
 
         return;
+
       }
 
       // ====================================
@@ -262,7 +262,9 @@
           if (
             switchNumber >= count
           ) {
+
             return;
+
           }
 
           switchNumber++;
@@ -277,11 +279,13 @@
             doNextSwitch,
             100
           );
+
         }
 
         doNextSwitch();
 
         return;
+
       }
 
     }
