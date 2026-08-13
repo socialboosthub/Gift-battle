@@ -4,7 +4,8 @@ import { Server } from "socket.io";
 import {
   TikTokLiveClient,
   EventType,
-  GiftStreakTracker
+  GiftStreakTracker,
+  LikeAccumulator
 } from "piratetok-live-js";
 
 const app = express();
@@ -21,6 +22,25 @@ const PORT = process.env.PORT || 3000;
 
 const TIKTOK_USERNAME =
   process.env.TIKTOK_USERNAME || "lxkt16";
+
+// ==========================================
+// BATTLE SCORING
+// ==========================================
+//
+// Normal gift / hit = 5
+// Big gift / brutality = 50
+// One follow = 1
+// Every 100 new likes = 1
+// Battle target = 100
+// ==========================================
+
+const NORMAL_GIFT_POWER = 5;
+const BIG_GIFT_POWER = 50;
+
+const FOLLOW_POWER = 1;
+
+const LIKES_PER_POINT = 100;
+const LIKE_POWER = 1;
 
 // ==========================================
 // EXPRESS
@@ -99,24 +119,42 @@ let tiktokClient = null;
 // ==========================================
 // GIFT STREAK TRACKING
 // ==========================================
-//
-// PirateTok's GiftStreakTracker handles TikTok's
-// cumulative repeatCount values.
-//
-// Example:
-//
-// TikTok: x1 -> x2 -> x3 -> x4 -> x5
-//
-// Game receives:
-//
-// +1 -> +1 -> +1 -> +1 -> +1
-//
-// Total = exactly 5 gifts.
-//
-// ==========================================
 
 let giftStreakTracker =
   new GiftStreakTracker();
+
+// ==========================================
+// LIKE TRACKING
+// ==========================================
+//
+// Every 100 new likes = 1 point.
+//
+// Example:
+//
+// 40 likes
+// +
+// 60 likes
+// =
+// 100 likes
+// =
+// 1 point
+//
+// Any remaining likes are carried forward.
+//
+// Example:
+//
+// 250 likes
+//
+// = 2 points
+// + 50 likes carried over
+// ==========================================
+
+let likeAccumulator =
+  new LikeAccumulator();
+
+let lastLikeTotal = 0;
+
+let likeRemainder = 0;
 
 // ==========================================
 // DUPLICATE MESSAGE PROTECTION
@@ -305,6 +343,7 @@ function processGift(data) {
   // ========================================
   // ROSE
   // GIRL NORMAL ATTACK
+  // 5 POINTS
   // ========================================
 
   if (
@@ -319,7 +358,7 @@ function processGift(data) {
 
       brutality: false,
 
-      power: 1,
+      power: NORMAL_GIFT_POWER,
 
       username: username,
 
@@ -338,6 +377,7 @@ function processGift(data) {
   // ========================================
   // ROSA
   // GIRL BIG ATTACK
+  // 50 POINTS
   // ========================================
 
   if (
@@ -352,7 +392,7 @@ function processGift(data) {
 
       brutality: true,
 
-      power: 10,
+      power: BIG_GIFT_POWER,
 
       username: username,
 
@@ -371,6 +411,7 @@ function processGift(data) {
   // ========================================
   // TIKTOK
   // BOY NORMAL ATTACK
+  // 5 POINTS
   // ========================================
 
   if (
@@ -385,7 +426,7 @@ function processGift(data) {
 
       brutality: false,
 
-      power: 1,
+      power: NORMAL_GIFT_POWER,
 
       username: username,
 
@@ -404,6 +445,7 @@ function processGift(data) {
   // ========================================
   // MIND BLOWN
   // BOY BIG ATTACK
+  // 50 POINTS
   // ========================================
 
   if (
@@ -419,7 +461,7 @@ function processGift(data) {
 
       brutality: true,
 
-      power: 10,
+      power: BIG_GIFT_POWER,
 
       username: username,
 
@@ -508,6 +550,190 @@ function processGift(data) {
 }
 
 // ==========================================
+// PROCESS FOLLOW
+// ==========================================
+//
+// 1 follow = 1 point for BOYS
+// ==========================================
+
+function processFollow(data) {
+
+  if (
+    isDuplicateMessage(data)
+  ) {
+
+    return;
+
+  }
+
+  const username =
+    data.user?.uniqueId ||
+    data.user?.nickname ||
+    "Unknown";
+
+  const nickname =
+    data.user?.nickname ||
+    username;
+
+  console.log(
+    `👤 ${username} followed | BOYS +${FOLLOW_POWER}`
+  );
+
+  sendGameCommand({
+
+    type: "attack",
+
+    side: "boy",
+
+    brutality: false,
+
+    power: FOLLOW_POWER,
+
+    username: username,
+
+    nickname: nickname,
+
+    gift: "Follow",
+
+    actionLabel: "Follow",
+
+    repeatCount: 1
+
+  });
+
+}
+
+// ==========================================
+// PROCESS LIKES
+// ==========================================
+//
+// Every 100 NEW likes = 1 point for GIRLS.
+//
+// The remainder is saved.
+//
+// Example:
+//
+// 250 likes
+//
+// 100 = 1
+// 100 = 1
+// 50  = saved
+//
+// Next 50 likes:
+//
+// 50 saved + 50 new = 100
+//
+// So another 1 point is created.
+// ==========================================
+
+function processLike(data) {
+
+  if (
+    isDuplicateMessage(data)
+  ) {
+
+    return;
+
+  }
+
+  const username =
+    data.user?.uniqueId ||
+    data.user?.nickname ||
+    "Unknown";
+
+  const nickname =
+    data.user?.nickname ||
+    username;
+
+  const stats =
+    likeAccumulator.process(
+      data
+    );
+
+  const totalLikeCount =
+    Number(
+      stats?.totalLikeCount
+    ) || 0;
+
+  const newLikes =
+    Math.max(
+      0,
+      totalLikeCount -
+      lastLikeTotal
+    );
+
+  lastLikeTotal =
+    Math.max(
+      lastLikeTotal,
+      totalLikeCount
+    );
+
+  if (
+    newLikes <= 0
+  ) {
+
+    return;
+
+  }
+
+  likeRemainder +=
+    newLikes;
+
+  const pointCount =
+    Math.floor(
+      likeRemainder /
+      LIKES_PER_POINT
+    );
+
+  likeRemainder =
+    likeRemainder %
+    LIKES_PER_POINT;
+
+  console.log(
+    `❤️ ${username} +${newLikes} likes`
+  );
+
+  console.log(
+    `🎯 Girls gained ${pointCount} point(s)`
+  );
+
+  console.log(
+    `📦 Likes carried over: ${likeRemainder}/${LIKES_PER_POINT}`
+  );
+
+  for (
+    let i = 0;
+    i < pointCount;
+    i++
+  ) {
+
+    sendGameCommand({
+
+      type: "attack",
+
+      side: "girl",
+
+      brutality: false,
+
+      power: LIKE_POWER,
+
+      username: username,
+
+      nickname: nickname,
+
+      gift: "100 Likes",
+
+      actionLabel: "100 Likes",
+
+      repeatCount: 1
+
+    });
+
+  }
+
+}
+
+// ==========================================
 // CONNECT TO TIKTOK
 // ==========================================
 
@@ -516,6 +742,7 @@ async function connectTikTok() {
   try {
 
     console.log("");
+
     console.log(
       "------------------------------------"
     );
@@ -534,11 +761,26 @@ async function connectTikTok() {
     );
 
     // ======================================
-    // RESET TRACKER FOR NEW CONNECTION
+    // RESET GIFT TRACKER
     // ======================================
 
     giftStreakTracker =
       new GiftStreakTracker();
+
+    // ======================================
+    // RESET LIKE TRACKER
+    // ======================================
+
+    likeAccumulator =
+      new LikeAccumulator();
+
+    lastLikeTotal = 0;
+
+    likeRemainder = 0;
+
+    // ======================================
+    // CREATE TIKTOK CLIENT
+    // ======================================
 
     tiktokClient =
       new TikTokLiveClient(
@@ -631,6 +873,64 @@ async function connectTikTok() {
         );
 
         processGift(data);
+
+      }
+    );
+
+    // ======================================
+    // FOLLOWS
+    // ======================================
+
+    tiktokClient.on(
+      EventType.follow,
+      (data) => {
+
+        console.log(
+          "===================================="
+        );
+
+        console.log(
+          "👤 RAW FOLLOW EVENT"
+        );
+
+        console.log(
+          JSON.stringify(data)
+        );
+
+        console.log(
+          "===================================="
+        );
+
+        processFollow(data);
+
+      }
+    );
+
+    // ======================================
+    // LIKES
+    // ======================================
+
+    tiktokClient.on(
+      EventType.like,
+      (data) => {
+
+        console.log(
+          "===================================="
+        );
+
+        console.log(
+          "❤️ RAW LIKE EVENT"
+        );
+
+        console.log(
+          JSON.stringify(data)
+        );
+
+        console.log(
+          "===================================="
+        );
+
+        processLike(data);
 
       }
     );
