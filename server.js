@@ -3,7 +3,8 @@ import http from "http";
 import { Server } from "socket.io";
 import {
   TikTokLiveClient,
-  EventType
+  EventType,
+  GiftStreakTracker
 } from "piratetok-live-js";
 
 const app = express();
@@ -96,58 +97,45 @@ let tiktokConnected = false;
 let tiktokClient = null;
 
 // ==========================================
-// GIFT TRACKING
+// GIFT STREAK TRACKING
 // ==========================================
 //
-// TikTok combo gifts can arrive like:
+// PirateTok's GiftStreakTracker handles TikTok's
+// cumulative repeatCount values.
 //
-// x1
-// x2
-// x3
-// x4
-// ...
-// x29
+// Example:
 //
-// repeatCount is a RUNNING TOTAL.
+// TikTok: x1 -> x2 -> x3 -> x4 -> x5
 //
-// Therefore:
+// Game receives:
 //
-// x1 -> +1
-// x2 -> +1
-// x3 -> +1
+// +1 -> +1 -> +1 -> +1 -> +1
 //
-// Total = 3
-//
-// We also protect against the SAME raw
-// TikTok message being delivered twice.
+// Total = exactly 5 gifts.
 //
 // ==========================================
 
-const activeGiftCombos = new Map();
-
-const processedMessageIds = new Map();
-
-const completedCombos = new Map();
-
-// How long duplicate message protection stays alive.
-const MESSAGE_MEMORY_MS = 60 * 1000;
-
-// How long a finished combo remains protected.
-const COMPLETED_COMBO_MEMORY_MS = 60 * 1000;
+let giftStreakTracker =
+  new GiftStreakTracker();
 
 // ==========================================
-// CLEAN OLD TRACKING DATA
+// DUPLICATE MESSAGE PROTECTION
 // ==========================================
+
+const processedMessageIds =
+  new Map();
+
+const MESSAGE_MEMORY_MS =
+  60 * 1000;
 
 function cleanupTracking() {
 
   const now = Date.now();
 
-  // ----------------------------------------
-  // Remove old processed message IDs
-  // ----------------------------------------
-
-  for (const [id, timestamp] of processedMessageIds) {
+  for (
+    const [id, timestamp]
+    of processedMessageIds
+  ) {
 
     if (
       now - timestamp >
@@ -155,23 +143,6 @@ function cleanupTracking() {
     ) {
 
       processedMessageIds.delete(id);
-
-    }
-
-  }
-
-  // ----------------------------------------
-  // Remove old completed combos
-  // ----------------------------------------
-
-  for (const [key, timestamp] of completedCombos) {
-
-    if (
-      now - timestamp >
-      COMPLETED_COMBO_MEMORY_MS
-    ) {
-
-      completedCombos.delete(key);
 
     }
 
@@ -185,75 +156,7 @@ setInterval(
 );
 
 // ==========================================
-// GET USER ID
-// ==========================================
-
-function getUserId(data) {
-
-  return String(
-    data.user?.id ||
-    data.user?.uniqueId ||
-    data.user?.nickname ||
-    "unknown-user"
-  );
-
-}
-
-// ==========================================
-// GET GIFT ID
-// ==========================================
-
-function getGiftId(data) {
-
-  return String(
-    data.gift?.id ||
-    data.giftId ||
-    data.gift?.name ||
-    "unknown-gift"
-  );
-
-}
-
-// ==========================================
-// GET COMBO KEY
-// ==========================================
-//
-// groupId identifies a particular TikTok
-// gift streak.
-//
-// This is better than using only username
-// + gift because separate gifts must remain
-// separate.
-//
-
-function getComboKey(data) {
-
-  const userId =
-    getUserId(data);
-
-  const giftId =
-    getGiftId(data);
-
-  const groupId =
-    data.groupId;
-
-  if (
-    groupId !== undefined &&
-    groupId !== null &&
-    String(groupId) !== ""
-  ) {
-
-    return `${userId}:${giftId}:group:${groupId}`;
-
-  }
-
-  // Fallback for gifts without groupId.
-  return `${userId}:${giftId}:nogroup`;
-
-}
-
-// ==========================================
-// GET RAW MESSAGE ID
+// GET MESSAGE ID
 // ==========================================
 
 function getMessageId(data) {
@@ -267,43 +170,7 @@ function getMessageId(data) {
 }
 
 // ==========================================
-// GET GIFT COUNT
-// ==========================================
-
-function getGiftCount(data) {
-
-  const repeatCount =
-    Number(data.repeatCount);
-
-  if (
-    Number.isFinite(repeatCount) &&
-    repeatCount > 0
-  ) {
-
-    return repeatCount;
-
-  }
-
-  const comboCount =
-    Number(data.comboCount);
-
-  if (
-    Number.isFinite(comboCount) &&
-    comboCount > 0
-  ) {
-
-    return comboCount;
-
-  }
-
-  // A gift event with no repeatCount is
-  // treated as exactly ONE gift.
-  return 1;
-
-}
-
-// ==========================================
-// CHECK DUPLICATE RAW EVENT
+// DUPLICATE CHECK
 // ==========================================
 
 function isDuplicateMessage(data) {
@@ -311,8 +178,6 @@ function isDuplicateMessage(data) {
   const messageId =
     getMessageId(data);
 
-  // If there is no message ID, we cannot
-  // perform this particular check.
   if (!messageId) {
 
     return false;
@@ -320,7 +185,9 @@ function isDuplicateMessage(data) {
   }
 
   if (
-    processedMessageIds.has(messageId)
+    processedMessageIds.has(
+      messageId
+    )
   ) {
 
     console.log(
@@ -342,145 +209,13 @@ function isDuplicateMessage(data) {
 }
 
 // ==========================================
-// CALCULATE NEW GIFTS
-// ==========================================
-
-function calculateNewGiftCount(data) {
-
-  const currentCount =
-    getGiftCount(data);
-
-  const key =
-    getComboKey(data);
-
-  // ----------------------------------------
-  // If this combo was already completed,
-  // ignore late duplicate events.
-  // ----------------------------------------
-
-  if (
-    completedCombos.has(key)
-  ) {
-
-    console.log(
-      "🛑 COMPLETED COMBO EVENT IGNORED:",
-      key
-    );
-
-    return 0;
-
-  }
-
-  // ----------------------------------------
-  // Get previous running total
-  // ----------------------------------------
-
-  const previousCount =
-    activeGiftCombos.get(key) || 0;
-
-  // ----------------------------------------
-  // Calculate DELTA
-  // ----------------------------------------
-
-  const newGiftCount =
-    currentCount - previousCount;
-
-  console.log(
-    `📊 Combo ${key}`
-  );
-
-  console.log(
-    `Previous total: ${previousCount}`
-  );
-
-  console.log(
-    `Current total: ${currentCount}`
-  );
-
-  console.log(
-    `NEW gifts: ${newGiftCount}`
-  );
-
-  // ----------------------------------------
-  // IMPORTANT:
-  //
-  // NEVER turn 0 into 1.
-  //
-  // 0 means the event was already counted.
-  // ----------------------------------------
-
-  if (newGiftCount <= 0) {
-
-    console.log(
-      "🛑 No new gifts in this event."
-    );
-
-    // Still remember the highest count.
-    if (
-      currentCount >
-      previousCount
-    ) {
-
-      activeGiftCombos.set(
-        key,
-        currentCount
-      );
-
-    }
-
-    return 0;
-
-  }
-
-  // ----------------------------------------
-  // Save newest running total
-  // ----------------------------------------
-
-  activeGiftCombos.set(
-    key,
-    currentCount
-  );
-
-  // ----------------------------------------
-  // If this is the final event, remember
-  // that the combo has already been finished.
-  // ----------------------------------------
-
-  if (
-    Number(data.repeatEnd) === 1
-  ) {
-
-    completedCombos.set(
-      key,
-      Date.now()
-    );
-
-    activeGiftCombos.delete(
-      key
-    );
-
-    console.log(
-      "🏁 COMBO FINISHED:",
-      key,
-      "Final total:",
-      currentCount
-    );
-
-  }
-
-  return newGiftCount;
-
-}
-
-// ==========================================
 // PROCESS GIFT
 // ==========================================
 
 function processGift(data) {
 
   // ========================================
-  // FIRST:
-  // Ignore duplicate raw TikTok messages.
+  // Ignore duplicate raw messages
   // ========================================
 
   if (
@@ -510,14 +245,21 @@ function processGift(data) {
       .toLowerCase();
 
   // ========================================
-  // CALCULATE ONLY THE NEW GIFTS
+  // USE PIRATETOK STREAK TRACKER
   // ========================================
+
+  const streak =
+    giftStreakTracker.process(
+      data
+    );
 
   const newGiftCount =
-    calculateNewGiftCount(data);
+    Number(
+      streak?.eventGiftCount
+    ) || 0;
 
   // ========================================
-  // ZERO = ALREADY COUNTED
+  // NOTHING NEW
   // ========================================
 
   if (
@@ -541,7 +283,13 @@ function processGift(data) {
   );
 
   console.log(
-    `📦 New gift units: ${newGiftCount}`
+    `📦 NEW GIFT UNITS: ${newGiftCount}`
+  );
+
+  console.log(
+    `📊 TikTok running total: ${
+      data.repeatCount || 1
+    }`
   );
 
   console.log(
@@ -584,11 +332,12 @@ function processGift(data) {
     });
 
     return;
+
   }
 
   // ========================================
   // ROSA
-  // GIRL BRUTALITY
+  // GIRL BIG ATTACK
   // ========================================
 
   if (
@@ -616,6 +365,7 @@ function processGift(data) {
     });
 
     return;
+
   }
 
   // ========================================
@@ -648,11 +398,12 @@ function processGift(data) {
     });
 
     return;
+
   }
 
   // ========================================
   // MIND BLOWN
-  // BOY BRUTALITY
+  // BOY BIG ATTACK
   // ========================================
 
   if (
@@ -681,6 +432,7 @@ function processGift(data) {
     });
 
     return;
+
   }
 
   // ========================================
@@ -711,6 +463,7 @@ function processGift(data) {
     });
 
     return;
+
   }
 
   // ========================================
@@ -740,6 +493,7 @@ function processGift(data) {
     });
 
     return;
+
   }
 
   // ========================================
@@ -754,7 +508,7 @@ function processGift(data) {
 }
 
 // ==========================================
-// TIKTOK CONNECTION
+// CONNECT TO TIKTOK
 // ==========================================
 
 async function connectTikTok() {
@@ -762,13 +516,29 @@ async function connectTikTok() {
   try {
 
     console.log("");
-    console.log("------------------------------------");
-    console.log("Connecting to TikTok LIVE...");
+    console.log(
+      "------------------------------------"
+    );
+
+    console.log(
+      "Connecting to TikTok LIVE..."
+    );
+
     console.log(
       "Username:",
       TIKTOK_USERNAME
     );
-    console.log("------------------------------------");
+
+    console.log(
+      "------------------------------------"
+    );
+
+    // ======================================
+    // RESET TRACKER FOR NEW CONNECTION
+    // ======================================
+
+    giftStreakTracker =
+      new GiftStreakTracker();
 
     tiktokClient =
       new TikTokLiveClient(
@@ -879,7 +649,9 @@ async function connectTikTok() {
       "❌ FAILED TO CONNECT TO TIKTOK LIVE"
     );
 
-    console.error(error);
+    console.error(
+      error
+    );
 
     io.emit(
       "tiktokStatus",
