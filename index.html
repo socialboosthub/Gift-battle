@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Mortal Kombat - TikTok Gift Battle</title>
 
 <style>
-
-/* =========================================================
-   RESET
-========================================================= */
 
 *{
   box-sizing:border-box;
@@ -19,8 +16,7 @@
   font-family:Impact,"Segoe UI",Arial,sans-serif;
 }
 
-html,
-body{
+html,body{
   width:100%;
   min-height:100%;
 }
@@ -37,9 +33,10 @@ body{
   overflow-x:hidden;
 }
 
-/* =========================================================
-   SECRET HINT
-========================================================= */
+
+/* =====================================================
+   STREAMER HINT
+===================================================== */
 
 .secret-hint{
   font:13px Arial,sans-serif;
@@ -56,27 +53,33 @@ body{
   font-weight:bold;
 }
 
-/* =========================================================
+
+/* =====================================================
    ARENA
-========================================================= */
+===================================================== */
 
 .arena-wrapper{
   width:100%;
   max-width:960px;
   aspect-ratio:16/9;
   position:relative;
+
   border:3px solid #2a1f3d;
   border-radius:12px;
+
   overflow:hidden;
+
   box-shadow:
     0 0 30px rgba(0,0,0,.9),
     0 0 15px rgba(176,38,255,.3);
+
   background:#000;
 }
 
-/* =========================================================
-   BACKGROUND IMAGE SIDES
-========================================================= */
+
+/* =====================================================
+   BACKGROUNDS
+===================================================== */
 
 .bg-split{
   position:absolute;
@@ -84,8 +87,7 @@ body{
   bottom:0;
 
   background-size:cover;
-  background-repeat:no-repeat;
-  background-position:center center;
+  background-position:center;
 
   transition:
     width .5s cubic-bezier(.25,1,.5,1);
@@ -96,14 +98,14 @@ body{
   width:50%;
 
   background-color:#4a1942;
-  background-image:url("./girls.jpg");
+  background-image:url("girls.jpg");
 
   border-right:2px solid rgba(255,255,255,.8);
 
   box-shadow:
     5px 0 20px rgba(176,38,255,.8);
 
-  z-index:1;
+  z-index:2;
 }
 
 .bg-boys{
@@ -111,7 +113,7 @@ body{
   width:50%;
 
   background-color:#193a4a;
-  background-image:url("./boys.jpg");
+  background-image:url("boys.jpg");
 
   border-left:2px solid rgba(255,255,255,.8);
 
@@ -121,15 +123,18 @@ body{
   z-index:1;
 }
 
-/* =========================================================
+
+/* =====================================================
    CENTER DIVIDER
-========================================================= */
+===================================================== */
 
 .center-divider{
   position:absolute;
+
   left:50%;
   top:0;
   bottom:0;
+
   width:6px;
 
   background:#fff;
@@ -141,15 +146,16 @@ body{
     0 0 30px #b026ff,
     0 0 45px #00d2ff;
 
-  z-index:8;
+  z-index:5;
 
   transition:
     left .5s cubic-bezier(.25,1,.5,1);
 }
 
-/* =========================================================
-   TOP SCORE HUD
-========================================================= */
+
+/* =====================================================
+   TOP SCORE
+===================================================== */
 
 .hud-top{
   position:absolute;
@@ -162,7 +168,7 @@ body{
   justify-content:space-between;
   align-items:center;
 
-  z-index:30;
+  z-index:20;
 }
 
 .team-score-box{
@@ -182,6 +188,7 @@ body{
 
 .score-number{
   font-size:32px;
+
   color:#fff;
 
   padding:8px 20px;
@@ -195,6 +202,7 @@ body{
 
 .team-name{
   font-size:28px;
+
   color:#fff;
 
   padding:8px 25px;
@@ -227,21 +235,24 @@ body{
     );
 }
 
-/* =========================================================
-   GIFT RULE PANELS
-========================================================= */
+
+/* =====================================================
+   GIFT RULE PANEL
+===================================================== */
 
 .gift-panel{
   position:absolute;
 
   top:50%;
+
   transform:translateY(-50%);
 
   display:flex;
   flex-direction:column;
+
   gap:6px;
 
-  z-index:20;
+  z-index:15;
 
   pointer-events:none;
 
@@ -259,20 +270,34 @@ body{
 
 .gift-panel.girls-side{
   left:15px;
-  border-left:3px solid #d800ff;
+
+  border-left:
+    3px solid #d800ff;
 }
 
 .gift-panel.boys-side{
   right:15px;
-  border-right:3px solid #00d2ff;
+
+  border-right:
+    3px solid #00d2ff;
 }
+
+
+/* =====================================================
+   GIFT ITEMS
+===================================================== */
 
 .gift-item{
   display:flex;
   align-items:center;
+
   gap:10px;
 
-  font:800 13px "Segoe UI",Arial,sans-serif;
+  font:
+    800 13px
+    "Segoe UI",
+    Arial,
+    sans-serif;
 
   color:#fff;
 
@@ -296,6 +321,7 @@ body{
 .gift-info{
   display:flex;
   flex-direction:column;
+
   justify-content:center;
 
   line-height:1.1;
@@ -313,17 +339,20 @@ body{
 
 .gift-points{
   color:#ffcc00;
+
   font-size:14px;
 }
 
 .gift-action{
   color:#00ffcc;
+
   font-size:12px;
 }
 
-/* =========================================================
+
+/* =====================================================
    CHARACTERS
-========================================================= */
+===================================================== */
 
 .avatar-wrapper{
   position:absolute;
@@ -332,7 +361,7 @@ body{
 
   height:60%;
 
-  z-index:10;
+  z-index:6;
 
   transition:
     left .5s cubic-bezier(.25,1,.5,1);
@@ -340,11 +369,13 @@ body{
 
 .avatar-wrapper-girl{
   transform:translateX(-100%);
+
   padding-right:30px;
 }
 
 .avatar-wrapper-boy{
   transform:translateX(0);
+
   padding-left:30px;
 }
 
@@ -356,104 +387,32 @@ body{
 
   transition:
     transform .15s ease-out;
-
-  display:block;
 }
 
-/* =========================================================
+
+/* =====================================================
+   IMPORTANT:
+   NO FLOATING BOUQUET / CONFETTI IMAGE
+===================================================== */
+
+/*
+   We intentionally removed the old
+   floating-gift system.
+
+   Bouquet and Confetti will NOT appear
+   as giant pictures over the arena.
+
+   Instead the screen will show:
+
+       CHARACTER CHANGED
+
+   This keeps the battle clean.
+*/
+
+
+/* =====================================================
    CHARACTER CHANGED ANNOUNCEMENT
-========================================================= */
-
-.character-change{
-  position:absolute;
-
-  top:42%;
-  left:50%;
-
-  transform:
-    translate(-50%,-50%)
-    scale(.5);
-
-  z-index:100;
-
-  pointer-events:none;
-
-  opacity:0;
-
-  font:
-    900 42px Arial,sans-serif;
-
-  text-transform:uppercase;
-
-  text-align:center;
-
-  letter-spacing:3px;
-
-  white-space:nowrap;
-
-  text-shadow:
-    0 3px 5px #000,
-    0 0 15px currentColor;
-
-  animation:
-    characterChanged .9s
-    cubic-bezier(.175,.885,.32,1.275)
-    forwards;
-}
-
-.character-change.girl{
-  color:#ff4dff;
-
-  text-shadow:
-    0 0 10px #d800ff,
-    0 0 25px #d800ff,
-    4px 4px 0 #000;
-}
-
-.character-change.boy{
-  color:#00d9ff;
-
-  text-shadow:
-    0 0 10px #0066ff,
-    0 0 25px #0066ff,
-    4px 4px 0 #000;
-}
-
-@keyframes characterChanged{
-
-  0%{
-    opacity:0;
-    transform:
-      translate(-50%,-50%)
-      scale(.4);
-  }
-
-  20%{
-    opacity:1;
-    transform:
-      translate(-50%,-50%)
-      scale(1.15);
-  }
-
-  45%{
-    opacity:1;
-    transform:
-      translate(-50%,-50%)
-      scale(1);
-  }
-
-  100%{
-    opacity:0;
-    transform:
-      translate(-50%,-80%)
-      scale(1.05);
-  }
-
-}
-
-/* =========================================================
-   ANNOUNCEMENTS
-========================================================= */
+===================================================== */
 
 .announcement{
   position:absolute;
@@ -466,6 +425,7 @@ body{
     scale(.5);
 
   font-size:56px;
+
   font-weight:900;
 
   text-transform:uppercase;
@@ -478,7 +438,7 @@ body{
 
   pointer-events:none;
 
-  z-index:110;
+  z-index:70;
 
   transition:
     all .2s
@@ -513,9 +473,10 @@ body{
     4px 4px 0 #000;
 }
 
-/* =========================================================
-   FEED
-========================================================= */
+
+/* =====================================================
+   ACTION FEED
+===================================================== */
 
 .action-feed{
   position:absolute;
@@ -527,7 +488,7 @@ body{
 
   gap:6px;
 
-  z-index:25;
+  z-index:15;
 
   pointer-events:none;
 }
@@ -547,9 +508,12 @@ body{
 
   border-radius:4px;
 
-  font:13px Arial,sans-serif;
+  font:
+    13px Arial,
+    sans-serif;
 
   display:flex;
+
   align-items:center;
 
   gap:8px;
@@ -561,11 +525,13 @@ body{
 }
 
 .feed-item-girl{
-  border-left:3px solid #d800ff;
+  border-left:
+    3px solid #d800ff;
 }
 
 .feed-item-boy{
-  border-left:3px solid #00d2ff;
+  border-left:
+    3px solid #00d2ff;
 }
 
 .feed-gift-icon{
@@ -586,12 +552,12 @@ body{
     opacity:1;
     transform:translateY(0);
   }
-
 }
 
-/* =========================================================
-   BATTLE SCORE BAR
-========================================================= */
+
+/* =====================================================
+   BATTLE SCORE
+===================================================== */
 
 .battle-scorebar{
   width:100%;
@@ -604,7 +570,8 @@ body{
   justify-content:center;
   align-items:stretch;
 
-  border:2px solid #2e2440;
+  border:
+    2px solid #2e2440;
 
   border-radius:10px;
 
@@ -675,9 +642,10 @@ body{
   background:#111;
 }
 
-/* =========================================================
+
+/* =====================================================
    CONTROLS
-========================================================= */
+===================================================== */
 
 .controls-panel{
   width:100%;
@@ -687,7 +655,8 @@ body{
 
   background:#120e1a;
 
-  border:1px solid #2e2440;
+  border:
+    1px solid #2e2440;
 
   border-radius:10px;
 
@@ -757,7 +726,8 @@ body{
 
   color:#fff;
 
-  border:1px solid #ff88ff;
+  border:
+    1px solid #ff88ff;
 }
 
 .btn-boy-hit{
@@ -775,7 +745,8 @@ body{
 
   color:#fff;
 
-  border:1px solid #44aaff;
+  border:
+    1px solid #44aaff;
 }
 
 .btn-util{
@@ -783,12 +754,14 @@ body{
 
   color:#ccc;
 
-  border:1px solid #44355e;
+  border:
+    1px solid #44355e;
 }
 
-/* =========================================================
-   FULLSCREEN BUTTON
-========================================================= */
+
+/* =====================================================
+   FULLSCREEN
+===================================================== */
 
 .fullscreen-btn{
   position:fixed;
@@ -801,11 +774,13 @@ body{
   width:52px;
   height:52px;
 
-  border:1px solid rgba(255,255,255,.25);
+  border:
+    1px solid rgba(255,255,255,.25);
 
   border-radius:50%;
 
-  background:rgba(0,0,0,.75);
+  background:
+    rgba(0,0,0,.75);
 
   color:#fff;
 
@@ -841,25 +816,24 @@ body{
 
   cursor:pointer;
 
-  z-index:120;
+  z-index:100;
 }
 
-/* =========================================================
+
+/* =====================================================
    SCREEN SHAKE
-========================================================= */
+===================================================== */
 
 .arena-hit{
   animation:
-    screenShake
-    .3s
+    screenShake .3s
     cubic-bezier(.36,.07,.19,.97)
     both;
 }
 
 .arena-brutality{
   animation:
-    brutalShake
-    .6s
+    brutalShake .6s
     cubic-bezier(.36,.07,.19,.97)
     both;
 
@@ -891,7 +865,6 @@ body{
   80%{
     transform:translate(4px,-2px);
   }
-
 }
 
 @keyframes brutalShake{
@@ -937,12 +910,12 @@ body{
       translate(10px,-5px)
       scale(1.01);
   }
-
 }
 
-/* =========================================================
+
+/* =====================================================
    VIEWER MODE
-========================================================= */
+===================================================== */
 
 body.viewer-mode{
   padding:0;
@@ -966,15 +939,18 @@ body.viewer-mode #tiktok-debug{
 }
 
 body.viewer-mode .arena-wrapper{
-  width:min(
-    100vw,
-    calc(100vh * 16 / 9)
-  );
 
-  height:min(
-    100vh,
-    calc(100vw * 9 / 16)
-  );
+  width:
+    min(
+      100vw,
+      calc(100vh * 16 / 9)
+    );
+
+  height:
+    min(
+      100vh,
+      calc(100vw * 9 / 16)
+    );
 
   max-width:none;
 
@@ -989,20 +965,15 @@ body.viewer-mode .arena-wrapper{
   margin:0;
 }
 
-/* =========================================================
+
+/* =====================================================
    MOBILE
-========================================================= */
+===================================================== */
 
 @media(max-width:700px){
 
   body{
     padding:8px;
-  }
-
-  .hud-top{
-    top:10px;
-    left:10px;
-    right:10px;
   }
 
   .team-name{
@@ -1012,12 +983,15 @@ body.viewer-mode .arena-wrapper{
 
   .score-number{
     font-size:22px;
+
     padding:6px 10px;
+
     min-width:45px;
   }
 
   .gift-panel{
     padding:5px 7px;
+
     gap:3px;
   }
 
@@ -1048,18 +1022,52 @@ body.viewer-mode .arena-wrapper{
     bottom:14%;
   }
 
-  .character-change{
-    font-size:27px;
-    letter-spacing:1px;
-  }
-
   .announcement{
     font-size:32px;
   }
 
   .feed-item{
     font-size:9px;
+
     padding:3px 6px;
+  }
+
+  .feed-gift-icon{
+    width:18px;
+    height:18px;
+  }
+
+}
+
+
+/* =====================================================
+   VERY SMALL PHONE
+===================================================== */
+
+@media(max-width:420px){
+
+  .gift-panel{
+    transform:
+      translateY(-50%)
+      scale(.82);
+
+    transform-origin:center;
+  }
+
+  .hud-top{
+    left:10px;
+    right:10px;
+  }
+
+  .team-name{
+    font-size:15px;
+    padding:5px 7px;
+  }
+
+  .score-number{
+    font-size:18px;
+    min-width:36px;
+    padding:5px 7px;
   }
 
 }
@@ -1067,74 +1075,73 @@ body.viewer-mode .arena-wrapper{
 </style>
 </head>
 
+
 <body>
 
-<!-- =========================================================
-     PRELOAD ALL IMAGES
-========================================================= -->
+
+<!-- =====================================================
+     PRELOAD CHARACTER IMAGES
+===================================================== -->
 
 <div style="display:none">
 
-  <img src="./girls.jpg">
-  <img src="./boys.jpg">
+  <img src="kitana_idle.png">
+  <img src="kitana_attack.png">
 
-  <img src="./kitana_idle.png">
-  <img src="./kitana_attack.png">
+  <img src="mileena_idle.png">
+  <img src="mileena_attack.png">
 
-  <img src="./mileena_idle.png">
-  <img src="./mileena_attack.png">
+  <img src="jade_idle.png">
+  <img src="jade_attack.png">
 
-  <img src="./jade_idle.png">
-  <img src="./jade_attack.png">
+  <img src="subzero_idle.png">
+  <img src="subzero_attack.png">
 
-  <img src="./subzero_idle.png">
-  <img src="./subzero_attack.png">
+  <img src="scorpion_idle.png">
+  <img src="scorpion_attack.png">
 
-  <img src="./scorpion_idle.png">
-  <img src="./scorpion_attack.png">
+  <img src="liukang_idle.png">
+  <img src="liukang_attack.png">
 
-  <img src="./liukang_idle.png">
-  <img src="./liukang_attack.png">
+  <img src="icon_100likes.png">
+  <img src="icon_follow.png">
 
-  <img src="./icon_100likes.png">
-  <img src="./icon_follow.png">
+  <img src="icon_rose.png">
+  <img src="icon_rosa.png">
 
-  <img src="./icon_rose.png">
-  <img src="./icon_rosa.png">
-
-  <img src="./icon_tiktok.png">
-  <img src="./icon_necklace.png">
-
-  <img src="./icon_bouquet.png">
-  <img src="./icon_confetti.png">
+  <img src="icon_tiktok.png">
+  <img src="icon_necklace.png">
 
 </div>
 
+
 <div class="secret-hint">
+
   Streamer Mode Active:
   Press <span>H</span>
   to hide/show controls
+
 </div>
 
-<!-- =========================================================
+
+<!-- =====================================================
      ARENA
-========================================================= -->
+===================================================== -->
 
 <div class="arena-wrapper" id="arena">
 
-  <!-- BACKGROUNDS -->
 
   <div
     class="bg-split bg-girls"
     id="bg-girls">
   </div>
 
+
   <div
     class="bg-split bg-boys"
     id="bg-boys">
   </div>
 
-  <!-- CENTER LINE -->
 
   <div
     class="center-divider"
@@ -1142,11 +1149,12 @@ body.viewer-mode .arena-wrapper{
   </div>
 
 
-  <!-- =====================================================
-       TOP HUD
-  ====================================================== -->
+  <!-- =================================================
+       TOP SCORE
+  ================================================== -->
 
   <div class="hud-top">
+
 
     <div class="team-score-box team-girls">
 
@@ -1181,19 +1189,21 @@ body.viewer-mode .arena-wrapper{
 
     </div>
 
+
   </div>
 
 
-  <!-- =====================================================
-       GIRL GIFT RULES
-  ====================================================== -->
+  <!-- =================================================
+       GIRLS GIFTS
+  ================================================== -->
 
   <div class="gift-panel girls-side">
+
 
     <div class="gift-item">
 
       <img
-        src="./icon_100likes.png"
+        src="icon_100likes.png"
         class="gift-icon"
         alt="100 Likes">
 
@@ -1215,7 +1225,7 @@ body.viewer-mode .arena-wrapper{
     <div class="gift-item">
 
       <img
-        src="./icon_rose.png"
+        src="icon_rose.png"
         class="gift-icon"
         alt="Rose">
 
@@ -1237,7 +1247,7 @@ body.viewer-mode .arena-wrapper{
     <div class="gift-item">
 
       <img
-        src="./icon_rosa.png"
+        src="icon_rosa.png"
         class="gift-icon"
         alt="Rosa">
 
@@ -1256,10 +1266,12 @@ body.viewer-mode .arena-wrapper{
     </div>
 
 
+    <!-- BUILT-IN BOUQUET ICON -->
+
     <div class="gift-item">
 
       <img
-        src="./icon_bouquet.png"
+        id="bouquet-rule-icon"
         class="gift-icon"
         alt="Bouquet">
 
@@ -1270,26 +1282,28 @@ body.viewer-mode .arena-wrapper{
         </span>
 
         <span class="gift-action">
-          Character Change
+          Character Changed
         </span>
 
       </div>
 
     </div>
 
+
   </div>
 
 
-  <!-- =====================================================
-       BOY GIFT RULES
-  ====================================================== -->
+  <!-- =================================================
+       BOYS GIFTS
+  ================================================== -->
 
   <div class="gift-panel boys-side">
+
 
     <div class="gift-item">
 
       <img
-        src="./icon_follow.png"
+        src="icon_follow.png"
         class="gift-icon"
         alt="Follow">
 
@@ -1311,7 +1325,7 @@ body.viewer-mode .arena-wrapper{
     <div class="gift-item">
 
       <img
-        src="./icon_tiktok.png"
+        src="icon_tiktok.png"
         class="gift-icon"
         alt="TikTok">
 
@@ -1333,7 +1347,7 @@ body.viewer-mode .arena-wrapper{
     <div class="gift-item">
 
       <img
-        src="./icon_necklace.png"
+        src="icon_necklace.png"
         class="gift-icon"
         alt="Necklace">
 
@@ -1352,10 +1366,12 @@ body.viewer-mode .arena-wrapper{
     </div>
 
 
+    <!-- BUILT-IN CONFETTI ICON -->
+
     <div class="gift-item">
 
       <img
-        src="./icon_confetti.png"
+        id="confetti-rule-icon"
         class="gift-icon"
         alt="Confetti">
 
@@ -1366,26 +1382,27 @@ body.viewer-mode .arena-wrapper{
         </span>
 
         <span class="gift-action">
-          Character Change
+          Character Changed
         </span>
 
       </div>
 
     </div>
 
+
   </div>
 
 
-  <!-- =====================================================
+  <!-- =================================================
        GIRL CHARACTER
-  ====================================================== -->
+  ================================================== -->
 
   <div
     class="avatar-wrapper avatar-wrapper-girl"
     id="wrap-girl">
 
     <img
-      src="./kitana_idle.png"
+      src="kitana_idle.png"
       class="avatar"
       id="avatar-girl"
       alt="Girl Fighter">
@@ -1393,16 +1410,16 @@ body.viewer-mode .arena-wrapper{
   </div>
 
 
-  <!-- =====================================================
+  <!-- =================================================
        BOY CHARACTER
-  ====================================================== -->
+  ================================================== -->
 
   <div
     class="avatar-wrapper avatar-wrapper-boy"
     id="wrap-boy">
 
     <img
-      src="./subzero_idle.png"
+      src="subzero_idle.png"
       class="avatar"
       id="avatar-boy"
       alt="Boy Fighter">
@@ -1410,7 +1427,9 @@ body.viewer-mode .arena-wrapper{
   </div>
 
 
-  <!-- WINNER ANNOUNCEMENT -->
+  <!-- =================================================
+       ANNOUNCEMENT
+  ================================================== -->
 
   <div
     class="announcement"
@@ -1418,12 +1437,15 @@ body.viewer-mode .arena-wrapper{
   </div>
 
 
-  <!-- FEEDS -->
+  <!-- =================================================
+       FEEDS
+  ================================================== -->
 
   <div
     class="action-feed action-feed-girls"
     id="feed-girls">
   </div>
+
 
   <div
     class="action-feed action-feed-boys"
@@ -1431,35 +1453,39 @@ body.viewer-mode .arena-wrapper{
   </div>
 
 
-  <!-- SECRET BUTTON -->
-
   <button
     class="secret-toggle-btn"
     onclick="toggleControls()">
+
     ⚙
+
   </button>
+
 
 </div>
 
 
-<!-- =========================================================
+<!-- =====================================================
      FULLSCREEN
-========================================================= -->
+===================================================== -->
 
 <button
   class="fullscreen-btn"
   onclick="startViewerMode()">
+
   ⛶
+
 </button>
 
 
-<!-- =========================================================
-     SCORE BAR
-========================================================= -->
+<!-- =====================================================
+     BATTLE SCORE
+===================================================== -->
 
 <div
   class="battle-scorebar"
   id="battle-scorebar">
+
 
   <div class="battle-score-side girls">
 
@@ -1468,14 +1494,18 @@ body.viewer-mode .arena-wrapper{
     <span
       class="battle-score-number"
       id="girl-battle-score">
+
       100
+
     </span>
 
   </div>
 
 
   <div class="battle-score-center">
+
     VS
+
   </div>
 
 
@@ -1486,17 +1516,20 @@ body.viewer-mode .arena-wrapper{
     <span
       class="battle-score-number"
       id="boy-battle-score">
+
       100
+
     </span>
 
   </div>
 
+
 </div>
 
 
-<!-- =========================================================
+<!-- =====================================================
      ADMIN CONTROLS
-========================================================= -->
+===================================================== -->
 
 <div
   class="controls-panel"
@@ -1505,80 +1538,99 @@ body.viewer-mode .arena-wrapper{
 
   <div class="button-group">
 
+
     <button
       class="btn btn-girl-hit"
       onclick="attack('girl',false,null,'Rose',5)">
+
       🌹 Girls Rose (5)
+
     </button>
 
 
     <button
       class="btn btn-girl-brutal"
       onclick="attack('girl',true,null,'Rosa',50)">
+
       🌹 Girls Rosa (50)
+
     </button>
 
 
     <button
       class="btn btn-boy-hit"
       onclick="attack('boy',false,null,'TikTok',5)">
+
       🎵 Boys TikTok (5)
+
     </button>
 
 
     <button
       class="btn btn-boy-brutal"
       onclick="attack('boy',true,null,'Necklace',50)">
+
       💎 Boys Necklace (50)
+
     </button>
+
 
   </div>
 
 
   <div class="button-group">
 
+
     <button
       class="btn btn-util"
       onclick="switchCharacter('girl',null,'Bouquet')">
+
       💐 Switch Girl
+
     </button>
 
 
     <button
       class="btn btn-util"
       onclick="switchCharacter('boy',null,'Confetti')">
+
       🎉 Switch Boy
+
     </button>
 
 
     <button
       class="btn btn-util"
       onclick="resetMatch()">
+
       ⚡ Reset Match
+
     </button>
 
 
     <button
       class="btn btn-util"
       onclick="resetScores()">
+
       🔄 Zero Scores
+
     </button>
 
 
     <button
       class="btn btn-util"
       onclick="toggleControls()">
+
       👁 Hide Controls
+
     </button>
+
 
   </div>
 
+
 </div>
 
-
-<!-- =========================================================
-     MUSIC
-========================================================= -->
 
 <audio
   id="battle-background-music"
@@ -1587,85 +1639,264 @@ body.viewer-mode .arena-wrapper{
 </audio>
 
 
-<!-- =========================================================
-     MAIN JAVASCRIPT
-========================================================= -->
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
 
 <script>
 
-/* =========================================================
-   GAME VARIABLES
-========================================================= */
+
+/* =====================================================
+   BATTLE VARIABLES
+===================================================== */
 
 let linePosition = 100;
 
 let girlWins = 0;
+
 let boyWins = 0;
 
 let isMatchActive = true;
 
 
-/* =========================================================
-   GIRL CHARACTERS
-========================================================= */
+/* =====================================================
+   CHARACTER LIST
+===================================================== */
 
 const girlCharacters = [
 
   {
     name:"KITANA",
-    idle:"./kitana_idle.png",
-    attack:"./kitana_attack.png"
+    idle:"kitana_idle.png",
+    attack:"kitana_attack.png"
   },
 
   {
     name:"MILEENA",
-    idle:"./mileena_idle.png",
-    attack:"./mileena_attack.png"
+    idle:"mileena_idle.png",
+    attack:"mileena_attack.png"
   },
 
   {
     name:"JADE",
-    idle:"./jade_idle.png",
-    attack:"./jade_attack.png"
+    idle:"jade_idle.png",
+    attack:"jade_attack.png"
   }
 
 ];
 
 
-/* =========================================================
-   BOY CHARACTERS
-========================================================= */
-
 const boyCharacters = [
 
   {
     name:"SUB-ZERO",
-    idle:"./subzero_idle.png",
-    attack:"./subzero_attack.png"
+    idle:"subzero_idle.png",
+    attack:"subzero_attack.png"
   },
 
   {
     name:"SCORPION",
-    idle:"./scorpion_idle.png",
-    attack:"./scorpion_attack.png"
+    idle:"scorpion_idle.png",
+    attack:"scorpion_attack.png"
   },
 
   {
     name:"LIU KANG",
-    idle:"./liukang_idle.png",
-    attack:"./liukang_attack.png"
+    idle:"liukang_idle.png",
+    attack:"liukang_attack.png"
   }
 
 ];
 
 
 let currentGirlIndex = 0;
+
 let currentBoyIndex = 0;
 
 
-/* =========================================================
+/* =====================================================
+   BUILT-IN BOUQUET + CONFETTI IMAGES
+=====================================================
+
+   IMPORTANT:
+
+   These are embedded directly into the page.
+
+   You DON'T need:
+   icon_bouquet.png
+   icon_confetti.png
+
+===================================================== */
+
+
+/* Bouquet image */
+
+const bouquetSVG =
+'data:image/svg+xml;charset=UTF-8,' +
+encodeURIComponent(`
+
+<svg
+xmlns="http://www.w3.org/2000/svg"
+viewBox="0 0 100 100">
+
+<defs>
+
+<radialGradient id="p">
+<stop offset="0" stop-color="#ff8cff"/>
+<stop offset="1" stop-color="#d000ff"/>
+</radialGradient>
+
+</defs>
+
+<path
+d="M50 95 L43 48 L57 48 Z"
+fill="#8b4513"/>
+
+<path
+d="M50 70
+C30 65 18 50 20 35
+C38 36 48 48 50 70Z"
+fill="#39b54a"/>
+
+<path
+d="M50 70
+C70 65 82 50 80 35
+C62 36 52 48 50 70Z"
+fill="#2fa84f"/>
+
+<circle
+cx="28"
+cy="30"
+r="17"
+fill="url(#p)"/>
+
+<circle
+cx="50"
+cy="22"
+r="18"
+fill="#ff4fa3"/>
+
+<circle
+cx="72"
+cy="30"
+r="17"
+fill="#ff77d9"/>
+
+<circle
+cx="39"
+cy="43"
+r="17"
+fill="#d800ff"/>
+
+<circle
+cx="61"
+cy="43"
+r="17"
+fill="#ff3ca6"/>
+
+<circle
+cx="50"
+cy="32"
+r="9"
+fill="#ffd700"/>
+
+</svg>
+`);
+
+
+/* Confetti image */
+
+const confettiSVG =
+'data:image/svg+xml;charset=UTF-8,' +
+encodeURIComponent(`
+
+<svg
+xmlns="http://www.w3.org/2000/svg"
+viewBox="0 0 100 100">
+
+<rect
+x="25"
+y="20"
+width="50"
+height="65"
+rx="6"
+fill="#ffffff"
+stroke="#00d2ff"
+stroke-width="4"/>
+
+<path
+d="M25 35 L50 50 L75 35"
+fill="none"
+stroke="#00d2ff"
+stroke-width="4"/>
+
+<circle
+cx="20"
+cy="18"
+r="6"
+fill="#ff3cac"/>
+
+<circle
+cx="80"
+cy="20"
+r="6"
+fill="#ffd700"/>
+
+<circle
+cx="15"
+cy="55"
+r="5"
+fill="#00ff88"/>
+
+<circle
+cx="85"
+cy="58"
+r="5"
+fill="#ff6600"/>
+
+<rect
+x="12"
+y="75"
+width="10"
+height="5"
+rx="2"
+fill="#ff00ff"
+transform="rotate(-25 12 75)"/>
+
+<rect
+x="78"
+y="75"
+width="10"
+height="5"
+rx="2"
+fill="#00d2ff"
+transform="rotate(25 78 75)"/>
+
+<circle
+cx="50"
+cy="70"
+r="5"
+fill="#ffcc00"/>
+
+</svg>
+`);
+
+
+/* Put icons into page */
+
+document.getElementById(
+  "bouquet-rule-icon"
+).src = bouquetSVG;
+
+
+document.getElementById(
+  "confetti-rule-icon"
+).src = confettiSVG;
+
+
+/* =====================================================
    RANDOM USERNAME
-========================================================= */
+===================================================== */
 
 function getRandomUsername(){
 
@@ -1689,36 +1920,35 @@ function getRandomUsername(){
   const name =
     names[
       Math.floor(
-        Math.random() *
-        names.length
+        Math.random()*names.length
       )
     ];
 
   const suffix =
     Math.floor(
-      Math.random() * 99999
+      Math.random()*99999
     );
 
   return name + suffix;
 }
 
 
-/* =========================================================
+/* =====================================================
    UPDATE VISUALS
-========================================================= */
+===================================================== */
 
 function updateVisuals(){
 
   let displayPosition =
     linePosition;
 
-  if(displayPosition > 200){
-    displayPosition = 200;
-  }
 
-  if(displayPosition < 0){
+  if(displayPosition > 200)
+    displayPosition = 200;
+
+
+  if(displayPosition < 0)
     displayPosition = 0;
-  }
 
 
   const visualPercentage =
@@ -1764,15 +1994,14 @@ function updateVisuals(){
   document.getElementById(
     "boy-battle-score"
   ).innerText =
-    200 -
-    Math.round(displayPosition);
+    200 - Math.round(displayPosition);
 
 }
 
 
-/* =========================================================
+/* =====================================================
    SCREEN SHAKE
-========================================================= */
+===================================================== */
 
 function triggerAnimation(
   isBrutality
@@ -1804,79 +2033,65 @@ function triggerAnimation(
 }
 
 
-/* =========================================================
+/* =====================================================
    CHARACTER CHANGED MESSAGE
-========================================================= */
+===================================================== */
 
 function showCharacterChanged(
   side
 ){
 
-  const arena =
+  const announcement =
     document.getElementById(
-      "arena"
+      "announcement-text"
     );
 
 
-  const message =
-    document.createElement(
-      "div"
-    );
-
-
-  message.className =
-    "character-change " +
+  announcement.className =
+    "announcement " +
     (
       side === "girl"
-        ? "girl"
-        : "boy"
-    );
+        ? "annct-girls"
+        : "annct-boys"
+    ) +
+    " active";
 
 
-  message.innerText =
+  announcement.innerText =
     "CHARACTER CHANGED";
-
-
-  arena.appendChild(
-    message
-  );
 
 
   setTimeout(
     function(){
 
-      message.remove();
+      announcement.classList.remove(
+        "active"
+      );
 
     },
-    950
+    900
   );
 
 }
 
 
-/* =========================================================
+/* =====================================================
    ATTACK
-========================================================= */
+===================================================== */
 
 function attack(
 
   attacker,
-
   isBrutality,
-
   username = null,
-
   giftName = "",
-
   customPower = null,
-
   actionLabel = ""
 
 ){
 
-  if(!isMatchActive){
+  if(!isMatchActive)
     return;
-  }
 
 
   if(
@@ -1913,7 +2128,6 @@ function attack(
 
 
   const feedAction =
-
     actionLabel ||
     giftName ||
     (
@@ -1922,8 +2136,6 @@ function attack(
         : "Hit"
     );
 
-
-  /* GIRLS */
 
   if(attacker === "girl"){
 
@@ -1942,12 +2154,8 @@ function attack(
       "girl"
     );
 
-  }
 
-
-  /* BOYS */
-
-  else{
+  }else{
 
     linePosition -=
       powerPush;
@@ -1980,9 +2188,9 @@ function attack(
 }
 
 
-/* =========================================================
+/* =====================================================
    WINNER
-========================================================= */
+===================================================== */
 
 function checkWinner(){
 
@@ -1991,8 +2199,6 @@ function checkWinner(){
       "announcement-text"
     );
 
-
-  /* GIRLS WIN */
 
   if(linePosition >= 200){
 
@@ -2005,8 +2211,7 @@ function checkWinner(){
       girlWins;
 
 
-    isMatchActive =
-      false;
+    isMatchActive = false;
 
 
     announcement.className =
@@ -2030,10 +2235,9 @@ function checkWinner(){
       900
     );
 
+
   }
 
-
-  /* BOYS WIN */
 
   else if(linePosition <= 0){
 
@@ -2046,8 +2250,7 @@ function checkWinner(){
       boyWins;
 
 
-    isMatchActive =
-      false;
+    isMatchActive = false;
 
 
     announcement.className =
@@ -2076,9 +2279,9 @@ function checkWinner(){
 }
 
 
-/* =========================================================
-   CHARACTER ATTACK ANIMATION
-========================================================= */
+/* =====================================================
+   CHARACTER ATTACK
+===================================================== */
 
 function animateCharacter(
   fighter
@@ -2141,23 +2344,27 @@ function animateCharacter(
 }
 
 
-/* =========================================================
+/* =====================================================
    CHARACTER SWITCH
-=========================================================
+=====================================================
 
-   BOUQUET  = GIRL CHARACTER CHANGE
-   CONFETTI = BOY CHARACTER CHANGE
+   GIRL:
+   Bouquet → next character
 
-   IMPORTANT:
-   NO GIFT IMAGE POPUP HERE.
-========================================================= */
+   BOY:
+   Confetti → next character
+
+   NO BIG GIFT IMAGE.
+
+   ONLY:
+   CHARACTER CHANGED
+
+===================================================== */
 
 function switchCharacter(
 
   side,
-
   username = null,
-
   giftName = null
 
 ){
@@ -2173,9 +2380,9 @@ function switchCharacter(
   }
 
 
-  /* =======================================================
+  /* ==============================================
      GIRL
-  ====================================================== */
+  ============================================== */
 
   if(side === "girl"){
 
@@ -2183,7 +2390,8 @@ function switchCharacter(
 
       (
         currentGirlIndex + 1
-      ) %
+      )
+      %
       girlCharacters.length;
 
 
@@ -2199,21 +2407,13 @@ function switchCharacter(
       char.name;
 
 
-    const girlAvatar =
-      document.getElementById(
-        "avatar-girl"
-      );
-
-
-    girlAvatar.src =
+    document.getElementById(
+      "avatar-girl"
+    ).src =
       char.idle;
 
 
-    girlAvatar.style.transform =
-      "scale(1) translateX(0)";
-
-
-    /* ONLY TEXT NOW */
+    /* CLEAN MESSAGE */
 
     showCharacterChanged(
       "girl"
@@ -2223,18 +2423,23 @@ function switchCharacter(
     /* FEED */
 
     addFeed(
+
       "girl",
+
       username,
-      giftName || "Bouquet",
-      "./icon_bouquet.png"
+
+      "Character Changed",
+
+      bouquetSVG
+
     );
 
   }
 
 
-  /* =======================================================
+  /* ==============================================
      BOY
-  ====================================================== */
+  ============================================== */
 
   else{
 
@@ -2242,7 +2447,8 @@ function switchCharacter(
 
       (
         currentBoyIndex + 1
-      ) %
+      )
+      %
       boyCharacters.length;
 
 
@@ -2258,21 +2464,13 @@ function switchCharacter(
       char.name;
 
 
-    const boyAvatar =
-      document.getElementById(
-        "avatar-boy"
-      );
-
-
-    boyAvatar.src =
+    document.getElementById(
+      "avatar-boy"
+    ).src =
       char.idle;
 
 
-    boyAvatar.style.transform =
-      "scale(1) translateX(0)";
-
-
-    /* ONLY TEXT NOW */
+    /* CLEAN MESSAGE */
 
     showCharacterChanged(
       "boy"
@@ -2282,10 +2480,15 @@ function switchCharacter(
     /* FEED */
 
     addFeed(
+
       "boy",
+
       username,
-      giftName || "Confetti",
-      "./icon_confetti.png"
+
+      "Character Changed",
+
+      confettiSVG
+
     );
 
   }
@@ -2293,18 +2496,15 @@ function switchCharacter(
 }
 
 
-/* =========================================================
+/* =====================================================
    FEED
-========================================================= */
+===================================================== */
 
 function addFeed(
 
   side,
-
   user,
-
   gift,
-
   giftImage = null
 
 ){
@@ -2330,9 +2530,13 @@ function addFeed(
     "feed-item " +
 
     (
+
       side === "girl"
+
         ? "feed-item-girl"
+
         : "feed-item-boy"
+
     );
 
 
@@ -2355,7 +2559,8 @@ function addFeed(
       `<img
         class="feed-gift-icon"
         src="${giftImage}"
-        alt="">`;
+        alt="">
+      `;
 
   }
 
@@ -2368,7 +2573,9 @@ function addFeed(
        style="
        color:${nameColor};
        font-weight:bold">
-       ${user}
+
+       ${escapeHTML(user)}
+
      </span>
 
      <span>
@@ -2376,7 +2583,7 @@ function addFeed(
      </span>
 
      <span>
-       ${gift}
+       ${escapeHTML(gift)}
      </span>`;
 
 
@@ -2398,9 +2605,30 @@ function addFeed(
 }
 
 
-/* =========================================================
+/* =====================================================
+   SECURITY HELPER
+===================================================== */
+
+function escapeHTML(
+  text
+){
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+  div.textContent =
+    text;
+
+  return div.innerHTML;
+
+}
+
+
+/* =====================================================
    RESET MATCH
-========================================================= */
+===================================================== */
 
 function resetMatch(){
 
@@ -2413,15 +2641,17 @@ function resetMatch(){
 }
 
 
-/* =========================================================
+/* =====================================================
    RESET SCORES
-========================================================= */
+===================================================== */
 
 function resetScores(){
 
   resetMatch();
 
+
   girlWins = 0;
+
   boyWins = 0;
 
 
@@ -2437,9 +2667,9 @@ function resetScores(){
 }
 
 
-/* =========================================================
+/* =====================================================
    CONTROLS
-========================================================= */
+===================================================== */
 
 function toggleControls(){
 
@@ -2470,9 +2700,9 @@ window.addEventListener(
 );
 
 
-/* =========================================================
+/* =====================================================
    VIEWER MODE
-========================================================= */
+===================================================== */
 
 async function startViewerMode(){
 
@@ -2510,8 +2740,10 @@ async function startViewerMode(){
   try{
 
     if(
+
       !document.fullscreenElement &&
       arena.requestFullscreen
+
     ){
 
       await arena.requestFullscreen();
@@ -2556,9 +2788,9 @@ async function startViewerMode(){
 }
 
 
-/* =========================================================
-   FULLSCREEN CHANGE
-========================================================= */
+/* =====================================================
+   FULLSCREEN EXIT
+===================================================== */
 
 document.addEventListener(
   "fullscreenchange",
@@ -2578,132 +2810,23 @@ document.addEventListener(
 );
 
 
-/* =========================================================
-   IMAGE ERROR DEBUGGING
-========================================================= */
-
-function setupImageDebug(){
-
-  const images =
-    document.querySelectorAll(
-      "img"
-    );
-
-
-  images.forEach(
-    function(img){
-
-      img.addEventListener(
-        "error",
-        function(){
-
-          console.warn(
-            "IMAGE NOT FOUND:",
-            img.src
-          );
-
-        }
-      );
-
-    }
-  );
-
-
-  const girlBackground =
-    document.getElementById(
-      "bg-girls"
-    );
-
-
-  const boyBackground =
-    document.getElementById(
-      "bg-boys"
-    );
-
-
-  const testGirl =
-    new Image();
-
-
-  testGirl.onload =
-    function(){
-
-      console.log(
-        "🟣 GIRLS BACKGROUND OK"
-      );
-
-    };
-
-
-  testGirl.onerror =
-    function(){
-
-      console.error(
-        "❌ GIRLS BACKGROUND NOT FOUND: ./girls.jpg"
-      );
-
-    };
-
-
-  testGirl.src =
-    "./girls.jpg";
-
-
-  const testBoy =
-    new Image();
-
-
-  testBoy.onload =
-    function(){
-
-      console.log(
-        "🔵 BOYS BACKGROUND OK"
-      );
-
-    };
-
-
-  testBoy.onerror =
-    function(){
-
-      console.error(
-        "❌ BOYS BACKGROUND NOT FOUND: ./boys.jpg"
-      );
-
-    };
-
-
-  testBoy.src =
-    "./boys.jpg";
-
-}
-
-
-/* =========================================================
-   START
-========================================================= */
+/* =====================================================
+   START GAME
+===================================================== */
 
 updateVisuals();
 
-setupImageDebug();
-
 </script>
 
 
-<!-- =========================================================
-     SOCKET.IO
-========================================================= -->
+<!-- =====================================================
+     TIKTOK CONNECTION
+===================================================== -->
 
-<script
-  src="https://cdn.socket.io/4.8.1/socket.io.min.js">
-</script>
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
+<script src="tiktok-client.js"></script>
 
-<!-- =========================================================
-     TIKTOK CLIENT
-========================================================= -->
-
-<script src="./tiktok-client.js"></script>
 
 </body>
-      </html>
+   </html>
