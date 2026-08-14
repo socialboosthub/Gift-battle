@@ -11,7 +11,237 @@
       ],
       reconnection: true
     });
+  // ======================================
+  // 🎵 BACKGROUND MUSIC SYSTEM
+  // ======================================
 
+  const battleMusic = [
+    {
+      src: "sounds/song1.mp3",
+      repeats: 3
+    },
+
+    {
+      src: "sounds/song2.mp3",
+      repeats: 3
+    }
+  ];
+
+
+  let currentMusicIndex = 0;
+
+  let currentMusicPlay = 0;
+
+  let musicStarted = false;
+
+
+  const musicPlayer =
+    document.getElementById(
+      "battle-background-music"
+    );
+
+
+  // ======================================
+  // LOAD SONG
+  // ======================================
+
+  function loadBattleSong() {
+
+    if (!musicPlayer) {
+
+      console.log(
+        "🎵 Music player not found."
+      );
+
+      return;
+
+    }
+
+
+    const song =
+      battleMusic[
+        currentMusicIndex
+      ];
+
+
+    musicPlayer.src =
+      song.src;
+
+    musicPlayer.volume =
+      0.25;
+
+    currentMusicPlay = 1;
+
+
+    console.log(
+      "🎵 Loading:",
+      song.src
+    );
+
+  }
+
+
+  // ======================================
+  // START MUSIC
+  // ======================================
+
+  function startBattleMusic() {
+
+    if (!musicPlayer) {
+
+      return;
+
+    }
+
+
+    if (!musicPlayer.src) {
+
+      loadBattleSong();
+
+    }
+
+
+    musicPlayer.volume =
+      0.25;
+
+
+    const playPromise =
+      musicPlayer.play();
+
+
+    if (
+      playPromise &&
+      typeof playPromise.catch ===
+        "function"
+    ) {
+
+      playPromise.catch(
+        error => {
+
+          console.log(
+            "🎵 Music waiting for user interaction:",
+            error
+          );
+
+        }
+      );
+
+    }
+
+
+    musicStarted = true;
+
+  }
+
+
+  // ======================================
+  // SONG FINISHED
+  // ======================================
+
+  if (musicPlayer) {
+
+    musicPlayer.addEventListener(
+      "ended",
+      () => {
+
+        const song =
+          battleMusic[
+            currentMusicIndex
+          ];
+
+
+        // Still has another repetition.
+        if (
+          currentMusicPlay <
+          song.repeats
+        ) {
+
+          currentMusicPlay++;
+
+
+          console.log(
+            "🎵 Repeating song " +
+            currentMusicPlay +
+            "/" +
+            song.repeats
+          );
+
+
+          musicPlayer.currentTime =
+            0;
+
+
+          musicPlayer.play()
+            .catch(
+              error => {
+
+                console.log(
+                  "🎵 Could not restart song:",
+                  error
+                );
+
+              }
+            );
+
+
+          return;
+
+        }
+
+
+        // ==================================
+        // MOVE TO NEXT SONG
+        // ==================================
+
+        currentMusicIndex++;
+
+
+        if (
+          currentMusicIndex >=
+          battleMusic.length
+        ) {
+
+          currentMusicIndex = 0;
+
+        }
+
+
+        console.log(
+          "🎵 Moving to next song"
+        );
+
+
+        loadBattleSong();
+
+
+        musicPlayer.play()
+          .catch(
+            error => {
+
+              console.log(
+                "🎵 Could not start next song:",
+                error
+              );
+
+            }
+          );
+
+      }
+    );
+
+  }
+
+
+  // ======================================
+  // MAKE MUSIC AVAILABLE TO index.html
+  // ======================================
+
+  window.startBattleMusic =
+    startBattleMusic;
+
+
+  // Load the first song immediately.
+  loadBattleSong();
 
   // ======================================
   // VOICE SYSTEM
