@@ -492,7 +492,7 @@
 
           speakAnnouncement(
             side +
-            "!!! BRUTALITY!!!",
+            "!",
             {
               rate: 0.78,
 
@@ -516,7 +516,7 @@
 
           speakAnnouncement(
             side +
-            " HIT!!!",
+            "!",
             {
               rate: 1.28,
 
