@@ -177,8 +177,8 @@
     /* Moving Avatar Wrappers */
     .avatar-wrapper {
       position: absolute;
-      bottom: 22%;
-      height: 52%;
+      bottom: 15%;
+      height: 60%;
       z-index: 6;
       transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
@@ -203,7 +203,7 @@
     /* Win Announcement */
     .announcement {
       position: absolute;
-      top: 35%;
+      top: 40%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.5);
       font-size: 56px;
@@ -229,7 +229,7 @@
     /* Action Feed Log Containers */
     .action-feed {
       position: absolute;
-      bottom: 80px;
+      bottom: 20px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -241,7 +241,7 @@
     .action-feed-boys { right: 15px; }
 
     .feed-item {
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.65);
       padding: 4px 10px;
       border-radius: 4px;
       font-size: 13px;
@@ -252,7 +252,6 @@
       text-align: left;
       direction: ltr;
       animation: fadeIn 0.3s ease;
-      backdrop-filter: blur(4px);
     }
 
     .feed-item-girl { border-left: 3px solid #d800ff; }
@@ -264,25 +263,23 @@
     }
 
     /* ==========================================
-       GIFT HUD LEGEND OVERLAY (INSIDE ARENA)
+       GIFT HUD LEGEND OVERLAY (MIDDLE RIGHT VERTICAL)
        ========================================== */
     .gift-hud-overlay {
       position: absolute;
-      bottom: 8px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 50%;
+      right: 15px; /* Aligned to the right side where you circled */
+      transform: translateY(-50%); /* Keeps it perfectly centered vertically */
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      background: rgba(10, 8, 16, 0.88);
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-      border-radius: 10px;
-      padding: 5px 8px;
+      flex-direction: column; /* Stack vertically instead of horizontally */
+      gap: 5px; /* Tighter gap */
+      background: rgba(10, 8, 16, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 6px;
       z-index: 18;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(6px);
-      max-width: 96%;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
     }
 
     .gift-hud-card {
@@ -290,32 +287,32 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.06);
-      border-radius: 6px;
-      padding: 3px 6px;
-      min-width: 62px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      padding: 3px;
+      min-width: 50px; /* Small and compact */
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       transition: transform 0.2s;
     }
 
     .gift-hud-card.girl-side {
-      border-bottom: 3px solid #d800ff;
+      border-right: 3px solid #d800ff; /* Side border instead of bottom */
     }
 
     .gift-hud-card.boy-side {
-      border-bottom: 3px solid #00d2ff;
+      border-right: 3px solid #00d2ff;
     }
 
     .gift-hud-card img {
-      width: 26px;
-      height: 26px;
+      width: 22px; /* Smaller image */
+      height: 22px;
       object-fit: contain;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
     }
 
     .gift-hud-title {
-      font-size: 9px;
+      font-size: 8px; /* Micro text */
       font-family: Arial, sans-serif;
       font-weight: bold;
       color: #bbb;
@@ -325,7 +322,7 @@
     }
 
     .gift-hud-action {
-      font-size: 11px;
+      font-size: 10px;
       font-family: 'Impact', sans-serif;
       color: #fff;
       margin-top: 1px;
@@ -464,8 +461,8 @@
 
     .arena-wrapper:fullscreen .bg-split { height: 100%; }
     .arena-wrapper:fullscreen .hud-top { top: 3%; left: 3%; right: 3%; }
-    .arena-wrapper:fullscreen .action-feed { bottom: 85px; }
-    .arena-wrapper:fullscreen .gift-hud-overlay { bottom: 15px; }
+    .arena-wrapper:fullscreen .action-feed { bottom: 3%; }
+    .arena-wrapper:fullscreen .gift-hud-overlay { right: 2%; top: 50%; } /* stays on the right in fullscreen */
     .arena-wrapper:fullscreen .secret-toggle-btn { display: none; }
 
     body.viewer-mode {
@@ -568,7 +565,7 @@
     <div class="action-feed action-feed-boys" id="feed-boys"></div>
 
     <!-- ==========================================
-         TIKTOK GIFT HUD OVERLAY (INSIDE STREAM)
+         TIKTOK GIFT HUD OVERLAY (COMPACT VERTICAL LIST)
          ========================================== -->
     <div class="gift-hud-overlay">
       <!-- ROSE -->
