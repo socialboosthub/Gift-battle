@@ -11,6 +11,8 @@
       ],
       reconnection: true
     });
+
+
   // ======================================
   // 🎵 BACKGROUND MUSIC SYSTEM
   // ======================================
@@ -27,18 +29,31 @@
     }
   ];
 
-
   let currentMusicIndex = 0;
-
   let currentMusicPlay = 0;
-
   let musicStarted = false;
 
+  let musicPlayer = null;
 
-  const musicPlayer =
-    document.getElementById(
-      "battle-background-music"
-    );
+
+  // ======================================
+  // FIND MUSIC PLAYER
+  // ======================================
+
+  function getMusicPlayer() {
+
+    if (!musicPlayer) {
+
+      musicPlayer =
+        document.getElementById(
+          "battle-background-music"
+        );
+
+    }
+
+    return musicPlayer;
+
+  }
 
 
   // ======================================
@@ -47,7 +62,10 @@
 
   function loadBattleSong() {
 
-    if (!musicPlayer) {
+    const player =
+      getMusicPlayer();
+
+    if (!player) {
 
       console.log(
         "🎵 Music player not found."
@@ -57,21 +75,18 @@
 
     }
 
-
     const song =
       battleMusic[
         currentMusicIndex
       ];
 
-
-    musicPlayer.src =
+    player.src =
       song.src;
 
-    musicPlayer.volume =
+    player.volume =
       0.25;
 
     currentMusicPlay = 1;
-
 
     console.log(
       "🎵 Loading:",
@@ -87,26 +102,33 @@
 
   function startBattleMusic() {
 
-    if (!musicPlayer) {
+    const player =
+      getMusicPlayer();
+
+    if (!player) {
+
+      console.log(
+        "🎵 Music player not found."
+      );
 
       return;
 
     }
 
 
-    if (!musicPlayer.src) {
+    if (!player.src) {
 
       loadBattleSong();
 
     }
 
 
-    musicPlayer.volume =
+    player.volume =
       0.25;
 
 
     const playPromise =
-      musicPlayer.play();
+      player.play();
 
 
     if (
@@ -119,7 +141,7 @@
         error => {
 
           console.log(
-            "🎵 Music waiting for user interaction:",
+            "🎵 Music could not start:",
             error
           );
 
@@ -131,6 +153,10 @@
 
     musicStarted = true;
 
+    console.log(
+      "🎵 Background music started."
+    );
+
   }
 
 
@@ -138,11 +164,25 @@
   // SONG FINISHED
   // ======================================
 
-  if (musicPlayer) {
+  function setupMusicPlayer() {
 
-    musicPlayer.addEventListener(
+    const player =
+      getMusicPlayer();
+
+    if (!player) {
+
+      console.log(
+        "🎵 Music player not found."
+      );
+
+      return;
+
+    }
+
+
+    player.addEventListener(
       "ended",
-      () => {
+      function () {
 
         const song =
           battleMusic[
@@ -150,14 +190,16 @@
           ];
 
 
-        // Still has another repetition.
+        // -------------------------------
+        // REPEAT CURRENT SONG
+        // -------------------------------
+
         if (
           currentMusicPlay <
           song.repeats
         ) {
 
           currentMusicPlay++;
-
 
           console.log(
             "🎵 Repeating song " +
@@ -167,16 +209,16 @@
           );
 
 
-          musicPlayer.currentTime =
+          player.currentTime =
             0;
 
 
-          musicPlayer.play()
+          player.play()
             .catch(
               error => {
 
                 console.log(
-                  "🎵 Could not restart song:",
+                  "🎵 Could not repeat song:",
                   error
                 );
 
@@ -189,12 +231,11 @@
         }
 
 
-        // ==================================
-        // MOVE TO NEXT SONG
-        // ==================================
+        // -------------------------------
+        // NEXT SONG
+        // -------------------------------
 
         currentMusicIndex++;
-
 
         if (
           currentMusicIndex >=
@@ -207,19 +248,19 @@
 
 
         console.log(
-          "🎵 Moving to next song"
+          "🎵 Moving to next song."
         );
 
 
         loadBattleSong();
 
 
-        musicPlayer.play()
+        player.play()
           .catch(
             error => {
 
               console.log(
-                "🎵 Could not start next song:",
+                "🎵 Could not play next song:",
                 error
               );
 
@@ -233,15 +274,43 @@
 
 
   // ======================================
-  // MAKE MUSIC AVAILABLE TO index.html
+  // INITIALIZE MUSIC
   // ======================================
+
+  function initializeBattleMusic() {
+
+    const player =
+      getMusicPlayer();
+
+    if (!player) {
+
+      console.log(
+        "🎵 Waiting for music player..."
+      );
+
+      setTimeout(
+        initializeBattleMusic,
+        100
+      );
+
+      return;
+
+    }
+
+
+    loadBattleSong();
+
+    setupMusicPlayer();
+
+  }
+
 
   window.startBattleMusic =
     startBattleMusic;
 
 
-  // Load the first song immediately.
-  loadBattleSong();
+  initializeBattleMusic();
+
 
   // ======================================
   // VOICE SYSTEM
@@ -326,7 +395,7 @@
 
 
   // ======================================
-  // 🔥 LIVE ANNOUNCER
+  // LIVE ANNOUNCER
   // ======================================
 
   function speakAnnouncement(
@@ -353,9 +422,6 @@
 
     }
 
-
-    // Prevent too many announcements
-    // from stacking up during a busy LIVE.
 
     if (
       voiceQueue.length >= 3
@@ -422,9 +488,6 @@
     speech.volume =
       item.volume;
 
-
-    // Try to use an English voice
-    // available on the phone.
 
     const voices =
       window.speechSynthesis
@@ -497,13 +560,6 @@
 
   // ======================================
   // UNLOCK PHONE VOICE
-  // ======================================
-  //
-  // Mobile browsers can block speech
-  // until the user interacts with the page.
-  //
-  // We call this from the fullscreen
-  // button because that is a user tap.
   // ======================================
 
   function unlockBattleVoice() {
@@ -655,7 +711,6 @@
         command.type === "attack"
       ) {
 
-
         const side =
           command.side === "boy"
             ? "BOYS"
@@ -672,9 +727,7 @@
           .toLowerCase();
 
 
-        // ==================================
-        // 👤 FOLLOW
-        // ==================================
+        // FOLLOW
 
         if (
           action === "follow"
@@ -692,9 +745,7 @@
         }
 
 
-        // ==================================
-        // ❤️ 100 LIKES
-        // ==================================
+        // 100 LIKES
 
         else if (
           action === "100 likes"
@@ -712,17 +763,14 @@
         }
 
 
-        // ==================================
-        // 💥 BRUTALITY
-        // ==================================
+        // BRUTALITY
 
         else if (
           command.brutality === true
         ) {
 
           speakAnnouncement(
-            side +
-            "!",
+            side + "!",
             {
               rate: 0.78,
 
@@ -738,15 +786,12 @@
         }
 
 
-        // ==================================
-        // 👊 NORMAL HIT
-        // ==================================
+        // NORMAL HIT
 
         else {
 
           speakAnnouncement(
-            side +
-            "!",
+            side + "!",
             {
               rate: 1.28,
 
@@ -772,7 +817,6 @@
         command.type === "attack"
       ) {
 
-
         const count =
           Math.max(
             1,
@@ -791,7 +835,6 @@
 
 
         function doNextAttack() {
-
 
           if (
             attackNumber >= count
@@ -814,8 +857,6 @@
             command.actionLabel || ""
           );
 
-
-          // Stop if somebody has already won.
 
           if (
             typeof isMatchActive !==
@@ -855,7 +896,6 @@
         "switchCharacter"
       ) {
 
-
         const count =
           Math.max(
             1,
@@ -869,7 +909,6 @@
 
 
         function doNextSwitch() {
-
 
           if (
             switchNumber >= count
@@ -911,9 +950,6 @@
 
   // ======================================
   // MAKE VOICE AVAILABLE TO index.html
-  // ======================================
-  //
-  // The fullscreen button can call this.
   // ======================================
 
   window.unlockBattleVoice =
