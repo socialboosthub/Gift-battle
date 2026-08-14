@@ -174,6 +174,79 @@
     .team-girls .team-name { background: linear-gradient(135deg, #ff1e56, #d800ff); }
     .team-boys .team-name { background: linear-gradient(135deg, #0066ff, #00d2ff); }
 
+    /* ==========================================
+       NEW VISUAL GIFT PANELS (SIDE UI)
+       ========================================== */
+    .gift-panel {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 15;
+      pointer-events: none;
+      background: rgba(0, 0, 0, 0.75);
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+
+    .gift-panel.girls-side {
+      left: 15px;
+      border-left: 3px solid #d800ff;
+    }
+
+    .gift-panel.boys-side {
+      right: 15px;
+      border-right: 3px solid #00d2ff;
+    }
+
+    .gift-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+      white-space: nowrap;
+    }
+
+    .gift-icon {
+      width: 24px; /* Small like you asked bro! */
+      height: 24px;
+      object-fit: contain;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .gift-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      line-height: 1.1;
+    }
+
+    .gift-name {
+      font-size: 11px;
+      color: #ddd;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .gift-points {
+      color: #ffcc00;
+      font-size: 14px;
+    }
+
+    .gift-action {
+      color: #00ffcc;
+      font-size: 12px;
+    }
+
     /* Moving Avatar Wrappers (Glued to center line) */
     .avatar-wrapper {
       position: absolute;
@@ -405,11 +478,6 @@
   transform: scale(0.92);
 }
 
-
-/* ==========================================
-   WHEN THE ARENA ITSELF IS FULLSCREEN
-   ========================================== */
-
 .arena-wrapper:fullscreen {
   width: 100vw;
   height: 100vh;
@@ -421,20 +489,10 @@
   background: #000;
 }
 
-
-/* ==========================================
-   FULLSCREEN ARENA CONTENT
-   ========================================== */
-
 .arena-wrapper:fullscreen .bg-split { height: 100%; }
 .arena-wrapper:fullscreen .hud-top { top: 3%; left: 3%; right: 3%; }
 .arena-wrapper:fullscreen .action-feed { bottom: 3%; }
 .arena-wrapper:fullscreen .secret-toggle-btn { display: none; }
-
-
-/* ==========================================
-   HIDE EVERYTHING EXCEPT THE VIDEO
-   ========================================== */
 
 body.viewer-mode {
   padding: 0;
@@ -453,11 +511,6 @@ body.viewer-mode #tiktok-debug {
   display: none !important;
 }
 
-
-/* ==========================================
-   16:9 VIDEO AREA
-   ========================================== */
-
 body.viewer-mode .arena-wrapper {
   width: min(100vw, calc(100vh * 16 / 9));
   height: min(100vh, calc(100vw * 9 / 16));
@@ -469,11 +522,6 @@ body.viewer-mode .arena-wrapper {
   margin: 0;
 }
 
-
-/* ==========================================
-   MOBILE LANDSCAPE
-   ========================================== */
-
 @media (orientation: landscape) {
   body.viewer-mode .arena-wrapper {
     width: min(100vw, calc(100vh * 16 / 9));
@@ -481,22 +529,12 @@ body.viewer-mode .arena-wrapper {
   }
 }
 
-
-/* ==========================================
-   MOBILE PORTRAIT
-   ========================================== */
-
 @media (orientation: portrait) {
   body.viewer-mode .arena-wrapper {
     width: 100vw;
     height: calc(100vw * 9 / 16);
   }
 }
-
-
-/* ==========================================
-   FULLSCREEN DOCUMENT
-   ========================================== */
 
 html:fullscreen,
 body:fullscreen {
@@ -542,6 +580,74 @@ body:fullscreen {
       </div>
     </div>
 
+    <!-- ==========================================
+         NEW VISUAL RULES OVERLAYS (THE RED ZONES)
+         ========================================== -->
+    
+    <!-- GIRLS SIDE RULES -->
+    <div class="gift-panel girls-side">
+      <div class="gift-item">
+        <img src="icon_100likes.png" class="gift-icon" alt="Likes">
+        <div class="gift-info">
+          <span class="gift-name">100x Likes</span>
+          <span class="gift-points">+1 Pt</span>
+        </div>
+      </div>
+      <div class="gift-item">
+        <img src="icon_rose.png" class="gift-icon" alt="Rose">
+        <div class="gift-info">
+          <span class="gift-name">Rose</span>
+          <span class="gift-points">+5 Pts</span>
+        </div>
+      </div>
+      <div class="gift-item">
+        <img src="icon_rosa.png" class="gift-icon" alt="Rosa">
+        <div class="gift-info">
+          <span class="gift-name">Rosa</span>
+          <span class="gift-points">+50 Pts</span>
+        </div>
+      </div>
+      <div class="gift-item">
+        <img src="icon_bouquet.png" class="gift-icon" alt="Bouquet">
+        <div class="gift-info">
+          <span class="gift-name">Bouquet</span>
+          <span class="gift-action">Switch Char</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOYS SIDE RULES -->
+    <div class="gift-panel boys-side">
+      <div class="gift-item">
+        <img src="icon_follow.png" class="gift-icon" alt="Follow">
+        <div class="gift-info">
+          <span class="gift-name">Follow</span>
+          <span class="gift-points">+1 Pt</span>
+        </div>
+      </div>
+      <div class="gift-item">
+        <img src="icon_tiktok.png" class="gift-icon" alt="TikTok">
+        <div class="gift-info">
+          <span class="gift-name">TikTok</span>
+          <span class="gift-points">+5 Pts</span>
+        </div>
+      </div>
+      <div class="gift-item">
+        <img src="icon_necklace.png" class="gift-icon" alt="Necklace">
+        <div class="gift-info">
+          <span class="gift-name">Necklace</span>
+          <span class="gift-points">+50 Pts</span>
+        </div>
+      </div>
+      <div class="gift-item">
+        <img src="icon_confetti.png" class="gift-icon" alt="Confetti">
+        <div class="gift-info">
+          <span class="gift-name">Confetti</span>
+          <span class="gift-action">Switch Char</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Avatars wrapped in containers -->
     <div class="avatar-wrapper avatar-wrapper-girl" id="wrap-girl">
       <img src="kitana_idle.png" alt="Girl Fighter" class="avatar" id="avatar-girl">
@@ -568,7 +674,7 @@ body:fullscreen {
   ⛶
   </button>
 
-  <!-- Live battle position score: total is always 200 now -->
+  <!-- Live battle position score -->
   <div class="battle-scorebar" id="battle-scorebar">
     <div class="battle-score-side girls">
       GIRLS
@@ -581,24 +687,18 @@ body:fullscreen {
     </div>
   </div>
 
-  <div style="width:100%;max-width:960px;margin-top:10px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#aaa;">
-    <b style="color:#fff;">LIVE RULES:</b>
-    Hit = 5 • Brutality = 50 • Follow = 1 • 100 Likes = 1 • First to 200 wins
-  </div>
-
   <div class="controls-panel" id="controls-panel">
-    <!-- Admin Buttons Update: These now pass the correct Gift Names instead of just saying 'Hit' -->
+    <!-- Admin Buttons -->
     <div class="button-group">
-      <button class="btn btn-girl-hit" onclick="attack('girl', false, null, 'Rose')">Girls Hit (5)</button>
-      <button class="btn btn-girl-brutal" onclick="attack('girl', true, null, 'Rosa')">BRUTALITY! (50)</button>
-      <button class="btn btn-boy-hit" onclick="attack('boy', false, null, 'Tiktok')">Boys Hit (5)</button>
-      <button class="btn btn-boy-brutal" onclick="attack('boy', true, null, 'Friendship Necklace')">BRUTALITY! (50)</button>
+      <button class="btn btn-girl-hit" onclick="attack('girl', false, null, 'Rose', 5)">Girls Rose (5)</button>
+      <button class="btn btn-girl-brutal" onclick="attack('girl', true, null, 'Rosa', 50)">Girls Rosa (50)</button>
+      <button class="btn btn-boy-hit" onclick="attack('boy', false, null, 'Tiktok', 5)">Boys Tiktok (5)</button>
+      <button class="btn btn-boy-brutal" onclick="attack('boy', true, null, 'Necklace', 50)">Boys Necklace (50)</button>
     </div>
 
     <div class="button-group">
-      <!-- These already default to Bouquet and Confetti respectively -->
-      <button class="btn btn-util" onclick="switchCharacter('girl')">⚡ Switch Girl</button>
-      <button class="btn btn-util" onclick="switchCharacter('boy')">⚡ Switch Boy</button>
+      <button class="btn btn-util" onclick="switchCharacter('girl')">⚡ Switch Girl (Bouquet)</button>
+      <button class="btn btn-util" onclick="switchCharacter('boy')">⚡ Switch Boy (Confetti)</button>
       <button class="btn btn-util" onclick="resetMatch()">⚡ Reset Match</button>
       <button class="btn btn-util" onclick="resetScores()">🔄 Zero Scores</button>
       <button class="btn btn-util" onclick="toggleControls()">👁 Hide Controls (Press H)</button>
@@ -637,10 +737,9 @@ body:fullscreen {
 
     function updateVisuals() {
       let displayPosition = linePosition;
-      if (displayPosition > 200) displayPosition = 200; // Cap to 200 now
+      if (displayPosition > 200) displayPosition = 200;
       if (displayPosition < 0) displayPosition = 0;
 
-      // We divide by 2 so 200 points fits on a 100% width screen
       const visualPercentage = displayPosition / 2;
 
       document.getElementById("bg-girls").style.width = visualPercentage + "%";
@@ -679,7 +778,6 @@ body:fullscreen {
     ) {
       if (!isMatchActive) return;
 
-      // Swap empty or default username to a random one
       if (!username || username === "Unknown") {
         username = getRandomUsername();
       }
@@ -713,7 +811,7 @@ body:fullscreen {
       const announcement =
         document.getElementById("announcement-text");
 
-      if (linePosition >= 200) { // Win at 200 now
+      if (linePosition >= 200) { 
         girlWins++;
         document.getElementById("girl-wins").innerText = girlWins;
         isMatchActive = false;
@@ -760,7 +858,6 @@ body:fullscreen {
     }
 
     function switchCharacter(side, username = null, giftName = null) {
-      // Swap empty or default username to a random one
       if (!username || username === "@Admin") {
         username = getRandomUsername();
       }
@@ -807,7 +904,7 @@ body:fullscreen {
     }
 
     function resetMatch() {
-      linePosition = 100; // Reset to 100 now
+      linePosition = 100;
       isMatchActive = true; 
       updateVisuals();
     }
@@ -836,19 +933,13 @@ body:fullscreen {
 // ==========================================
 
 async function startViewerMode() {
-unlockBattleVoice();
-startBattleMusic();
-  const arena =
-    document.getElementById("arena");
-
-  // Hide the normal webpage UI.
-  document.body.classList.add(
-    "viewer-mode"
-  );
+  if (typeof unlockBattleVoice === "function") unlockBattleVoice();
+  if (typeof startBattleMusic === "function") startBattleMusic();
+  
+  const arena = document.getElementById("arena");
+  document.body.classList.add("viewer-mode");
 
   try {
-    // Ask the browser for real fullscreen.
-    // This must happen from a user tap.
     if (!document.fullscreenElement && arena.requestFullscreen) {
       await arena.requestFullscreen();
     }
@@ -856,7 +947,6 @@ startBattleMusic();
     console.log("Fullscreen request was blocked:", error);
   }
 
-  // Try to keep the phone in landscape.
   try {
     if (screen.orientation && screen.orientation.lock) {
       await screen.orientation.lock("landscape");
@@ -865,10 +955,6 @@ startBattleMusic();
     console.log("Landscape lock not available:", error);
   }
 }
-
-// ==========================================
-// EXIT VIEWER MODE
-// ==========================================
 
 async function exitViewerMode() {
   document.body.classList.remove("viewer-mode");
@@ -881,10 +967,6 @@ async function exitViewerMode() {
   }
 }
 
-// ==========================================
-// DETECT WHEN USER EXITS FULLSCREEN
-// ==========================================
-
 document.addEventListener("fullscreenchange", () => {
   if (!document.fullscreenElement) {
     document.body.classList.remove("viewer-mode");
@@ -893,20 +975,9 @@ document.addEventListener("fullscreenchange", () => {
 
   </script>
 
-  <!-- ==========================================
-     BACKGROUND MUSIC
-     ========================================== -->
 <audio id="battle-background-music" preload="auto" playsinline></audio>
-
-<!-- ==========================================
-     SOCKET.IO
-     ========================================== -->
 <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-
-<!-- ==========================================
-     TIKTOK CLIENT
-     ========================================== -->
 <script src="tiktok-client.js"></script>
-
 </body>
 </html>
+
