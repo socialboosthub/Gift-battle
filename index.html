@@ -174,11 +174,11 @@
     .team-girls .team-name { background: linear-gradient(135deg, #ff1e56, #d800ff); }
     .team-boys .team-name { background: linear-gradient(135deg, #0066ff, #00d2ff); }
 
-    /* Moving Avatar Wrappers (Glued to center line) */
+    /* Moving Avatar Wrappers */
     .avatar-wrapper {
       position: absolute;
-      bottom: 15%;
-      height: 60%;
+      bottom: 22%;
+      height: 52%;
       z-index: 6;
       transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
@@ -193,7 +193,6 @@
       padding-left: 30px;
     }
 
-    /* Actual Character Images */
     .avatar {
       height: 100%;
       width: auto;
@@ -204,7 +203,7 @@
     /* Win Announcement */
     .announcement {
       position: absolute;
-      top: 40%;
+      top: 35%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.5);
       font-size: 56px;
@@ -230,7 +229,7 @@
     /* Action Feed Log Containers */
     .action-feed {
       position: absolute;
-      bottom: 20px;
+      bottom: 80px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -238,16 +237,11 @@
       pointer-events: none;
     }
 
-    .action-feed-girls {
-      left: 15px;
-    }
-
-    .action-feed-boys {
-      right: 15px;
-    }
+    .action-feed-girls { left: 15px; }
+    .action-feed-boys { right: 15px; }
 
     .feed-item {
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.75);
       padding: 4px 10px;
       border-radius: 4px;
       font-size: 13px;
@@ -258,20 +252,89 @@
       text-align: left;
       direction: ltr;
       animation: fadeIn 0.3s ease;
+      backdrop-filter: blur(4px);
     }
 
-    .feed-item-girl {
-      border-left: 3px solid #d800ff;
-    }
-
-    .feed-item-boy {
-      border-left: 3px solid #00d2ff;
-    }
+    .feed-item-girl { border-left: 3px solid #d800ff; }
+    .feed-item-boy { border-left: 3px solid #00d2ff; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(5px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* ==========================================
+       GIFT HUD LEGEND OVERLAY (INSIDE ARENA)
+       ========================================== */
+    .gift-hud-overlay {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      background: rgba(10, 8, 16, 0.88);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      padding: 5px 8px;
+      z-index: 18;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
+      max-width: 96%;
+    }
+
+    .gift-hud-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      padding: 3px 6px;
+      min-width: 62px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: transform 0.2s;
+    }
+
+    .gift-hud-card.girl-side {
+      border-bottom: 3px solid #d800ff;
+    }
+
+    .gift-hud-card.boy-side {
+      border-bottom: 3px solid #00d2ff;
+    }
+
+    .gift-hud-card img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+    }
+
+    .gift-hud-title {
+      font-size: 9px;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      color: #bbb;
+      margin-top: 2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .gift-hud-action {
+      font-size: 11px;
+      font-family: 'Impact', sans-serif;
+      color: #fff;
+      margin-top: 1px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .gift-hud-card.girl-side .gift-hud-action { color: #ff77ff; }
+    .gift-hud-card.boy-side .gift-hud-action { color: #66d9ff; }
 
     /* Controls Panel */
     .controls-panel {
@@ -303,7 +366,6 @@
     .btn-util { background: #251d33; color: #ccc; border: 1px solid #44355e; }
     .btn-util:hover { background: #362a4a; color: #fff; }
 
-
     /* Live Battle Position Scores */
     .battle-scorebar {
       width: 100%;
@@ -331,13 +393,8 @@
       color: #fff;
     }
 
-    .battle-score-side.girls {
-      background: linear-gradient(135deg, rgba(216,0,255,0.28), rgba(138,28,166,0.18));
-    }
-
-    .battle-score-side.boys {
-      background: linear-gradient(135deg, rgba(0,102,255,0.18), rgba(0,210,255,0.28));
-    }
+    .battle-score-side.girls { background: linear-gradient(135deg, rgba(216,0,255,0.28), rgba(138,28,166,0.18)); }
+    .battle-score-side.boys { background: linear-gradient(135deg, rgba(0,102,255,0.18), rgba(0,210,255,0.28)); }
 
     .battle-score-number {
       font-size: 28px;
@@ -372,198 +429,94 @@
     }
     .secret-toggle-btn:hover { color: rgba(255, 255, 255, 0.8); }
 
-/* ==========================================
-   FULLSCREEN VIDEO / STREAMER VIEWER MODE
-   ========================================== */
+    /* FULLSCREEN / STREAMER VIEWER MODE */
+    .fullscreen-btn {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 999999;
+      width: 52px;
+      height: 52px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50%;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    }
 
-.fullscreen-btn {
-  position: fixed;
-  right: 14px;
-  bottom: 14px;
-  z-index: 999999;
+    .fullscreen-btn:active { transform: scale(0.92); }
 
-  width: 52px;
-  height: 52px;
+    .arena-wrapper:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      aspect-ratio: auto;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      background: #000;
+    }
 
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 50%;
+    .arena-wrapper:fullscreen .bg-split { height: 100%; }
+    .arena-wrapper:fullscreen .hud-top { top: 3%; left: 3%; right: 3%; }
+    .arena-wrapper:fullscreen .action-feed { bottom: 85px; }
+    .arena-wrapper:fullscreen .gift-hud-overlay { bottom: 15px; }
+    .arena-wrapper:fullscreen .secret-toggle-btn { display: none; }
 
-  background: rgba(0,0,0,0.75);
-  color: #fff;
+    body.viewer-mode {
+      padding: 0;
+      margin: 0;
+      width: 100vw;
+      height: 100vh;
+      min-height: 100vh;
+      overflow: hidden;
+      background: #000;
+    }
 
-  font-size: 22px;
-  cursor: pointer;
+    body.viewer-mode .secret-hint,
+    body.viewer-mode .battle-scorebar,
+    body.viewer-mode .controls-panel,
+    body.viewer-mode #tiktok-debug {
+      display: none !important;
+    }
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    body.viewer-mode .arena-wrapper {
+      width: min(100vw, calc(100vh * 16 / 9));
+      height: min(100vh, calc(100vw * 9 / 16));
+      max-width: none;
+      aspect-ratio: 16 / 9;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      margin: 0;
+    }
 
-  box-shadow: 0 4px 20px rgba(0,0,0,0.7);
-}
+    @media (orientation: landscape) {
+      body.viewer-mode .arena-wrapper {
+        width: min(100vw, calc(100vh * 16 / 9));
+        height: min(100vh, calc(100vw * 9 / 16));
+      }
+    }
 
-.fullscreen-btn:active {
-  transform: scale(0.92);
-}
+    @media (orientation: portrait) {
+      body.viewer-mode .arena-wrapper {
+        width: 100vw;
+        height: calc(100vw * 9 / 16);
+      }
+    }
 
-
-/* ==========================================
-   WHEN THE ARENA ITSELF IS FULLSCREEN
-   ========================================== */
-
-.arena-wrapper:fullscreen {
-
-  width: 100vw;
-  height: 100vh;
-
-  max-width: none;
-
-  aspect-ratio: auto;
-
-  border: none;
-  border-radius: 0;
-
-  box-shadow: none;
-
-  background: #000;
-}
-
-
-/* ==========================================
-   FULLSCREEN ARENA CONTENT
-   ========================================== */
-
-.arena-wrapper:fullscreen .bg-split {
-  height: 100%;
-}
-
-.arena-wrapper:fullscreen .hud-top {
-  top: 3%;
-  left: 3%;
-  right: 3%;
-}
-
-.arena-wrapper:fullscreen .action-feed {
-  bottom: 3%;
-}
-
-.arena-wrapper:fullscreen .secret-toggle-btn {
-  display: none;
-}
-
-
-/* ==========================================
-   HIDE EVERYTHING EXCEPT THE VIDEO
-   ========================================== */
-
-body.viewer-mode {
-  padding: 0;
-  margin: 0;
-
-  width: 100vw;
-  height: 100vh;
-
-  min-height: 100vh;
-
-  overflow: hidden;
-
-  background: #000;
-}
-
-body.viewer-mode .secret-hint,
-body.viewer-mode .battle-scorebar,
-body.viewer-mode .controls-panel,
-body.viewer-mode #tiktok-debug {
-  display: none !important;
-}
-
-
-/* ==========================================
-   16:9 VIDEO AREA
-   ========================================== */
-
-body.viewer-mode .arena-wrapper {
-
-  width: min(
-    100vw,
-    calc(100vh * 16 / 9)
-  );
-
-  height: min(
-    100vh,
-    calc(100vw * 9 / 16)
-  );
-
-  max-width: none;
-
-  aspect-ratio: 16 / 9;
-
-  border: none;
-  border-radius: 0;
-
-  box-shadow: none;
-
-  margin: 0;
-}
-
-
-/* ==========================================
-   MOBILE LANDSCAPE
-   ========================================== */
-
-@media (orientation: landscape) {
-
-  body.viewer-mode .arena-wrapper {
-
-    width: min(
-      100vw,
-      calc(100vh * 16 / 9)
-    );
-
-    height: min(
-      100vh,
-      calc(100vw * 9 / 16)
-    );
-
-  }
-
-}
-
-
-/* ==========================================
-   MOBILE PORTRAIT
-   ========================================== */
-
-@media (orientation: portrait) {
-
-  body.viewer-mode .arena-wrapper {
-
-    width: 100vw;
-
-    height: calc(
-      100vw * 9 / 16
-    );
-
-  }
-
-}
-
-
-/* ==========================================
-   FULLSCREEN DOCUMENT
-   ========================================== */
-
-html:fullscreen,
-body:fullscreen {
-
-  width: 100%;
-  height: 100%;
-
-  margin: 0;
-  padding: 0;
-
-  background: #000;
-}
-    
+    html:fullscreen, body:fullscreen {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #000;
+    }
   </style>
 </head>
 <body>
@@ -614,18 +567,73 @@ body:fullscreen {
     <div class="action-feed action-feed-girls" id="feed-girls"></div>
     <div class="action-feed action-feed-boys" id="feed-boys"></div>
 
+    <!-- ==========================================
+         TIKTOK GIFT HUD OVERLAY (INSIDE STREAM)
+         ========================================== -->
+    <div class="gift-hud-overlay">
+      <!-- ROSE -->
+      <div class="gift-hud-card girl-side">
+        <img src="https://p16-webcast.tiktokcdn.com/webcast/eb9321ef1c9118e6988892419c8f070b~tplv-obj.png" alt="Rose">
+        <span class="gift-hud-title">Rose</span>
+        <span class="gift-hud-action">+5 GIRLS</span>
+      </div>
+
+      <!-- TIKTOK -->
+      <div class="gift-hud-card boy-side">
+        <img src="https://p16-webcast.tiktokcdn.com/webcast/5fef43026e6ef34a811776bb54bc5cf1~tplv-obj.png" alt="TikTok">
+        <span class="gift-hud-title">TikTok</span>
+        <span class="gift-hud-action">+5 BOYS</span>
+      </div>
+
+      <!-- ROSA -->
+      <div class="gift-hud-card girl-side">
+        <img src="https://p16-webcast.tiktokcdn.com/webcast/eb9321ef1c9118e6988892419c8f070b~tplv-obj.png" alt="Rosa">
+        <span class="gift-hud-title">Rosa</span>
+        <span class="gift-hud-action">+50 BRUTAL</span>
+      </div>
+
+      <!-- MIND BLOWN -->
+      <div class="gift-hud-card boy-side">
+        <img src="https://p16-webcast.tiktokcdn.com/webcast/18318395e26322cb2b42caef1cf10283~tplv-obj.png" alt="Mind Blown">
+        <span class="gift-hud-title">Mind Blown</span>
+        <span class="gift-hud-action">+50 BRUTAL</span>
+      </div>
+
+      <!-- LIKE POP -->
+      <div class="gift-hud-card girl-side">
+        <img src="https://p16-webcast.tiktokcdn.com/webcast/40dbf20c4fa4830ba2b5be027582b13c~tplv-obj.png" alt="Like-Pop">
+        <span class="gift-hud-title">Like-Pop</span>
+        <span class="gift-hud-action">SWITCH ⚡</span>
+      </div>
+
+      <!-- PAPER CRANE -->
+      <div class="gift-hud-card boy-side">
+        <img src="https://p16-webcast.tiktokcdn.com/webcast/fa7be3ca4523a6ff33604bcbd0f38b34~tplv-obj.png" alt="Paper Crane">
+        <span class="gift-hud-title">Crane</span>
+        <span class="gift-hud-action">SWITCH ⚡</span>
+      </div>
+
+      <!-- 100 LIKES -->
+      <div class="gift-hud-card girl-side">
+        <img src="https://p16-webcast.tiktokcdn.com/webcast/6f53e346f0df576a47012921cb1ed5aa~tplv-obj.png" alt="100 Likes" onerror="this.src='https://p16-webcast.tiktokcdn.com/webcast/eb9321ef1c9118e6988892419c8f070b~tplv-obj.png'">
+        <span class="gift-hud-title">100 Likes</span>
+        <span class="gift-hud-action">+1 GIRLS</span>
+      </div>
+
+      <!-- FOLLOW -->
+      <div class="gift-hud-card boy-side">
+        <img src="https://p16-webcast.tiktokcdn.com/webcast/5fef43026e6ef34a811776bb54bc5cf1~tplv-obj.png" alt="Follow">
+        <span class="gift-hud-title">Follow</span>
+        <span class="gift-hud-action">+1 BOYS</span>
+      </div>
+    </div>
+
     <button class="secret-toggle-btn" onclick="toggleControls()" title="Toggle Settings Controls">⚙</button>
   </div>
 
-  <button
-  class="fullscreen-btn"
-  id="fullscreen-btn"
-  onclick="startViewerMode()"
-  title="Full Screen">
-  ⛶
-  </button>
+  <button class="fullscreen-btn" id="fullscreen-btn" onclick="startViewerMode()" title="Full Screen">⛶</button>
 
-  <!-- Live battle position score: total is always 100 -->
+  <!-- Live battle position score -->
   <div class="battle-scorebar" id="battle-scorebar">
     <div class="battle-score-side girls">
       GIRLS
@@ -636,11 +644,6 @@ body:fullscreen {
       BOYS
       <span class="battle-score-number" id="boy-battle-score">50</span>
     </div>
-  </div>
-
-  <div style="width:100%;max-width:960px;margin-top:10px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#aaa;">
-    <b style="color:#fff;">LIVE RULES:</b>
-    Hit = 5 • Brutality = 50 • Follow = 1 • 100 Likes = 1 • First to 100 wins
   </div>
 
   <div class="controls-panel" id="controls-panel">
@@ -693,10 +696,6 @@ body:fullscreen {
       document.getElementById("wrap-girl").style.left = displayPosition + "%";
       document.getElementById("wrap-boy").style.left = displayPosition + "%";
 
-      // Live battle score. Total is always 100:
-      // center = 50 / 50
-      // line moves toward boys = girls gain points
-      // line moves toward girls = boys gain points
       const girlBattleScore = Math.round(displayPosition);
       const boyBattleScore = 100 - girlBattleScore;
 
@@ -726,11 +725,6 @@ body:fullscreen {
     ) {
       if (!isMatchActive) return;
 
-      // Scoring:
-      // normal hit/gift = 5
-      // brutality = 50
-      // follow = 1
-      // 100 likes = 1
       const defaultPower = isBrutality ? 50 : 5;
       const suppliedPower = Number(customPower);
 
@@ -807,38 +801,19 @@ body:fullscreen {
     }
 
     function switchCharacter(side, username = "@Admin", giftName = null) {
-  if (side === 'girl') {
-
-    currentGirlIndex =
-      (currentGirlIndex + 1) % girlCharacters.length;
-
-    const char = girlCharacters[currentGirlIndex];
-
-    document.getElementById("girl-name-label").innerText = char.name;
-    document.getElementById("avatar-girl").src = char.idle;
-
-    addFeed(
-      'girl',
-      username,
-      giftName || "Like-Pop"
-    );
-
-  } else {
-
-    currentBoyIndex =
-      (currentBoyIndex + 1) % boyCharacters.length;
-
-    const char = boyCharacters[currentBoyIndex];
-
-    document.getElementById("boy-name-label").innerText = char.name;
-    document.getElementById("avatar-boy").src = char.idle;
-
-    addFeed(
-      'boy',
-      username,
-      giftName || "Paper Crane"
-    );
-  }
+      if (side === 'girl') {
+        currentGirlIndex = (currentGirlIndex + 1) % girlCharacters.length;
+        const char = girlCharacters[currentGirlIndex];
+        document.getElementById("girl-name-label").innerText = char.name;
+        document.getElementById("avatar-girl").src = char.idle;
+        addFeed('girl', username, giftName || "Like-Pop");
+      } else {
+        currentBoyIndex = (currentBoyIndex + 1) % boyCharacters.length;
+        const char = boyCharacters[currentBoyIndex];
+        document.getElementById("boy-name-label").innerText = char.name;
+        document.getElementById("avatar-boy").src = char.idle;
+        addFeed('boy', username, giftName || "Paper Crane");
+      }
     }
 
     function addFeed(side, user, gift) {
@@ -880,151 +855,53 @@ body:fullscreen {
 
     updateVisuals();
 
-// ==========================================
-// YOUTUBE-STYLE VIEWER MODE
-// ==========================================
+    async function startViewerMode() {
+      unlockBattleVoice();
+      startBattleMusic();
+      const arena = document.getElementById("arena");
+      document.body.classList.add("viewer-mode");
 
-async function startViewerMode() {
-unlockBattleVoice();
-startBattleMusic();
-  const arena =
-    document.getElementById("arena");
+      try {
+        if (!document.fullscreenElement && arena.requestFullscreen) {
+          await arena.requestFullscreen();
+        }
+      } catch (error) {
+        console.log("Fullscreen request was blocked:", error);
+      }
 
-  // Hide the normal webpage UI.
-  document.body.classList.add(
-    "viewer-mode"
-  );
-
-  try {
-
-    // Ask the browser for real fullscreen.
-    // This must happen from a user tap.
-    if (
-      !document.fullscreenElement &&
-      arena.requestFullscreen
-    ) {
-
-      await arena.requestFullscreen();
-
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock("landscape");
+        }
+      } catch (error) {
+        console.log("Landscape lock not available:", error);
+      }
     }
 
-  } catch (error) {
-
-    console.log(
-      "Fullscreen request was blocked:",
-      error
-    );
-
-  }
-
-  // Try to keep the phone in landscape.
-  try {
-
-    if (
-      screen.orientation &&
-      screen.orientation.lock
-    ) {
-
-      await screen.orientation.lock(
-        "landscape"
-      );
-
+    async function exitViewerMode() {
+      document.body.classList.remove("viewer-mode");
+      if (document.fullscreenElement && document.exitFullscreen) {
+        try {
+          await document.exitFullscreen();
+        } catch (error) {
+          console.log("Could not exit fullscreen:", error);
+        }
+      }
     }
 
-  } catch (error) {
-
-    console.log(
-      "Landscape lock not available:",
-      error
-    );
-
-  }
-
-}
-
-
-// ==========================================
-// EXIT VIEWER MODE
-// ==========================================
-
-async function exitViewerMode() {
-
-  document.body.classList.remove(
-    "viewer-mode"
-  );
-
-  if (
-    document.fullscreenElement &&
-    document.exitFullscreen
-  ) {
-
-    try {
-
-      await document.exitFullscreen();
-
-    } catch (error) {
-
-      console.log(
-        "Could not exit fullscreen:",
-        error
-      );
-
-    }
-
-  }
-
-}
-
-
-// ==========================================
-// DETECT WHEN USER EXITS FULLSCREEN
-// ==========================================
-
-document.addEventListener(
-  "fullscreenchange",
-  () => {
-
-    if (
-      !document.fullscreenElement
-    ) {
-
-      document.body.classList.remove(
-        "viewer-mode"
-      );
-
-    }
-
-  }
-);
-
-    
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement) {
+        document.body.classList.remove("viewer-mode");
+      }
+    });
   </script>
 
+  <!-- BACKGROUND MUSIC -->
+  <audio id="battle-background-music" preload="auto" playsinline></audio>
 
-  <!-- ==========================================
-     BACKGROUND MUSIC
-     ========================================== -->
-
-<audio
-  id="battle-background-music"
-  preload="auto"
-  playsinline>
-</audio>
-
-
-<!-- ==========================================
-     SOCKET.IO
-     ========================================== -->
-
-<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-
-
-<!-- ==========================================
-     TIKTOK CLIENT
-     ========================================== -->
-
-<script src="tiktok-client.js"></script>
+  <!-- SOCKET.IO & TIKTOK CLIENT -->
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="tiktok-client.js"></script>
 
 </body>
 </html>
-
