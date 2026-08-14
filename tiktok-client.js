@@ -400,7 +400,7 @@
         ) {
 
           speakAnnouncement(
-            "Thank you for the follow!",
+            "Thank you for the follow",
             {
               rate: 1.0,
               pitch: 1.15,
@@ -420,7 +420,7 @@
         ) {
 
           speakAnnouncement(
-            "Girls! 100 likes!",
+            "Girls!",
             {
               rate: 1.05,
               pitch: 1.2,
