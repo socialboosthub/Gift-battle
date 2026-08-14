@@ -681,6 +681,14 @@ body:fullscreen {
     let currentGirlIndex = 0;
     let currentBoyIndex = 0;
 
+    // Generate random realistic usernames
+    function getRandomUsername() {
+      const names = ["shadow", "kombat", "ghost", "ninja", "gamer", "pro", "alpha", "toxic", "queen", "king", "guest", "user"];
+      const suffix = Math.floor(Math.random() * 99999);
+      const name = names[Math.floor(Math.random() * names.length)];
+      return name + suffix;
+    }
+
     function updateVisuals() {
       let displayPosition = linePosition;
       if (displayPosition > 100) displayPosition = 100;
@@ -693,10 +701,6 @@ body:fullscreen {
       document.getElementById("wrap-girl").style.left = displayPosition + "%";
       document.getElementById("wrap-boy").style.left = displayPosition + "%";
 
-      // Live battle score. Total is always 100:
-      // center = 50 / 50
-      // line moves toward boys = girls gain points
-      // line moves toward girls = boys gain points
       const girlBattleScore = Math.round(displayPosition);
       const boyBattleScore = 100 - girlBattleScore;
 
@@ -719,18 +723,18 @@ body:fullscreen {
     function attack(
       attacker,
       isBrutality,
-      username = "Unknown",
+      username = null,
       giftName = "",
       customPower = null,
       actionLabel = ""
     ) {
       if (!isMatchActive) return;
 
-      // Scoring:
-      // normal hit/gift = 5
-      // brutality = 50
-      // follow = 1
-      // 100 likes = 1
+      // Swap empty or default username to a random one
+      if (!username || username === "Unknown") {
+        username = getRandomUsername();
+      }
+
       const defaultPower = isBrutality ? 50 : 5;
       const suppliedPower = Number(customPower);
 
@@ -806,39 +810,37 @@ body:fullscreen {
       }, 600);
     }
 
-    function switchCharacter(side, username = "@Admin", giftName = null) {
-  if (side === 'girl') {
+    function switchCharacter(side, username = null, giftName = null) {
+      // Swap empty or default username to a random one
+      if (!username || username === "@Admin") {
+        username = getRandomUsername();
+      }
 
-    currentGirlIndex =
-      (currentGirlIndex + 1) % girlCharacters.length;
+      if (side === 'girl') {
+        currentGirlIndex =
+          (currentGirlIndex + 1) % girlCharacters.length;
+        const char = girlCharacters[currentGirlIndex];
+        document.getElementById("girl-name-label").innerText = char.name;
+        document.getElementById("avatar-girl").src = char.idle;
 
-    const char = girlCharacters[currentGirlIndex];
+        addFeed(
+          'girl',
+          username,
+          giftName || "Bouquet"
+        );
+      } else {
+        currentBoyIndex =
+          (currentBoyIndex + 1) % boyCharacters.length;
+        const char = boyCharacters[currentBoyIndex];
+        document.getElementById("boy-name-label").innerText = char.name;
+        document.getElementById("avatar-boy").src = char.idle;
 
-    document.getElementById("girl-name-label").innerText = char.name;
-    document.getElementById("avatar-girl").src = char.idle;
-
-    addFeed(
-      'girl',
-      username,
-      giftName || "Like-Pop"
-    );
-
-  } else {
-
-    currentBoyIndex =
-      (currentBoyIndex + 1) % boyCharacters.length;
-
-    const char = boyCharacters[currentBoyIndex];
-
-    document.getElementById("boy-name-label").innerText = char.name;
-    document.getElementById("avatar-boy").src = char.idle;
-
-    addFeed(
-      'boy',
-      username,
-      giftName || "Paper Crane"
-    );
-  }
+        addFeed(
+          'boy',
+          username,
+          giftName || "Confetti"
+        );
+      }
     }
 
     function addFeed(side, user, gift) {
