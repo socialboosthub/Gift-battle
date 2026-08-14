@@ -411,19 +411,13 @@
    ========================================== */
 
 .arena-wrapper:fullscreen {
-
   width: 100vw;
   height: 100vh;
-
   max-width: none;
-
   aspect-ratio: auto;
-
   border: none;
   border-radius: 0;
-
   box-shadow: none;
-
   background: #000;
 }
 
@@ -432,23 +426,10 @@
    FULLSCREEN ARENA CONTENT
    ========================================== */
 
-.arena-wrapper:fullscreen .bg-split {
-  height: 100%;
-}
-
-.arena-wrapper:fullscreen .hud-top {
-  top: 3%;
-  left: 3%;
-  right: 3%;
-}
-
-.arena-wrapper:fullscreen .action-feed {
-  bottom: 3%;
-}
-
-.arena-wrapper:fullscreen .secret-toggle-btn {
-  display: none;
-}
+.arena-wrapper:fullscreen .bg-split { height: 100%; }
+.arena-wrapper:fullscreen .hud-top { top: 3%; left: 3%; right: 3%; }
+.arena-wrapper:fullscreen .action-feed { bottom: 3%; }
+.arena-wrapper:fullscreen .secret-toggle-btn { display: none; }
 
 
 /* ==========================================
@@ -458,14 +439,10 @@
 body.viewer-mode {
   padding: 0;
   margin: 0;
-
   width: 100vw;
   height: 100vh;
-
   min-height: 100vh;
-
   overflow: hidden;
-
   background: #000;
 }
 
@@ -482,26 +459,13 @@ body.viewer-mode #tiktok-debug {
    ========================================== */
 
 body.viewer-mode .arena-wrapper {
-
-  width: min(
-    100vw,
-    calc(100vh * 16 / 9)
-  );
-
-  height: min(
-    100vh,
-    calc(100vw * 9 / 16)
-  );
-
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
   max-width: none;
-
   aspect-ratio: 16 / 9;
-
   border: none;
   border-radius: 0;
-
   box-shadow: none;
-
   margin: 0;
 }
 
@@ -511,21 +475,10 @@ body.viewer-mode .arena-wrapper {
    ========================================== */
 
 @media (orientation: landscape) {
-
   body.viewer-mode .arena-wrapper {
-
-    width: min(
-      100vw,
-      calc(100vh * 16 / 9)
-    );
-
-    height: min(
-      100vh,
-      calc(100vw * 9 / 16)
-    );
-
+    width: min(100vw, calc(100vh * 16 / 9));
+    height: min(100vh, calc(100vw * 9 / 16));
   }
-
 }
 
 
@@ -534,17 +487,10 @@ body.viewer-mode .arena-wrapper {
    ========================================== */
 
 @media (orientation: portrait) {
-
   body.viewer-mode .arena-wrapper {
-
     width: 100vw;
-
-    height: calc(
-      100vw * 9 / 16
-    );
-
+    height: calc(100vw * 9 / 16);
   }
-
 }
 
 
@@ -554,13 +500,10 @@ body.viewer-mode .arena-wrapper {
 
 html:fullscreen,
 body:fullscreen {
-
   width: 100%;
   height: 100%;
-
   margin: 0;
   padding: 0;
-
   background: #000;
 }
     
@@ -625,33 +568,35 @@ body:fullscreen {
   ⛶
   </button>
 
-  <!-- Live battle position score: total is always 100 -->
+  <!-- Live battle position score: total is always 200 now -->
   <div class="battle-scorebar" id="battle-scorebar">
     <div class="battle-score-side girls">
       GIRLS
-      <span class="battle-score-number" id="girl-battle-score">50</span>
+      <span class="battle-score-number" id="girl-battle-score">100</span>
     </div>
     <div class="battle-score-center">VS</div>
     <div class="battle-score-side boys">
       BOYS
-      <span class="battle-score-number" id="boy-battle-score">50</span>
+      <span class="battle-score-number" id="boy-battle-score">100</span>
     </div>
   </div>
 
   <div style="width:100%;max-width:960px;margin-top:10px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#aaa;">
     <b style="color:#fff;">LIVE RULES:</b>
-    Hit = 5 • Brutality = 50 • Follow = 1 • 100 Likes = 1 • First to 100 wins
+    Hit = 5 • Brutality = 50 • Follow = 1 • 100 Likes = 1 • First to 200 wins
   </div>
 
   <div class="controls-panel" id="controls-panel">
+    <!-- Admin Buttons Update: These now pass the correct Gift Names instead of just saying 'Hit' -->
     <div class="button-group">
-      <button class="btn btn-girl-hit" onclick="attack('girl', false)">Girls Hit (5)</button>
-      <button class="btn btn-girl-brutal" onclick="attack('girl', true)">BRUTALITY! (50)</button>
-      <button class="btn btn-boy-hit" onclick="attack('boy', false)">Boys Hit (5)</button>
-      <button class="btn btn-boy-brutal" onclick="attack('boy', true)">BRUTALITY! (50)</button>
+      <button class="btn btn-girl-hit" onclick="attack('girl', false, null, 'Rose')">Girls Hit (5)</button>
+      <button class="btn btn-girl-brutal" onclick="attack('girl', true, null, 'Rosa')">BRUTALITY! (50)</button>
+      <button class="btn btn-boy-hit" onclick="attack('boy', false, null, 'Tiktok')">Boys Hit (5)</button>
+      <button class="btn btn-boy-brutal" onclick="attack('boy', true, null, 'Friendship Necklace')">BRUTALITY! (50)</button>
     </div>
 
     <div class="button-group">
+      <!-- These already default to Bouquet and Confetti respectively -->
       <button class="btn btn-util" onclick="switchCharacter('girl')">⚡ Switch Girl</button>
       <button class="btn btn-util" onclick="switchCharacter('boy')">⚡ Switch Boy</button>
       <button class="btn btn-util" onclick="resetMatch()">⚡ Reset Match</button>
@@ -661,7 +606,8 @@ body:fullscreen {
   </div>
 
   <script>
-    let linePosition = 50; 
+    // 100 vs 100 Start Points (200 Total)
+    let linePosition = 100; 
     let girlWins = 0;
     let boyWins = 0;
     let isMatchActive = true; 
@@ -691,18 +637,21 @@ body:fullscreen {
 
     function updateVisuals() {
       let displayPosition = linePosition;
-      if (displayPosition > 100) displayPosition = 100;
+      if (displayPosition > 200) displayPosition = 200; // Cap to 200 now
       if (displayPosition < 0) displayPosition = 0;
 
-      document.getElementById("bg-girls").style.width = displayPosition + "%";
-      document.getElementById("bg-boys").style.width = (100 - displayPosition) + "%";
-      document.getElementById("center-line").style.left = displayPosition + "%";
+      // We divide by 2 so 200 points fits on a 100% width screen
+      const visualPercentage = displayPosition / 2;
 
-      document.getElementById("wrap-girl").style.left = displayPosition + "%";
-      document.getElementById("wrap-boy").style.left = displayPosition + "%";
+      document.getElementById("bg-girls").style.width = visualPercentage + "%";
+      document.getElementById("bg-boys").style.width = (100 - visualPercentage) + "%";
+      document.getElementById("center-line").style.left = visualPercentage + "%";
+
+      document.getElementById("wrap-girl").style.left = visualPercentage + "%";
+      document.getElementById("wrap-boy").style.left = visualPercentage + "%";
 
       const girlBattleScore = Math.round(displayPosition);
-      const boyBattleScore = 100 - girlBattleScore;
+      const boyBattleScore = 200 - girlBattleScore;
 
       document.getElementById("girl-battle-score").innerText = girlBattleScore;
       document.getElementById("boy-battle-score").innerText = boyBattleScore;
@@ -764,7 +713,7 @@ body:fullscreen {
       const announcement =
         document.getElementById("announcement-text");
 
-      if (linePosition >= 100) {
+      if (linePosition >= 200) { // Win at 200 now
         girlWins++;
         document.getElementById("girl-wins").innerText = girlWins;
         isMatchActive = false;
@@ -858,7 +807,7 @@ body:fullscreen {
     }
 
     function resetMatch() {
-      linePosition = 50;
+      linePosition = 100; // Reset to 100 now
       isMatchActive = true; 
       updateVisuals();
     }
@@ -898,135 +847,66 @@ startBattleMusic();
   );
 
   try {
-
     // Ask the browser for real fullscreen.
     // This must happen from a user tap.
-    if (
-      !document.fullscreenElement &&
-      arena.requestFullscreen
-    ) {
-
+    if (!document.fullscreenElement && arena.requestFullscreen) {
       await arena.requestFullscreen();
-
     }
-
   } catch (error) {
-
-    console.log(
-      "Fullscreen request was blocked:",
-      error
-    );
-
+    console.log("Fullscreen request was blocked:", error);
   }
 
   // Try to keep the phone in landscape.
   try {
-
-    if (
-      screen.orientation &&
-      screen.orientation.lock
-    ) {
-
-      await screen.orientation.lock(
-        "landscape"
-      );
-
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock("landscape");
     }
-
   } catch (error) {
-
-    console.log(
-      "Landscape lock not available:",
-      error
-    );
-
+    console.log("Landscape lock not available:", error);
   }
-
 }
-
 
 // ==========================================
 // EXIT VIEWER MODE
 // ==========================================
 
 async function exitViewerMode() {
-
-  document.body.classList.remove(
-    "viewer-mode"
-  );
-
-  if (
-    document.fullscreenElement &&
-    document.exitFullscreen
-  ) {
-
+  document.body.classList.remove("viewer-mode");
+  if (document.fullscreenElement && document.exitFullscreen) {
     try {
-
       await document.exitFullscreen();
-
     } catch (error) {
-
-      console.log(
-        "Could not exit fullscreen:",
-        error
-      );
-
+      console.log("Could not exit fullscreen:", error);
     }
-
   }
-
 }
-
 
 // ==========================================
 // DETECT WHEN USER EXITS FULLSCREEN
 // ==========================================
 
-document.addEventListener(
-  "fullscreenchange",
-  () => {
-
-    if (
-      !document.fullscreenElement
-    ) {
-
-      document.body.classList.remove(
-        "viewer-mode"
-      );
-
-    }
-
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+    document.body.classList.remove("viewer-mode");
   }
-);
+});
 
-    
   </script>
-
 
   <!-- ==========================================
      BACKGROUND MUSIC
      ========================================== -->
-
-<audio
-  id="battle-background-music"
-  preload="auto"
-  playsinline>
-</audio>
-
+<audio id="battle-background-music" preload="auto" playsinline></audio>
 
 <!-- ==========================================
      SOCKET.IO
      ========================================== -->
-
 <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-
 
 <!-- ==========================================
      TIKTOK CLIENT
      ========================================== -->
-
 <script src="tiktok-client.js"></script>
 
 </body>
 </html>
-
