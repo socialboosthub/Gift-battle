@@ -34,6 +34,83 @@
   let musicPlayer = null;
   let musicEventsReady = false;
 
+  // ============================================================
+  // 🔊 SOFTWARE AUDIO BOOST
+  // ============================================================
+  // The <audio> element is kept at 100%, then routed through a
+  // compressor + gain stage. This makes the signal louder before
+  // Android/TikTok screen capture receives it.
+  //
+  // IMPORTANT: Browser code cannot bypass Android's physical/media
+  // volume. If Android volume is exactly 0, the device may still
+  // produce/capture no audible media signal.
+  let audioContext = null;
+  let musicSourceNode = null;
+  let musicGainNode = null;
+  let musicCompressorNode = null;
+
+  function setupAudioBoost() {
+    const player = getMusicPlayer();
+    if (!player) return false;
+
+    try {
+      const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+
+      if (!AudioContextClass) {
+        console.log("🔊 Web Audio is not supported; using normal audio.");
+        player.volume = 1.0;
+        return false;
+      }
+
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+
+        musicSourceNode =
+          audioContext.createMediaElementSource(player);
+
+        musicGainNode =
+          audioContext.createGain();
+
+        musicCompressorNode =
+          audioContext.createDynamicsCompressor();
+
+        // Strong software boost while the compressor controls clipping.
+        musicGainNode.gain.value = 2.2;
+
+        musicCompressorNode.threshold.value = -18;
+        musicCompressorNode.knee.value = 18;
+        musicCompressorNode.ratio.value = 8;
+        musicCompressorNode.attack.value = 0.003;
+        musicCompressorNode.release.value = 0.18;
+
+        musicSourceNode
+          .connect(musicGainNode)
+          .connect(musicCompressorNode)
+          .connect(audioContext.destination);
+
+        console.log("🔊 Software audio boost initialized.");
+      }
+
+      player.volume = 1.0;
+
+      if (audioContext.state === "suspended") {
+        audioContext.resume().catch(error => {
+          console.log("🔊 Audio resume error:", error);
+        });
+      }
+
+      return true;
+
+    } catch (error) {
+      console.log("🔊 Audio boost setup error:", error);
+      player.volume = 1.0;
+      return false;
+    }
+  }
+
+  window.enableBattleAudioBoost = setupAudioBoost;
+
 
   function getMusicPlayer() {
 
@@ -56,7 +133,7 @@
       battleMusic[currentMusicIndex];
 
     player.src = song.src;
-    player.volume = 0.25;
+    player.volume = 1.0;
 
     currentMusicPlay = 1;
 
@@ -74,7 +151,8 @@
       loadBattleSong();
     }
 
-    player.volume = 0.25;
+    setupAudioBoost();
+    player.volume = 1.0;
 
     const promise = player.play();
 
@@ -97,6 +175,7 @@
 
     if (!player || musicEventsReady) return;
 
+    setupAudioBoost();
     musicEventsReady = true;
 
     player.addEventListener(
@@ -166,6 +245,7 @@
     }
 
     loadBattleSong();
+    setupAudioBoost();
     setupMusicPlayer();
   }
 
