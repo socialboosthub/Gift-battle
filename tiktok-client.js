@@ -96,7 +96,7 @@
 
 
   // ======================================
-  // VOICE ANNOUNCER
+  // 🔥 LIVE ANNOUNCER
   // ======================================
 
   function speakAnnouncement(
@@ -124,18 +124,30 @@
     }
 
 
+    // Prevent too many announcements
+    // from stacking up during a busy LIVE.
+
+    if (
+      voiceQueue.length >= 3
+    ) {
+
+      voiceQueue.shift();
+
+    }
+
+
     voiceQueue.push({
 
       message: message,
 
       rate:
-        options.rate || 1.05,
+        options.rate ?? 1.15,
 
       pitch:
-        options.pitch || 1,
+        options.pitch ?? 1.0,
 
       volume:
-        options.volume || 1
+        options.volume ?? 1.0
 
     });
 
@@ -181,6 +193,42 @@
       item.volume;
 
 
+    // Try to use an English voice
+    // available on the phone.
+
+    const voices =
+      window.speechSynthesis
+        .getVoices();
+
+
+    const preferredVoice =
+      voices.find(
+        voice =>
+          /en-US|en-GB/i.test(
+            voice.lang
+          ) &&
+          /female|zira|samantha|google/i.test(
+            voice.name
+          )
+      ) ||
+      voices.find(
+        voice =>
+          /en-US|en-GB/i.test(
+            voice.lang
+          )
+      );
+
+
+    if (
+      preferredVoice
+    ) {
+
+      speech.voice =
+        preferredVoice;
+
+    }
+
+
     voiceSpeaking =
       true;
 
@@ -191,7 +239,10 @@
         voiceSpeaking =
           false;
 
-        processVoiceQueue();
+        setTimeout(
+          processVoiceQueue,
+          80
+        );
 
       };
 
@@ -392,7 +443,7 @@
 
 
         // ==================================
-        // FOLLOW
+        // 👤 FOLLOW
         // ==================================
 
         if (
@@ -400,11 +451,11 @@
         ) {
 
           speakAnnouncement(
-            "Thank you for the follow",
+            "THANK YOU FOR THE FOLLOW.",
             {
-              rate: 1.0,
-              pitch: 1.15,
-              volume: 1
+              rate: 1.08,
+              pitch: 1.28,
+              volume: 1.0
             }
           );
 
@@ -412,7 +463,7 @@
 
 
         // ==================================
-        // 100 LIKES
+        // ❤️ 100 LIKES
         // ==================================
 
         else if (
@@ -420,11 +471,11 @@
         ) {
 
           speakAnnouncement(
-            "Girls!",
+            "GIRLS.",
             {
-              rate: 1.05,
-              pitch: 1.2,
-              volume: 1
+              rate: 1.18,
+              pitch: 1.42,
+              volume: 1.0
             }
           );
 
@@ -432,7 +483,7 @@
 
 
         // ==================================
-        // BRUTALITY
+        // 💥 BRUTALITY
         // ==================================
 
         else if (
@@ -441,16 +492,16 @@
 
           speakAnnouncement(
             side +
-            " BRUTALITY!",
+            "!!! BRUTALITY!!!",
             {
-              rate: 0.9,
+              rate: 0.78,
 
               pitch:
                 command.side === "boy"
-                  ? 0.75
-                  : 1.25,
+                  ? 0.62
+                  : 1.18,
 
-              volume: 1
+              volume: 1.0
             }
           );
 
@@ -458,23 +509,23 @@
 
 
         // ==================================
-        // NORMAL HIT
+        // 👊 NORMAL HIT
         // ==================================
 
         else {
 
           speakAnnouncement(
             side +
-            " HIT!",
+            " HIT!!!",
             {
-              rate: 1.05,
+              rate: 1.28,
 
               pitch:
                 command.side === "boy"
-                  ? 0.8
-                  : 1.2,
+                  ? 0.78
+                  : 1.28,
 
-              volume: 1
+              volume: 1.0
             }
           );
 
@@ -535,6 +586,7 @@
 
 
           // Stop if somebody has already won.
+
           if (
             typeof isMatchActive !==
               "undefined" &&
