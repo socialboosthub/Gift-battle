@@ -548,58 +548,6 @@
 
 
   // ============================================================
-  // 👤 GET GIFTER PROFILE PICTURE
-  // ============================================================
-
-  function getProfilePic(command) {
-
-    const user = command && command.user;
-
-    const candidates = [
-      command && command.profilePic,
-      command && command.avatarUrl,
-      user && user.avatarLarge,
-      user && user.avatarMedium,
-      user && user.avatarThumb,
-      user && user.avatarLarger,
-      user && user.profilePicture,
-      user && user.profilePictureUrl,
-      user && user.avatar && user.avatar.urlList,
-      user && user.avatarThumb && user.avatarThumb.urlList,
-      user && user.avatarMedium && user.avatarMedium.urlList,
-      user && user.avatarLarge && user.avatarLarge.urlList
-    ];
-
-    function findUrl(value) {
-      if (!value) return null;
-      if (typeof value === "string") return value;
-      if (Array.isArray(value)) {
-        for (const item of value) {
-          const found = findUrl(item);
-          if (found) return found;
-        }
-      }
-      if (typeof value === "object") {
-        for (const key of ["urlList","url","uri","url_list"]) {
-          if (value[key]) {
-            const found = findUrl(value[key]);
-            if (found) return found;
-          }
-        }
-      }
-      return null;
-    }
-
-    for (const candidate of candidates) {
-      const url = findUrl(candidate);
-      if (url) return url;
-    }
-
-    return null;
-  }
-
-
-  // ============================================================
   // 💐 DETECT CHARACTER SWITCH
   // ============================================================
 
@@ -870,9 +818,6 @@
       const username =
         getUsername(command);
 
-      const profilePic =
-        getProfilePic(command);
-
       const giftClean =
         cleanGiftName(gift);
 
@@ -939,8 +884,7 @@
             switchCharacter(
               switchSide,
               username,
-              gift,
-              profilePic
+              gift
             );
 
           } else {
@@ -1171,8 +1115,7 @@
         switchCharacter(
           side,
           username,
-          gift,
-          profilePic
+          gift
         );
 
 
