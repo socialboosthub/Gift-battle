@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
 <meta name="viewport"
       content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 
@@ -65,7 +66,6 @@ body{
 
 /* =========================================================
    MAIN ARENA
-   9:16 FOR PHONE / TIKTOK
 ========================================================= */
 
 .arena-wrapper{
@@ -458,7 +458,7 @@ body{
 
 
 /* =========================================================
-   CHARACTER CHANGED ANNOUNCEMENT
+   CHARACTER CHANGED
 ========================================================= */
 
 .character-change{
@@ -488,7 +488,6 @@ body{
   border:2px solid rgba(255,255,255,.75);
 
   font:
-
     900 17px Arial,sans-serif;
 
   letter-spacing:1px;
@@ -620,6 +619,8 @@ body{
   height:16px;
 
   object-fit:contain;
+
+  flex-shrink:0;
 }
 
 @keyframes feedIn{
@@ -725,7 +726,6 @@ body{
   pointer-events:none;
 
   font:
-
     900 38px Arial,sans-serif;
 
   text-align:center;
@@ -867,7 +867,6 @@ body{
   text-align:center;
 
   font:
-
     700 10px Arial,sans-serif;
 
   letter-spacing:1px;
@@ -900,7 +899,6 @@ body{
   margin-top:2px;
 
   font:
-
     900 21px Arial,sans-serif;
 
   line-height:1;
@@ -919,7 +917,6 @@ body{
   background:#111;
 
   font:
-
     900 11px Arial,sans-serif;
 }
 
@@ -981,7 +978,6 @@ body{
   border-radius:6px;
 
   font:
-
     700 10px Arial,sans-serif;
 
   color:#fff;
@@ -1040,7 +1036,7 @@ body{
 
 
 /* =========================================================
-   FULLSCREEN BUTTON
+   FULLSCREEN
 ========================================================= */
 
 .fullscreen-btn{
@@ -1295,48 +1291,6 @@ body.viewer-mode .arena-wrapper{
 <body>
 
 
-<!-- =====================================================
-     PRELOAD ALL IMAGES
-===================================================== -->
-
-<div style="display:none">
-
-  <img src="girls.jpg">
-  <img src="boys.jpg">
-
-  <img src="kitana_idle.png">
-  <img src="kitana_attack.png">
-
-  <img src="mileena_idle.png">
-  <img src="mileena_attack.png">
-
-  <img src="jade_idle.png">
-  <img src="jade_attack.png">
-
-  <img src="subzero_idle.png">
-  <img src="subzero_attack.png">
-
-  <img src="scorpion_idle.png">
-  <img src="scorpion_attack.png">
-
-  <img src="liukang_idle.png">
-  <img src="liukang_attack.png">
-
-  <img src="icon_100likes.png">
-  <img src="icon_follow.png">
-
-  <img src="icon_rose.png">
-  <img src="icon_rosa.png">
-
-  <img src="icon_tiktok.png">
-  <img src="icon_necklace.png">
-
-  <img src="icon_bouquet.png">
-  <img src="icon_confetti.png">
-
-</div>
-
-
 <div class="secret-hint">
   Streamer Mode Active:
   Press <span>H</span> to hide/show controls
@@ -1482,11 +1436,14 @@ body.viewer-mode .arena-wrapper{
     </div>
 
 
+    <!-- SVG BOUQUET -->
+
     <div class="gift-item">
 
       <img
-        src="icon_bouquet.png"
-        class="gift-icon">
+        data-svg-gift="bouquet"
+        class="gift-icon"
+        alt="Bouquet">
 
       <div class="gift-info">
 
@@ -1574,11 +1531,14 @@ body.viewer-mode .arena-wrapper{
     </div>
 
 
+    <!-- SVG CONFETTI / PARTY POPPER -->
+
     <div class="gift-item">
 
       <img
-        src="icon_confetti.png"
-        class="gift-icon">
+        data-svg-gift="confetti"
+        class="gift-icon"
+        alt="Confetti">
 
       <div class="gift-info">
 
@@ -1819,9 +1779,702 @@ body.viewer-mode .arena-wrapper{
 <script>
 
 
-/* =====================================================
+/* =========================================================
+   SVG HELPER
+   Converts inline SVG code into an image that works in <img>
+========================================================= */
+
+function svgToDataUri(svg){
+
+  return "data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(svg);
+
+}
+
+
+/* =========================================================
+   BOUQUET SVG
+   Recreated from the uploaded colorful balloon bouquet
+========================================================= */
+
+function createBouquetSVG(){
+
+  return `
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 200 200"
+  width="200"
+  height="200">
+
+  <defs>
+
+    <radialGradient id="pinkBalloon" cx="35%" cy="25%">
+      <stop offset="0%" stop-color="#ff8de8"/>
+      <stop offset="35%" stop-color="#ff24bd"/>
+      <stop offset="75%" stop-color="#ed009d"/>
+      <stop offset="100%" stop-color="#a90073"/>
+    </radialGradient>
+
+    <radialGradient id="yellowBalloon" cx="32%" cy="25%">
+      <stop offset="0%" stop-color="#fffda0"/>
+      <stop offset="35%" stop-color="#fff000"/>
+      <stop offset="75%" stop-color="#ffc400"/>
+      <stop offset="100%" stop-color="#e86b00"/>
+    </radialGradient>
+
+    <radialGradient id="orangeBalloon" cx="32%" cy="25%">
+      <stop offset="0%" stop-color="#ffb05d"/>
+      <stop offset="35%" stop-color="#ff6b18"/>
+      <stop offset="75%" stop-color="#f03400"/>
+      <stop offset="100%" stop-color="#ad1700"/>
+    </radialGradient>
+
+    <radialGradient id="blueBalloon" cx="30%" cy="22%">
+      <stop offset="0%" stop-color="#73eaff"/>
+      <stop offset="35%" stop-color="#00aaff"/>
+      <stop offset="75%" stop-color="#006eea"/>
+      <stop offset="100%" stop-color="#003b9d"/>
+    </radialGradient>
+
+    <radialGradient id="redBalloon" cx="30%" cy="22%">
+      <stop offset="0%" stop-color="#ff9696"/>
+      <stop offset="35%" stop-color="#ff4355"/>
+      <stop offset="75%" stop-color="#ed183a"/>
+      <stop offset="100%" stop-color="#a5002d"/>
+    </radialGradient>
+
+    <linearGradient id="stem" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#66ff91"/>
+      <stop offset="35%" stop-color="#00bd50"/>
+      <stop offset="70%" stop-color="#008b3d"/>
+      <stop offset="100%" stop-color="#004c28"/>
+    </linearGradient>
+
+    <linearGradient id="goldRing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff28a"/>
+      <stop offset="25%" stop-color="#ffd000"/>
+      <stop offset="55%" stop-color="#ffad00"/>
+      <stop offset="80%" stop-color="#fff06a"/>
+      <stop offset="100%" stop-color="#b86c00"/>
+    </linearGradient>
+
+    <filter id="softShadow">
+      <feDropShadow
+        dx="0"
+        dy="3"
+        stdDeviation="2"
+        flood-color="#000"
+        flood-opacity=".55"/>
+    </filter>
+
+  </defs>
+
+
+  <!-- GREEN STEMS -->
+
+  <g
+    fill="none"
+    stroke="url(#stem)"
+    stroke-width="9"
+    stroke-linecap="round"
+    filter="url(#softShadow)">
+
+    <path d="M100 151 C105 166 110 180 113 194"/>
+    <path d="M107 150 C121 165 132 178 139 192"/>
+    <path d="M94 151 C82 165 70 179 61 192"/>
+    <path d="M101 153 C96 169 93 181 91 195"/>
+    <path d="M112 151 C129 158 143 167 153 179"/>
+
+  </g>
+
+
+  <!-- TOP PINK FLOWER -->
+
+  <g filter="url(#softShadow)">
+
+    <ellipse
+      cx="86"
+      cy="32"
+      rx="24"
+      ry="31"
+      fill="url(#pinkBalloon)"/>
+
+    <ellipse
+      cx="119"
+      cy="31"
+      rx="24"
+      ry="31"
+      fill="url(#pinkBalloon)"/>
+
+    <ellipse
+      cx="101"
+      cy="52"
+      rx="30"
+      ry="34"
+      fill="url(#pinkBalloon)"/>
+
+    <ellipse
+      cx="70"
+      cy="55"
+      rx="25"
+      ry="30"
+      fill="url(#pinkBalloon)"/>
+
+    <ellipse
+      cx="132"
+      cy="55"
+      rx="25"
+      ry="30"
+      fill="url(#pinkBalloon)"/>
+
+    <circle
+      cx="101"
+      cy="52"
+      r="12"
+      fill="#ff9de9"/>
+
+  </g>
+
+
+  <!-- LEFT YELLOW FLOWER -->
+
+  <g filter="url(#softShadow)">
+
+    <ellipse
+      cx="32"
+      cy="73"
+      rx="17"
+      ry="27"
+      fill="url(#yellowBalloon)"/>
+
+    <ellipse
+      cx="54"
+      cy="70"
+      rx="18"
+      ry="27"
+      fill="url(#yellowBalloon)"/>
+
+    <ellipse
+      cx="67"
+      cy="91"
+      rx="17"
+      ry="27"
+      fill="url(#yellowBalloon)"/>
+
+    <ellipse
+      cx="53"
+      cy="111"
+      rx="18"
+      ry="27"
+      fill="url(#yellowBalloon)"/>
+
+    <ellipse
+      cx="27"
+      cy="108"
+      rx="18"
+      ry="27"
+      fill="url(#yellowBalloon)"/>
+
+    <ellipse
+      cx="17"
+      cy="90"
+      rx="17"
+      ry="25"
+      fill="url(#yellowBalloon)"/>
+
+    <circle
+      cx="43"
+      cy="91"
+      r="12"
+      fill="#ffd600"/>
+
+  </g>
+
+
+  <!-- RIGHT ORANGE FLOWER -->
+
+  <g filter="url(#softShadow)">
+
+    <ellipse
+      cx="150"
+      cy="63"
+      rx="19"
+      ry="27"
+      fill="url(#orangeBalloon)"/>
+
+    <ellipse
+      cx="173"
+      cy="53"
+      rx="19"
+      ry="27"
+      fill="url(#orangeBalloon)"/>
+
+    <ellipse
+      cx="185"
+      cy="77"
+      rx="19"
+      ry="27"
+      fill="url(#orangeBalloon)"/>
+
+    <ellipse
+      cx="165"
+      cy="96"
+      rx="19"
+      ry="27"
+      fill="url(#orangeBalloon)"/>
+
+    <ellipse
+      cx="143"
+      cy="91"
+      rx="19"
+      ry="27"
+      fill="url(#orangeBalloon)"/>
+
+    <circle
+      cx="166"
+      cy="75"
+      r="12"
+      fill="#ffe4ec"/>
+
+  </g>
+
+
+  <!-- RIGHT BLUE FLOWER -->
+
+  <g filter="url(#softShadow)">
+
+    <ellipse
+      cx="174"
+      cy="101"
+      rx="26"
+      ry="19"
+      transform="rotate(-20 174 101)"
+      fill="url(#blueBalloon)"/>
+
+    <ellipse
+      cx="181"
+      cy="122"
+      rx="27"
+      ry="19"
+      transform="rotate(8 181 122)"
+      fill="url(#blueBalloon)"/>
+
+    <ellipse
+      cx="163"
+      cy="137"
+      rx="27"
+      ry="19"
+      transform="rotate(30 163 137)"
+      fill="url(#blueBalloon)"/>
+
+    <ellipse
+      cx="143"
+      cy="126"
+      rx="26"
+      ry="19"
+      transform="rotate(-25 143 126)"
+      fill="url(#blueBalloon)"/>
+
+  </g>
+
+
+  <!-- BOTTOM RED FLOWER -->
+
+  <g filter="url(#softShadow)">
+
+    <ellipse
+      cx="66"
+      cy="126"
+      rx="22"
+      ry="29"
+      fill="url(#redBalloon)"/>
+
+    <ellipse
+      cx="92"
+      cy="124"
+      rx="22"
+      ry="29"
+      fill="url(#redBalloon)"/>
+
+    <ellipse
+      cx="106"
+      cy="146"
+      rx="22"
+      ry="29"
+      fill="url(#redBalloon)"/>
+
+    <ellipse
+      cx="88"
+      cy="163"
+      rx="22"
+      ry="28"
+      fill="url(#redBalloon)"/>
+
+    <ellipse
+      cx="59"
+      cy="160"
+      rx="22"
+      ry="28"
+      fill="url(#redBalloon)"/>
+
+    <ellipse
+      cx="46"
+      cy="142"
+      rx="22"
+      ry="28"
+      fill="url(#redBalloon)"/>
+
+    <circle
+      cx="75"
+      cy="144"
+      r="12"
+      fill="#ffd9e5"/>
+
+  </g>
+
+
+  <!-- CENTER PINK PETAL -->
+
+  <ellipse
+    cx="116"
+    cy="116"
+    rx="23"
+    ry="36"
+    transform="rotate(30 116 116)"
+    fill="url(#pinkBalloon)"
+    filter="url(#softShadow)"/>
+
+
+  <!-- GOLD BINDING -->
+
+  <ellipse
+    cx="101"
+    cy="163"
+    rx="27"
+    ry="10"
+    fill="url(#goldRing)"
+    stroke="#ffe873"
+    stroke-width="2"
+    transform="rotate(-12 101 163)"
+    filter="url(#softShadow)"/>
+
+</svg>`;
+}
+
+
+/* =========================================================
+   CONFETTI / PARTY POPPER SVG
+   Recreated from uploaded image
+========================================================= */
+
+function createConfettiSVG(){
+
+  return `
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 200 200"
+  width="200"
+  height="200">
+
+  <defs>
+
+    <linearGradient id="cone" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff"/>
+      <stop offset="18%" stop-color="#ff9b00"/>
+      <stop offset="43%" stop-color="#ff6b00"/>
+      <stop offset="70%" stop-color="#ffda00"/>
+      <stop offset="100%" stop-color="#ff174d"/>
+    </linearGradient>
+
+    <linearGradient id="blueRim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a9ffff"/>
+      <stop offset="25%" stop-color="#00eaff"/>
+      <stop offset="65%" stop-color="#0075ff"/>
+      <stop offset="100%" stop-color="#003db5"/>
+    </linearGradient>
+
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d98cff"/>
+      <stop offset="45%" stop-color="#8d27ff"/>
+      <stop offset="100%" stop-color="#4b00b7"/>
+    </linearGradient>
+
+    <linearGradient id="pink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff9be8"/>
+      <stop offset="45%" stop-color="#ff1bb7"/>
+      <stop offset="100%" stop-color="#d50080"/>
+    </linearGradient>
+
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8affff"/>
+      <stop offset="45%" stop-color="#00cfff"/>
+      <stop offset="100%" stop-color="#0074d9"/>
+    </linearGradient>
+
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4cff9c"/>
+      <stop offset="45%" stop-color="#00d95b"/>
+      <stop offset="100%" stop-color="#00963c"/>
+    </linearGradient>
+
+    <radialGradient id="star">
+      <stop offset="0%" stop-color="#fff98a"/>
+      <stop offset="35%" stop-color="#fff000"/>
+      <stop offset="80%" stop-color="#ffc400"/>
+      <stop offset="100%" stop-color="#ff8700"/>
+    </radialGradient>
+
+    <filter id="shadow">
+      <feDropShadow
+        dx="0"
+        dy="3"
+        stdDeviation="2"
+        flood-color="#000"
+        flood-opacity=".65"/>
+    </filter>
+
+  </defs>
+
+
+  <!-- TOP GREEN STREAMER -->
+
+  <path
+    d="M151 0
+       C151 15 163 20 158 34
+       C154 46 145 48 142 37
+       C139 25 148 18 140 0"
+    fill="url(#green)"
+    stroke="#00a946"
+    stroke-width="2"
+    filter="url(#shadow)"/>
+
+
+  <!-- BLUE CURL LEFT -->
+
+  <path
+    d="M39 8
+       C25 27 25 44 39 51
+       C53 58 64 67 58 81
+       C55 89 48 89 45 83"
+    fill="none"
+    stroke="url(#cyan)"
+    stroke-width="14"
+    stroke-linecap="round"
+    filter="url(#shadow)"/>
+
+
+  <!-- PINK CURL LEFT -->
+
+  <path
+    d="M19 47
+       C10 62 17 76 32 77
+       C49 78 54 88 57 102
+       C59 111 68 112 70 105"
+    fill="none"
+    stroke="url(#pink)"
+    stroke-width="13"
+    stroke-linecap="round"
+    filter="url(#shadow)"/>
+
+
+  <!-- PURPLE CURL CENTER -->
+
+  <path
+    d="M89 42
+       C76 50 78 59 91 64
+       C105 69 111 76 101 84
+       C94 90 99 97 110 101"
+    fill="none"
+    stroke="url(#purple)"
+    stroke-width="10"
+    stroke-linecap="round"
+    filter="url(#shadow)"/>
+
+
+  <!-- MAIN PARTY POPPER CONE -->
+
+  <path
+    d="M48 137
+       L142 58
+       L174 172
+       Z"
+    fill="url(#cone)"
+    stroke="#ffb300"
+    stroke-width="2"
+    filter="url(#shadow)"/>
+
+
+  <!-- INNER COLORED STRIPES -->
+
+  <path
+    d="M59 127
+       L137 63
+       L147 95
+       L72 145 Z"
+    fill="#ff3b00"
+    opacity=".9"/>
+
+  <path
+    d="M72 145
+       L147 95
+       L155 124
+       L86 157 Z"
+    fill="#4c16a8"
+    opacity=".95"/>
+
+  <path
+    d="M86 157
+       L155 124
+       L164 155
+       L100 169 Z"
+    fill="#00a9ff"
+    opacity=".9"/>
+
+  <path
+    d="M100 169
+       L164 155
+       L171 173
+       L115 177 Z"
+    fill="#ff176e"
+    opacity=".9"/>
+
+
+  <!-- BLUE EDGE / RIM -->
+
+  <path
+    d="M47 137
+       C72 149 105 158 140 145
+       C157 139 168 128 173 113
+       L182 144
+       C174 161 160 170 142 177
+       C105 190 73 174 47 151
+       Z"
+    fill="url(#blueRim)"
+    stroke="#8cffff"
+    stroke-width="2"
+    filter="url(#shadow)"/>
+
+
+  <!-- YELLOW STAR -->
+
+  <path
+    d="M73 12
+       L82 31
+       L103 30
+       L87 44
+       L94 65
+       L75 53
+       L57 66
+       L63 44
+       L47 31
+       L68 30
+       Z"
+    fill="url(#star)"
+    stroke="#ffbd00"
+    stroke-width="3"
+    stroke-linejoin="round"
+    filter="url(#shadow)"/>
+
+
+  <!-- PURPLE LOWER STREAMER -->
+
+  <path
+    d="M68 147
+       C62 160 50 165 39 174
+       C29 182 23 177 28 168
+       C35 156 51 157 57 147
+       C63 137 69 136 75 140"
+    fill="none"
+    stroke="url(#purple)"
+    stroke-width="13"
+    stroke-linecap="round"
+    filter="url(#shadow)"/>
+
+
+  <!-- RIGHT BLUE CURL -->
+
+  <path
+    d="M169 91
+       C183 83 192 87 189 101
+       C187 111 178 113 181 125
+       C184 137 175 142 167 136"
+    fill="none"
+    stroke="url(#cyan)"
+    stroke-width="13"
+    stroke-linecap="round"
+    filter="url(#shadow)"/>
+
+
+  <!-- EXTRA PINK LOWER STREAM -->
+
+  <path
+    d="M151 143
+       C157 153 169 158 171 169
+       C173 179 165 184 158 177"
+    fill="none"
+    stroke="url(#pink)"
+    stroke-width="10"
+    stroke-linecap="round"
+    filter="url(#shadow)"/>
+
+</svg>`;
+}
+
+
+/* =========================================================
+   CREATE SVG DATA URLS
+========================================================= */
+
+const BOUQUET_SVG =
+  svgToDataUri(
+    createBouquetSVG()
+  );
+
+const CONFETTI_SVG =
+  svgToDataUri(
+    createConfettiSVG()
+  );
+
+
+/* =========================================================
+   PUT SVGs INTO GIFT PANELS
+========================================================= */
+
+function initializeSVGIcons(){
+
+  document
+    .querySelectorAll(
+      '[data-svg-gift="bouquet"]'
+    )
+    .forEach(
+      img => {
+
+        img.src =
+          BOUQUET_SVG;
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      '[data-svg-gift="confetti"]'
+    )
+    .forEach(
+      img => {
+
+        img.src =
+          CONFETTI_SVG;
+
+      }
+    );
+
+}
+
+
+/* =========================================================
    VARIABLES
-===================================================== */
+========================================================= */
 
 let linePosition = 100;
 
@@ -1831,9 +2484,9 @@ let boyWins = 0;
 let isMatchActive = true;
 
 
-/* =====================================================
+/* =========================================================
    CHARACTERS
-===================================================== */
+========================================================= */
 
 const girlCharacters = [
 
@@ -1885,9 +2538,9 @@ let currentGirlIndex = 0;
 let currentBoyIndex = 0;
 
 
-/* =====================================================
+/* =========================================================
    RANDOM USERNAME
-===================================================== */
+========================================================= */
 
 function getRandomUsername(){
 
@@ -1925,9 +2578,9 @@ function getRandomUsername(){
 }
 
 
-/* =====================================================
+/* =========================================================
    VISUAL SCORE
-===================================================== */
+========================================================= */
 
 function updateVisuals(){
 
@@ -1993,9 +2646,9 @@ function updateVisuals(){
 }
 
 
-/* =====================================================
+/* =========================================================
    SCREEN SHAKE
-===================================================== */
+========================================================= */
 
 function triggerAnimation(
   isBrutality
@@ -2026,10 +2679,9 @@ function triggerAnimation(
 }
 
 
-/* =====================================================
-   GIFT TEXT ONLY
-   NO BIG GIFT IMAGE
-===================================================== */
+/* =========================================================
+   GIFT TEXT
+========================================================= */
 
 function showGift(
   giftImage,
@@ -2075,9 +2727,9 @@ function showGift(
 }
 
 
-/* =====================================================
+/* =========================================================
    CHARACTER CHANGED
-===================================================== */
+========================================================= */
 
 function showCharacterChanged(
   side,
@@ -2127,9 +2779,9 @@ function showCharacterChanged(
 }
 
 
-/* =====================================================
+/* =========================================================
    ATTACK
-===================================================== */
+========================================================= */
 
 function attack(
 
@@ -2248,9 +2900,9 @@ function attack(
 }
 
 
-/* =====================================================
+/* =========================================================
    GET GIFT ICON
-===================================================== */
+========================================================= */
 
 function getGiftIcon(
   giftName
@@ -2264,12 +2916,18 @@ function getGiftIcon(
     giftName.toLowerCase();
 
 
-  if(name.includes("rose"))
-    return "icon_rose.png";
+  /*
+     IMPORTANT:
+     Check "rosa" BEFORE "rose"
+     so Rosa gets the correct icon.
+  */
 
-
-  if(name.includes("rosa"))
+  if(name === "rosa")
     return "icon_rosa.png";
+
+
+  if(name === "rose")
+    return "icon_rose.png";
 
 
   if(name.includes("tiktok"))
@@ -2288,21 +2946,26 @@ function getGiftIcon(
     return "icon_100likes.png";
 
 
+  /*
+     THESE TWO ARE NOW PURE SVG.
+     NO PNG FILE IS REQUIRED.
+  */
+
   if(name.includes("bouquet"))
-    return "icon_bouquet.png";
+    return BOUQUET_SVG;
 
 
   if(name.includes("confetti"))
-    return "icon_confetti.png";
+    return CONFETTI_SVG;
 
 
   return null;
 }
 
 
-/* =====================================================
+/* =========================================================
    WINNER
-===================================================== */
+========================================================= */
 
 function checkWinner(){
 
@@ -2392,9 +3055,9 @@ function checkWinner(){
 }
 
 
-/* =====================================================
+/* =========================================================
    CHARACTER ATTACK
-===================================================== */
+========================================================= */
 
 function animateCharacter(
   fighter
@@ -2452,9 +3115,9 @@ function animateCharacter(
 }
 
 
-/* =====================================================
+/* =========================================================
    CHARACTER SWITCH
-===================================================== */
+========================================================= */
 
 function switchCharacter(
 
@@ -2503,8 +3166,6 @@ function switchCharacter(
       char.idle;
 
 
-    /* NO GIFT IMAGE */
-
     showCharacterChanged(
       "girl",
       char.name
@@ -2515,7 +3176,7 @@ function switchCharacter(
       "girl",
       username,
       "Character Changed",
-      "icon_bouquet.png"
+      BOUQUET_SVG
     );
 
   }
@@ -2548,8 +3209,6 @@ function switchCharacter(
       char.idle;
 
 
-    /* NO GIFT IMAGE */
-
     showCharacterChanged(
       "boy",
       char.name
@@ -2560,7 +3219,7 @@ function switchCharacter(
       "boy",
       username,
       "Character Changed",
-      "icon_confetti.png"
+      CONFETTI_SVG
     );
 
   }
@@ -2568,9 +3227,9 @@ function switchCharacter(
 }
 
 
-/* =====================================================
+/* =========================================================
    FEED
-===================================================== */
+========================================================= */
 
 function addFeed(
 
@@ -2671,9 +3330,9 @@ function addFeed(
 }
 
 
-/* =====================================================
+/* =========================================================
    RESET MATCH
-===================================================== */
+========================================================= */
 
 function resetMatch(){
 
@@ -2686,9 +3345,9 @@ function resetMatch(){
 }
 
 
-/* =====================================================
+/* =========================================================
    RESET SCORES
-===================================================== */
+========================================================= */
 
 function resetScores(){
 
@@ -2711,9 +3370,9 @@ function resetScores(){
 }
 
 
-/* =====================================================
+/* =========================================================
    CONTROLS
-===================================================== */
+========================================================= */
 
 function toggleControls(){
 
@@ -2744,9 +3403,9 @@ window.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    VIEWER MODE
-===================================================== */
+========================================================= */
 
 async function startViewerMode(){
 
@@ -2806,9 +3465,9 @@ async function startViewerMode(){
 }
 
 
-/* =====================================================
+/* =========================================================
    FULLSCREEN EXIT
-===================================================== */
+========================================================= */
 
 document.addEventListener(
   "fullscreenchange",
@@ -2828,9 +3487,11 @@ document.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    START
-===================================================== */
+========================================================= */
+
+initializeSVGIcons();
 
 updateVisuals();
 
