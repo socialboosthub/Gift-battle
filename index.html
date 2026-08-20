@@ -1099,55 +1099,115 @@ body{
 
 
 /* =========================================================
-   VIEWER MODE
+   STREAM / VIEWER MODE
+   Same exact game layout, just fullscreen
 ========================================================= */
 
 body.viewer-mode{
 
-  padding:0;
-  margin:0;
+  padding:0 !important;
+  margin:0 !important;
 
-  width:100vw;
-  height:100vh;
+  width:100vw !important;
+  height:100vh !important;
 
-  min-height:100vh;
+  min-height:100vh !important;
 
-  overflow:hidden;
+  overflow:hidden !important;
 
-  background:#000;
+  background:#000 !important;
 
-  justify-content:center;
+  display:flex !important;
+
+  align-items:center !important;
+  justify-content:center !important;
 }
+
+
+/* Hide ONLY the outside controls */
 
 body.viewer-mode .secret-hint,
 body.viewer-mode .battle-scorebar,
 body.viewer-mode .controls-panel,
+body.viewer-mode .fullscreen-btn,
 body.viewer-mode #tiktok-debug{
 
-  display:none!important;
+  display:none !important;
 }
+
+
+/* Keep the arena itself exactly 9:16 */
 
 body.viewer-mode .arena-wrapper{
 
-  width:min(
-    100vw,
-    calc(100vh * 9 / 16)
-  );
+  position:relative !important;
 
-  height:min(
-    100vh,
-    calc(100vw * 16 / 9)
-  );
+  width:auto !important;
+  height:100vh !important;
 
-  max-width:none;
+  aspect-ratio:9 / 16 !important;
 
-  aspect-ratio:9/16;
+  max-width:none !important;
+  max-height:100vh !important;
 
-  border:none;
+  margin:0 !important;
 
-  border-radius:0;
+  border:none !important;
+  border-radius:0 !important;
 
-  box-shadow:none;
+  box-shadow:none !important;
+
+  flex:none !important;
+
+  overflow:hidden !important;
+}
+
+
+/* When the actual arena is fullscreen */
+
+.arena-wrapper:fullscreen{
+
+  width:auto !important;
+
+  height:100vh !important;
+
+  aspect-ratio:9 / 16 !important;
+
+  max-width:none !important;
+  max-height:100vh !important;
+
+  margin:0 !important;
+
+  border:none !important;
+  border-radius:0 !important;
+
+  box-shadow:none !important;
+
+  background:#000 !important;
+}
+
+
+/* Keep the same internal game proportions */
+
+.arena-wrapper:fullscreen .bg-split,
+.arena-wrapper:fullscreen .center-divider,
+.arena-wrapper:fullscreen .hud-top,
+.arena-wrapper:fullscreen .gift-panel,
+.arena-wrapper:fullscreen .avatar-wrapper,
+.arena-wrapper:fullscreen .action-feed,
+.arena-wrapper:fullscreen .character-change,
+.arena-wrapper:fullscreen .gift-popup,
+.arena-wrapper:fullscreen .announcement{
+
+  /* Do not resize/reposition these elements */
+}
+
+
+/* Hide the secret gear while streaming */
+
+.arena-wrapper:fullscreen .secret-toggle-btn{
+
+  display:none !important;
 }
 
 
@@ -3402,11 +3462,6 @@ window.addEventListener(
   }
 );
 
-
-/* =========================================================
-   VIEWER MODE
-========================================================= */
-
 async function startViewerMode(){
 
   if(
@@ -3429,15 +3484,21 @@ async function startViewerMode(){
   }
 
 
-  document.body.classList.add(
-    "viewer-mode"
-  );
-
-
   const arena =
     document.getElementById(
       "arena"
     );
+
+
+  /*
+     Add viewer mode BEFORE fullscreen
+     so the browser calculates the correct
+     9:16 layout.
+  */
+
+  document.body.classList.add(
+    "viewer-mode"
+  );
 
 
   try{
@@ -3463,6 +3524,7 @@ async function startViewerMode(){
   }
 
 }
+
 
 
 /* =========================================================
