@@ -359,7 +359,7 @@ body{
 
   bottom:12%;
 
-  height:25%;
+  height:30%;
 
   z-index:6;
 
@@ -945,6 +945,11 @@ body.viewer-mode .arena-wrapper{
   margin:0;
 }
 
+/* Reduce character size in Viewer Mode */
+body.viewer-mode .avatar-wrapper {
+  height: 30% !important; /* Default is 55%. Lower this number to make them even smaller */
+  bottom: 15%;            /* Adjust position relative to the bottom if needed */
+}
 
 /* =====================================================
    MOBILE
