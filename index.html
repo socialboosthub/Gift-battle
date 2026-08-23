@@ -60,8 +60,8 @@ body{
 
 .arena-wrapper{
   width:100%;
-  max-width:960px;
-  aspect-ratio:16/9;
+  max-width:420px;
+  aspect-ratio:9/16;
   position:relative;
 
   border:3px solid #2a1f3d;
@@ -187,31 +187,31 @@ body{
 }
 
 .score-number{
-  font-size:32px;
+  font-size:24px;
 
   color:#fff;
 
-  padding:8px 20px;
+  padding:6px 12px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  min-width:70px;
+  min-width:45px;
 }
 
 .team-name{
-  font-size:28px;
+  font-size:18px;
 
   color:#fff;
 
-  padding:8px 25px;
+  padding:6px 14px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  letter-spacing:2px;
+  letter-spacing:1px;
 
   text-shadow:
     1px 1px 3px rgba(0,0,0,.5);
@@ -243,7 +243,7 @@ body{
 .gift-panel{
   position:absolute;
 
-  top:50%;
+  top:30%;
 
   transform:translateY(-50%);
 
@@ -258,7 +258,7 @@ body{
 
   background:rgba(0,0,0,.75);
 
-  padding:8px 12px;
+  padding:8px 10px;
 
   border-radius:10px;
 
@@ -269,14 +269,14 @@ body{
 }
 
 .gift-panel.girls-side{
-  left:15px;
+  left:10px;
 
   border-left:
     3px solid #d800ff;
 }
 
 .gift-panel.boys-side{
-  right:15px;
+  right:10px;
 
   border-right:
     3px solid #00d2ff;
@@ -291,10 +291,10 @@ body{
   display:flex;
   align-items:center;
 
-  gap:10px;
+  gap:8px;
 
   font:
-    800 13px
+    800 11px
     "Segoe UI",
     Arial,
     sans-serif;
@@ -308,8 +308,8 @@ body{
 }
 
 .gift-icon{
-  width:24px;
-  height:24px;
+  width:20px;
+  height:20px;
 
   object-fit:contain;
 
@@ -328,7 +328,7 @@ body{
 }
 
 .gift-name{
-  font-size:11px;
+  font-size:10px;
 
   color:#ddd;
 
@@ -340,13 +340,13 @@ body{
 .gift-points{
   color:#ffcc00;
 
-  font-size:14px;
+  font-size:12px;
 }
 
 .gift-action{
   color:#00ffcc;
 
-  font-size:12px;
+  font-size:10px;
 }
 
 
@@ -357,9 +357,9 @@ body{
 .avatar-wrapper{
   position:absolute;
 
-  bottom:15%;
+  bottom:12%;
 
-  height:60%;
+  height:55%;
 
   z-index:6;
 
@@ -370,13 +370,13 @@ body{
 .avatar-wrapper-girl{
   transform:translateX(-100%);
 
-  padding-right:30px;
+  padding-right:15px;
 }
 
 .avatar-wrapper-boy{
   transform:translateX(0);
 
-  padding-left:30px;
+  padding-left:15px;
 }
 
 .avatar{
@@ -388,26 +388,6 @@ body{
   transition:
     transform .15s ease-out;
 }
-
-
-/* =====================================================
-   IMPORTANT:
-   NO FLOATING BOUQUET / CONFETTI IMAGE
-===================================================== */
-
-/*
-   We intentionally removed the old
-   floating-gift system.
-
-   Bouquet and Confetti will NOT appear
-   as giant pictures over the arena.
-
-   Instead the screen will show:
-
-       CHARACTER CHANGED
-
-   This keeps the battle clean.
-*/
 
 
 /* =====================================================
@@ -424,7 +404,7 @@ body{
     translate(-50%,-50%)
     scale(.5);
 
-  font-size:56px;
+  font-size:36px;
 
   font-weight:900;
 
@@ -432,7 +412,7 @@ body{
 
   text-align:center;
 
-  letter-spacing:3px;
+  letter-spacing:2px;
 
   opacity:0;
 
@@ -452,7 +432,7 @@ body{
 
   transform:
     translate(-50%,-50%)
-    scale(1.1);
+    scale(1.0);
 }
 
 .annct-girls{
@@ -481,12 +461,12 @@ body{
 .action-feed{
   position:absolute;
 
-  bottom:20px;
+  bottom:15px;
 
   display:flex;
   flex-direction:column;
 
-  gap:6px;
+  gap:5px;
 
   z-index:15;
 
@@ -494,29 +474,29 @@ body{
 }
 
 .action-feed-girls{
-  left:15px;
+  left:10px;
 }
 
 .action-feed-boys{
-  right:15px;
+  right:10px;
 }
 
 .feed-item{
   background:rgba(0,0,0,.65);
 
-  padding:4px 10px;
+  padding:3px 8px;
 
   border-radius:4px;
 
   font:
-    13px Arial,
+    11px Arial,
     sans-serif;
 
   display:flex;
 
   align-items:center;
 
-  gap:8px;
+  gap:6px;
 
   text-align:left;
 
@@ -535,8 +515,8 @@ body{
 }
 
 .feed-gift-icon{
-  width:22px;
-  height:22px;
+  width:18px;
+  height:18px;
 
   object-fit:contain;
 }
@@ -561,7 +541,7 @@ body{
 
 .battle-scorebar{
   width:100%;
-  max-width:960px;
+  max-width:420px;
 
   margin-top:10px;
 
@@ -649,7 +629,7 @@ body{
 
 .controls-panel{
   width:100%;
-  max-width:960px;
+  max-width:420px;
 
   margin-top:15px;
 
@@ -680,19 +660,19 @@ body{
 
   justify-content:center;
 
-  gap:12px;
+  gap:8px;
 
   flex-wrap:wrap;
 }
 
 .btn{
-  padding:12px 24px;
+  padding:10px 14px;
 
   border:none;
 
   border-radius:8px;
 
-  font-size:16px;
+  font-size:13px;
 
   font-weight:bold;
 
@@ -914,7 +894,7 @@ body{
 
 
 /* =====================================================
-   VIEWER MODE
+   VIEWER MODE (9:16 VERTICAL ASPECT RATIO)
 ===================================================== */
 
 body.viewer-mode{
@@ -943,18 +923,18 @@ body.viewer-mode .arena-wrapper{
   width:
     min(
       100vw,
-      calc(100vh * 16 / 9)
+      calc(100vh * 9 / 16)
     );
 
   height:
     min(
       100vh,
-      calc(100vw * 9 / 16)
+      calc(100vw * 16 / 9)
     );
 
   max-width:none;
 
-  aspect-ratio:16/9;
+  aspect-ratio:9/16;
 
   border:none;
 
@@ -977,32 +957,32 @@ body.viewer-mode .arena-wrapper{
   }
 
   .team-name{
-    font-size:18px;
-    padding:6px 10px;
+    font-size:16px;
+    padding:5px 8px;
   }
 
   .score-number{
-    font-size:22px;
+    font-size:18px;
 
-    padding:6px 10px;
+    padding:5px 8px;
 
-    min-width:45px;
+    min-width:36px;
   }
 
   .gift-panel{
-    padding:5px 7px;
+    padding:4px 6px;
 
     gap:3px;
   }
 
   .gift-item{
     font-size:9px;
-    gap:5px;
+    gap:4px;
   }
 
   .gift-icon{
-    width:18px;
-    height:18px;
+    width:16px;
+    height:16px;
   }
 
   .gift-name{
@@ -1014,16 +994,16 @@ body.viewer-mode .arena-wrapper{
   }
 
   .gift-action{
-    font-size:9px;
+    font-size:8px;
   }
 
   .avatar-wrapper{
-    height:55%;
-    bottom:14%;
+    height:50%;
+    bottom:12%;
   }
 
   .announcement{
-    font-size:32px;
+    font-size:28px;
   }
 
   .feed-item{
@@ -1033,8 +1013,8 @@ body.viewer-mode .arena-wrapper{
   }
 
   .feed-gift-icon{
-    width:18px;
-    height:18px;
+    width:16px;
+    height:16px;
   }
 
 }
@@ -1055,19 +1035,19 @@ body.viewer-mode .arena-wrapper{
   }
 
   .hud-top{
-    left:10px;
-    right:10px;
+    left:8px;
+    right:8px;
   }
 
   .team-name{
-    font-size:15px;
-    padding:5px 7px;
+    font-size:14px;
+    padding:4px 6px;
   }
 
   .score-number{
-    font-size:18px;
-    min-width:36px;
-    padding:5px 7px;
+    font-size:16px;
+    min-width:32px;
+    padding:4px 6px;
   }
 
 }
@@ -1716,20 +1696,7 @@ let currentBoyIndex = 0;
 
 /* =====================================================
    BUILT-IN BOUQUET + CONFETTI IMAGES
-=====================================================
-
-   IMPORTANT:
-
-   These are embedded directly into the page.
-
-   You DON'T need:
-   icon_bouquet.png
-   icon_confetti.png
-
 ===================================================== */
-
-
-/* Bouquet image */
 
 const bouquetSVG =
 'data:image/svg+xml;charset=UTF-8,' +
@@ -1803,8 +1770,6 @@ fill="#ffd700"/>
 </svg>
 `);
 
-
-/* Confetti image */
 
 const confettiSVG =
 'data:image/svg+xml;charset=UTF-8,' +
@@ -1881,8 +1846,6 @@ fill="#ffcc00"/>
 </svg>
 `);
 
-
-/* Put icons into page */
 
 document.getElementById(
   "bouquet-rule-icon"
@@ -2346,19 +2309,6 @@ function animateCharacter(
 
 /* =====================================================
    CHARACTER SWITCH
-=====================================================
-
-   GIRL:
-   Bouquet → next character
-
-   BOY:
-   Confetti → next character
-
-   NO BIG GIFT IMAGE.
-
-   ONLY:
-   CHARACTER CHANGED
-
 ===================================================== */
 
 function switchCharacter(
@@ -2379,10 +2329,6 @@ function switchCharacter(
 
   }
 
-
-  /* ==============================================
-     GIRL
-  ============================================== */
 
   if(side === "girl"){
 
@@ -2413,14 +2359,10 @@ function switchCharacter(
       char.idle;
 
 
-    /* CLEAN MESSAGE */
-
     showCharacterChanged(
       "girl"
     );
 
-
-    /* FEED */
 
     addFeed(
 
@@ -2436,10 +2378,6 @@ function switchCharacter(
 
   }
 
-
-  /* ==============================================
-     BOY
-  ============================================== */
 
   else{
 
@@ -2470,14 +2408,10 @@ function switchCharacter(
       char.idle;
 
 
-    /* CLEAN MESSAGE */
-
     showCharacterChanged(
       "boy"
     );
 
-
-    /* FEED */
 
     addFeed(
 
@@ -2770,7 +2704,7 @@ async function startViewerMode(){
     ){
 
       await screen.orientation.lock(
-        "landscape"
+        "portrait"
       );
 
     }
@@ -2780,7 +2714,7 @@ async function startViewerMode(){
   catch(error){
 
     console.log(
-      "Landscape lock unavailable"
+      "Portrait lock unavailable"
     );
 
   }
@@ -2829,4 +2763,5 @@ updateVisuals();
 
 
 </body>
-   </html>
+</html>
+
