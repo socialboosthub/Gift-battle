@@ -21,7 +21,7 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 3000;
 
 const TIKTOK_USERNAME =
-  process.env.TIKTOK_USERNAME || "lxkt16";
+  process.env.TIKTOK_USERNAME || "wealthy_vibezz";
 
 // ==========================================
 // BATTLE SCORING
@@ -125,28 +125,6 @@ let giftStreakTracker =
 
 // ==========================================
 // LIKE TRACKING
-// ==========================================
-//
-// Every 100 new likes = 1 point.
-//
-// Example:
-//
-// 40 likes
-// +
-// 60 likes
-// =
-// 100 likes
-// =
-// 1 point
-//
-// Any remaining likes are carried forward.
-//
-// Example:
-//
-// 250 likes
-//
-// = 2 points
-// + 50 likes carried over
 // ==========================================
 
 let likeAccumulator =
@@ -252,10 +230,6 @@ function isDuplicateMessage(data) {
 
 function processGift(data) {
 
-  // ========================================
-  // Ignore duplicate raw messages
-  // ========================================
-
   if (
     isDuplicateMessage(data)
   ) {
@@ -282,10 +256,6 @@ function processGift(data) {
       .trim()
       .toLowerCase();
 
-  // ========================================
-  // USE PIRATETOK STREAK TRACKER
-  // ========================================
-
   const streak =
     giftStreakTracker.process(
       data
@@ -295,10 +265,6 @@ function processGift(data) {
     Number(
       streak?.eventGiftCount
     ) || 0;
-
-  // ========================================
-  // NOTHING NEW
-  // ========================================
 
   if (
     newGiftCount <= 0
@@ -351,23 +317,14 @@ function processGift(data) {
   ) {
 
     sendGameCommand({
-
       type: "attack",
-
       side: "girl",
-
       brutality: false,
-
       power: NORMAL_GIFT_POWER,
-
       username: username,
-
       nickname: nickname,
-
       gift: giftName,
-
       repeatCount: newGiftCount
-
     });
 
     return;
@@ -385,23 +342,14 @@ function processGift(data) {
   ) {
 
     sendGameCommand({
-
       type: "attack",
-
       side: "girl",
-
       brutality: true,
-
       power: BIG_GIFT_POWER,
-
       username: username,
-
       nickname: nickname,
-
       gift: giftName,
-
       repeatCount: newGiftCount
-
     });
 
     return;
@@ -419,23 +367,14 @@ function processGift(data) {
   ) {
 
     sendGameCommand({
-
       type: "attack",
-
       side: "boy",
-
       brutality: false,
-
       power: NORMAL_GIFT_POWER,
-
       username: username,
-
       nickname: nickname,
-
       gift: giftName,
-
       repeatCount: newGiftCount
-
     });
 
     return;
@@ -443,34 +382,25 @@ function processGift(data) {
   }
 
   // ========================================
-  // MIND BLOWN
+  // FRIENDSHIP NECKLACE
   // BOY BIG ATTACK
   // 50 POINTS
   // ========================================
 
   if (
-    normalizedGift === "mind blown" ||
-    normalizedGift === "mindblown"
+    normalizedGift === "friendship necklace" ||
+    normalizedGift === "friendshipnecklace"
   ) {
 
     sendGameCommand({
-
       type: "attack",
-
       side: "boy",
-
       brutality: true,
-
       power: BIG_GIFT_POWER,
-
       username: username,
-
       nickname: nickname,
-
       gift: giftName,
-
       repeatCount: newGiftCount
-
     });
 
     return;
@@ -478,30 +408,21 @@ function processGift(data) {
   }
 
   // ========================================
-  // LIKE-POP
+  // BOUQUET
   // GIRL CHARACTER SWITCH
   // ========================================
 
   if (
-    normalizedGift === "like-pop" ||
-    normalizedGift === "like pop" ||
-    normalizedGift === "likepop"
+    normalizedGift === "bouquet"
   ) {
 
     sendGameCommand({
-
       type: "switchCharacter",
-
       side: "girl",
-
       username: username,
-
       nickname: nickname,
-
       gift: giftName,
-
       repeatCount: newGiftCount
-
     });
 
     return;
@@ -509,29 +430,21 @@ function processGift(data) {
   }
 
   // ========================================
-  // PAPER CRANE
+  // CONFETTI
   // BOY CHARACTER SWITCH
   // ========================================
 
   if (
-    normalizedGift === "paper crane" ||
-    normalizedGift === "papercrane"
+    normalizedGift === "confetti"
   ) {
 
     sendGameCommand({
-
       type: "switchCharacter",
-
       side: "boy",
-
       username: username,
-
       nickname: nickname,
-
       gift: giftName,
-
       repeatCount: newGiftCount
-
     });
 
     return;
@@ -551,9 +464,6 @@ function processGift(data) {
 
 // ==========================================
 // PROCESS FOLLOW
-// ==========================================
-//
-// 1 follow = 1 point for BOYS
 // ==========================================
 
 function processFollow(data) {
@@ -580,50 +490,21 @@ function processFollow(data) {
   );
 
   sendGameCommand({
-
     type: "attack",
-
     side: "boy",
-
     brutality: false,
-
     power: FOLLOW_POWER,
-
     username: username,
-
     nickname: nickname,
-
     gift: "Follow",
-
     actionLabel: "Follow",
-
     repeatCount: 1
-
   });
 
 }
 
 // ==========================================
 // PROCESS LIKES
-// ==========================================
-//
-// Every 100 NEW likes = 1 point for GIRLS.
-//
-// The remainder is saved.
-//
-// Example:
-//
-// 250 likes
-//
-// 100 = 1
-// 100 = 1
-// 50  = saved
-//
-// Next 50 likes:
-//
-// 50 saved + 50 new = 100
-//
-// So another 1 point is created.
 // ==========================================
 
 function processLike(data) {
@@ -708,25 +589,15 @@ function processLike(data) {
   ) {
 
     sendGameCommand({
-
       type: "attack",
-
       side: "girl",
-
       brutality: false,
-
       power: LIKE_POWER,
-
       username: username,
-
       nickname: nickname,
-
       gift: "100 Likes",
-
       actionLabel: "100 Likes",
-
       repeatCount: 1
-
     });
 
   }
@@ -1014,3 +885,4 @@ server.listen(
 
   }
 );
+
