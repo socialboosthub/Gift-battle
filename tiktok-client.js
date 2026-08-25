@@ -1,28 +1,28 @@
-(() => {
+(function () {
 
-  // ============================================================
-  // 🔥 GIFT BATTLE - TIKTOK CLIENT
-  // ============================================================
+  const SERVER_URL =
+    "https://gift-battle-o0kv.onrender.com";
 
-  const SERVER_URL = "https://gift-battle-o0kv.onrender.com";
+  const socket =
+    io(SERVER_URL, {
+      transports: [
+        "websocket",
+        "polling"
+      ],
+      reconnection: true
+    });
 
-  const socket = io(SERVER_URL, {
-    transports: ["websocket", "polling"],
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1500
-  });
 
-
-  // ============================================================
-  // 🎵 BACKGROUND MUSIC
-  // ============================================================
+  // ======================================
+  // 🎵 BACKGROUND MUSIC SYSTEM
+  // ======================================
 
   const battleMusic = [
     {
       src: "sounds/song1.mp3",
       repeats: 3
     },
+
     {
       src: "sounds/song2.mp3",
       repeats: 3
@@ -30,160 +30,169 @@
   ];
 
   let currentMusicIndex = 0;
-  let currentMusicPlay = 1;
+  let currentMusicPlay = 0;
+  let musicStarted = false;
+
   let musicPlayer = null;
-  let musicEventsReady = false;
 
-  // ============================================================
-  // 🔊 SOFTWARE AUDIO BOOST
-  // ============================================================
-  // The <audio> element is kept at 100%, then routed through a
-  // compressor + gain stage. This makes the signal louder before
-  // Android/TikTok screen capture receives it.
-  //
-  // IMPORTANT: Browser code cannot bypass Android's physical/media
-  // volume. If Android volume is exactly 0, the device may still
-  // produce/capture no audible media signal.
-  let audioContext = null;
-  let musicSourceNode = null;
-  let musicGainNode = null;
-  let musicCompressorNode = null;
 
-  function setupAudioBoost() {
-    const player = getMusicPlayer();
-    if (!player) return false;
-
-    try {
-      const AudioContextClass =
-        window.AudioContext || window.webkitAudioContext;
-
-      if (!AudioContextClass) {
-        console.log("🔊 Web Audio is not supported; using normal audio.");
-        player.volume = 1.0;
-        return false;
-      }
-
-      if (!audioContext) {
-        audioContext = new AudioContextClass();
-
-        musicSourceNode =
-          audioContext.createMediaElementSource(player);
-
-        musicGainNode =
-          audioContext.createGain();
-
-        musicCompressorNode =
-          audioContext.createDynamicsCompressor();
-
-        // Strong software boost while the compressor controls clipping.
-        musicGainNode.gain.value = 2.2;
-
-        musicCompressorNode.threshold.value = -18;
-        musicCompressorNode.knee.value = 18;
-        musicCompressorNode.ratio.value = 8;
-        musicCompressorNode.attack.value = 0.003;
-        musicCompressorNode.release.value = 0.18;
-
-        musicSourceNode
-          .connect(musicGainNode)
-          .connect(musicCompressorNode)
-          .connect(audioContext.destination);
-
-        console.log("🔊 Software audio boost initialized.");
-      }
-
-      player.volume = 1.0;
-
-      if (audioContext.state === "suspended") {
-        audioContext.resume().catch(error => {
-          console.log("🔊 Audio resume error:", error);
-        });
-      }
-
-      return true;
-
-    } catch (error) {
-      console.log("🔊 Audio boost setup error:", error);
-      player.volume = 1.0;
-      return false;
-    }
-  }
-
-  window.enableBattleAudioBoost = setupAudioBoost;
-
+  // ======================================
+  // FIND MUSIC PLAYER
+  // ======================================
 
   function getMusicPlayer() {
 
     if (!musicPlayer) {
+
       musicPlayer =
-        document.getElementById("battle-background-music");
+        document.getElementById(
+          "battle-background-music"
+        );
+
     }
 
     return musicPlayer;
+
   }
 
+
+  // ======================================
+  // LOAD SONG
+  // ======================================
 
   function loadBattleSong() {
 
-    const player = getMusicPlayer();
+    const player =
+      getMusicPlayer();
 
-    if (!player) return;
+    if (!player) {
+
+      console.log(
+        "🎵 Music player not found."
+      );
+
+      return;
+
+    }
 
     const song =
-      battleMusic[currentMusicIndex];
+      battleMusic[
+        currentMusicIndex
+      ];
 
-    player.src = song.src;
-    player.volume = 1.0;
+    player.src =
+      song.src;
+
+    player.volume =
+      0.25;
 
     currentMusicPlay = 1;
 
-    console.log("🎵 Loading:", song.src);
+    console.log(
+      "🎵 Loading:",
+      song.src
+    );
+
   }
 
+
+  // ======================================
+  // START MUSIC
+  // ======================================
 
   function startBattleMusic() {
 
-    const player = getMusicPlayer();
+    const player =
+      getMusicPlayer();
 
-    if (!player) return;
+    if (!player) {
+
+      console.log(
+        "🎵 Music player not found."
+      );
+
+      return;
+
+    }
+
 
     if (!player.src) {
+
       loadBattleSong();
-    }
-
-    setupAudioBoost();
-    player.volume = 1.0;
-
-    const promise = player.play();
-
-    if (promise && promise.catch) {
-
-      promise.catch(error => {
-        console.log(
-          "🎵 Music could not start:",
-          error
-        );
-      });
 
     }
+
+
+    player.volume =
+      0.25;
+
+
+    const playPromise =
+      player.play();
+
+
+    if (
+      playPromise &&
+      typeof playPromise.catch ===
+        "function"
+    ) {
+
+      playPromise.catch(
+        error => {
+
+          console.log(
+            "🎵 Music could not start:",
+            error
+          );
+
+        }
+      );
+
+    }
+
+
+    musicStarted = true;
+
+    console.log(
+      "🎵 Background music started."
+    );
+
   }
 
 
+  // ======================================
+  // SONG FINISHED
+  // ======================================
+
   function setupMusicPlayer() {
 
-    const player = getMusicPlayer();
+    const player =
+      getMusicPlayer();
 
-    if (!player || musicEventsReady) return;
+    if (!player) {
 
-    setupAudioBoost();
-    musicEventsReady = true;
+      console.log(
+        "🎵 Music player not found."
+      );
+
+      return;
+
+    }
+
 
     player.addEventListener(
       "ended",
-      () => {
+      function () {
 
         const song =
-          battleMusic[currentMusicIndex];
+          battleMusic[
+            currentMusicIndex
+          ];
+
+
+        // -------------------------------
+        // REPEAT CURRENT SONG
+        // -------------------------------
 
         if (
           currentMusicPlay <
@@ -192,17 +201,39 @@
 
           currentMusicPlay++;
 
-          player.currentTime = 0;
-
-          player.play().catch(
-            error => console.log(
-              "Music repeat error:",
-              error
-            )
+          console.log(
+            "🎵 Repeating song " +
+            currentMusicPlay +
+            "/" +
+            song.repeats
           );
 
+
+          player.currentTime =
+            0;
+
+
+          player.play()
+            .catch(
+              error => {
+
+                console.log(
+                  "🎵 Could not repeat song:",
+                  error
+                );
+
+              }
+            );
+
+
           return;
+
         }
+
+
+        // -------------------------------
+        // NEXT SONG
+        // -------------------------------
 
         currentMusicIndex++;
 
@@ -215,19 +246,36 @@
 
         }
 
+
+        console.log(
+          "🎵 Moving to next song."
+        );
+
+
         loadBattleSong();
 
-        player.play().catch(
-          error => console.log(
-            "Next song error:",
-            error
-          )
-        );
+
+        player.play()
+          .catch(
+            error => {
+
+              console.log(
+                "🎵 Could not play next song:",
+                error
+              );
+
+            }
+          );
 
       }
     );
+
   }
 
+
+  // ======================================
+  // INITIALIZE MUSIC
+  // ======================================
 
   function initializeBattleMusic() {
 
@@ -236,17 +284,24 @@
 
     if (!player) {
 
+      console.log(
+        "🎵 Waiting for music player..."
+      );
+
       setTimeout(
         initializeBattleMusic,
-        200
+        100
       );
 
       return;
+
     }
 
+
     loadBattleSong();
-    setupAudioBoost();
+
     setupMusicPlayer();
+
   }
 
 
@@ -254,180 +309,23 @@
     startBattleMusic;
 
 
-  // ============================================================
-  // 🔊 VOICE SYSTEM
-  // ============================================================
+  initializeBattleMusic();
+
+
+  // ======================================
+  // VOICE SYSTEM
+  // ======================================
 
   let voiceEnabled = true;
+
   let voiceQueue = [];
+
   let voiceSpeaking = false;
 
 
-  function speakAnnouncement(
-    message,
-    options = {}
-  ) {
-
-    if (!voiceEnabled) return;
-
-    if (
-      !("speechSynthesis" in window)
-    ) return;
-
-    if (
-      voiceQueue.length >= 3
-    ) {
-
-      voiceQueue.shift();
-
-    }
-
-    voiceQueue.push({
-
-      message: message,
-
-      rate:
-        options.rate ?? 1.15,
-
-      pitch:
-        options.pitch ?? 1,
-
-      volume:
-        options.volume ?? 1
-
-    });
-
-    processVoiceQueue();
-  }
-
-
-  function processVoiceQueue() {
-
-    if (
-      voiceSpeaking ||
-      voiceQueue.length === 0
-    ) {
-      return;
-    }
-
-    const item =
-      voiceQueue.shift();
-
-    const speech =
-      new SpeechSynthesisUtterance(
-        item.message
-      );
-
-    speech.rate =
-      item.rate;
-
-    speech.pitch =
-      item.pitch;
-
-    speech.volume =
-      item.volume;
-
-    const voices =
-      window.speechSynthesis
-        .getVoices();
-
-    const preferredVoice =
-      voices.find(
-        voice =>
-          /en-US|en-GB/i.test(
-            voice.lang
-          )
-      );
-
-    if (preferredVoice) {
-      speech.voice =
-        preferredVoice;
-    }
-
-    voiceSpeaking = true;
-
-    speech.onend = () => {
-
-      voiceSpeaking = false;
-
-      setTimeout(
-        processVoiceQueue,
-        80
-      );
-
-    };
-
-    speech.onerror = () => {
-
-      voiceSpeaking = false;
-
-      processVoiceQueue();
-
-    };
-
-    window.speechSynthesis
-      .speak(speech);
-  }
-
-
-  function unlockBattleVoice() {
-
-    if (
-      !("speechSynthesis" in window)
-    ) {
-      return;
-    }
-
-    try {
-
-      window.speechSynthesis.cancel();
-
-      const unlock =
-        new SpeechSynthesisUtterance("");
-
-      unlock.volume = 0;
-
-      window.speechSynthesis
-        .speak(unlock);
-
-    } catch (error) {
-
-      console.log(
-        "Voice unlock error:",
-        error
-      );
-
-    }
-  }
-
-
-  window.unlockBattleVoice =
-    unlockBattleVoice;
-
-
-  window.setBattleVoice =
-    function(enabled) {
-
-      voiceEnabled =
-        Boolean(enabled);
-
-      if (
-        !voiceEnabled &&
-        "speechSynthesis" in window
-      ) {
-
-        window.speechSynthesis.cancel();
-
-        voiceQueue = [];
-
-      }
-
-    };
-
-
-  // ============================================================
-  // 🟢 STATUS BOX
-  // ============================================================
+  // ======================================
+  // SHOW STATUS
+  // ======================================
 
   function showStatus(message) {
 
@@ -461,7 +359,7 @@
         "5px";
 
       box.style.zIndex =
-        "999999";
+        "99999";
 
       box.style.padding =
         "8px";
@@ -484,256 +382,253 @@
       box.style.borderRadius =
         "5px";
 
-      document.body.appendChild(box);
+      document.body.appendChild(
+        box
+      );
+
     }
 
     box.innerText =
       message;
+
   }
 
 
-  // ============================================================
-  // 🧹 CLEAN GIFT NAME
-  // ============================================================
+  // ======================================
+  // LIVE ANNOUNCER
+  // ======================================
 
-  function cleanGiftName(value) {
+  function speakAnnouncement(
+    message,
+    options = {}
+  ) {
 
-    return String(value || "")
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, " ");
+    if (!voiceEnabled) {
+
+      return;
+
+    }
+
+    if (
+      typeof window === "undefined" ||
+      !("speechSynthesis" in window)
+    ) {
+
+      console.log(
+        "🔊 Speech synthesis is not supported."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      voiceQueue.length >= 3
+    ) {
+
+      voiceQueue.shift();
+
+    }
+
+
+    voiceQueue.push({
+
+      message: message,
+
+      rate:
+        options.rate ?? 1.15,
+
+      pitch:
+        options.pitch ?? 1.0,
+
+      volume:
+        options.volume ?? 1.0
+
+    });
+
+
+    processVoiceQueue();
+
   }
 
 
-  // ============================================================
-  // 🎁 GET GIFT NAME
-  // ============================================================
+  // ======================================
+  // PROCESS VOICE QUEUE
+  // ======================================
 
-  function getGiftName(command) {
+  function processVoiceQueue() {
 
-    return String(
+    if (
+      voiceSpeaking ||
+      voiceQueue.length === 0
+    ) {
 
-      command.gift ||
+      return;
 
-      command.giftName ||
-
-      command.name ||
-
-      command.actionLabel ||
-
-      ""
-
-    ).trim();
-  }
+    }
 
 
-  // ============================================================
-  // 👤 GET USERNAME
-  // ============================================================
-
-  function getUsername(command) {
-
-    return String(
-
-      command.username ||
-
-      command.uniqueId ||
-
-      command.user ||
-
-      "Unknown"
-
-    ).trim();
-  }
+    const item =
+      voiceQueue.shift();
 
 
-  // ============================================================
-  // 💐 DETECT CHARACTER SWITCH
-  // ============================================================
-
-  function detectSwitch(command) {
-
-    const gift =
-      cleanGiftName(
-        getGiftName(command)
+    const speech =
+      new SpeechSynthesisUtterance(
+        item.message
       );
 
 
-    // 💐 BOUQUET = GIRL SWITCH
+    speech.rate =
+      item.rate;
 
-    if (
-      gift === "bouquet" ||
-      gift.includes("bouquet")
-    ) {
+    speech.pitch =
+      item.pitch;
 
-      return "girl";
-
-    }
+    speech.volume =
+      item.volume;
 
 
-    // 🎉 CONFETTI = BOY SWITCH
-
-    if (
-      gift === "confetti" ||
-      gift.includes("confetti")
-    ) {
-
-      return "boy";
-
-    }
+    const voices =
+      window.speechSynthesis
+        .getVoices();
 
 
-    return null;
-  }
-
-
-  // ============================================================
-  // ⚔️ DETECT ATTACK
-  // ============================================================
-
-  function detectAttack(command) {
-
-    const gift =
-      cleanGiftName(
-        getGiftName(command)
+    const preferredVoice =
+      voices.find(
+        voice =>
+          /en-US|en-GB/i.test(
+            voice.lang
+          ) &&
+          /female|zira|samantha|google/i.test(
+            voice.name
+          )
+      ) ||
+      voices.find(
+        voice =>
+          /en-US|en-GB/i.test(
+            voice.lang
+          )
       );
 
 
-    // GIRLS
-
     if (
-      gift === "rose"
+      preferredVoice
     ) {
 
-      return {
-        side: "girl",
-        power: 5,
-        brutal: false
-      };
+      speech.voice =
+        preferredVoice;
 
     }
 
 
-    if (
-      gift === "rosa"
-    ) {
+    voiceSpeaking =
+      true;
 
-      return {
-        side: "girl",
-        power: 50,
-        brutal: true
+
+    speech.onend =
+      function () {
+
+        voiceSpeaking =
+          false;
+
+        setTimeout(
+          processVoiceQueue,
+          80
+        );
+
       };
 
-    }
 
+    speech.onerror =
+      function () {
 
-    if (
-      gift === "100 likes" ||
-      gift === "100x likes"
-    ) {
+        voiceSpeaking =
+          false;
 
-      return {
-        side: "girl",
-        power: 1,
-        brutal: false
+        processVoiceQueue();
+
       };
 
-    }
 
-
-    // BOYS
-
-    if (
-      gift === "follow"
-    ) {
-
-      return {
-        side: "boy",
-        power: 1,
-        brutal: false
-      };
-
-    }
-
-
-    if (
-      gift === "tiktok"
-    ) {
-
-      return {
-        side: "boy",
-        power: 5,
-        brutal: false
-      };
-
-    }
-
-
-    if (
-      gift === "necklace"
-    ) {
-
-      return {
-        side: "boy",
-        power: 50,
-        brutal: true
-      };
-
-    }
-
-
-    return null;
-  }
-
-
-  // ============================================================
-  // 🔢 REPEAT COUNT
-  // ============================================================
-
-  function getRepeatCount(command) {
-
-    const count =
-      Number(
-        command.repeatCount ||
-        command.repeat ||
-        1
-      );
-
-    return Math.max(
-      1,
-      count || 1
+    window.speechSynthesis.speak(
+      speech
     );
+
   }
 
 
-  // ============================================================
-  // 🔌 SOCKET CONNECTED
-  // ============================================================
+  // ======================================
+  // UNLOCK PHONE VOICE
+  // ======================================
+
+  function unlockBattleVoice() {
+
+    if (
+      typeof window === "undefined" ||
+      !("speechSynthesis" in window)
+    ) {
+
+      return;
+
+    }
+
+
+    try {
+
+      window.speechSynthesis.cancel();
+
+
+      const unlock =
+        new SpeechSynthesisUtterance(
+          ""
+        );
+
+
+      unlock.volume =
+        0;
+
+
+      window.speechSynthesis.speak(
+        unlock
+      );
+
+
+    } catch (error) {
+
+      console.log(
+        "Voice unlock error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  // ======================================
+  // SERVER CONNECTED
+  // ======================================
 
   socket.on(
     "connect",
     () => {
 
       showStatus(
-        "🟢 TIKTOK LIVE CONNECTED"
-      );
-
-      console.log(
-        "Socket connected:",
-        socket.id
+        "🟢 GAME CONNECTED | SERVER ONLINE"
       );
 
     }
   );
 
 
-  // ============================================================
-  // 🔴 CONNECTION ERROR
-  // ============================================================
+  // ======================================
+  // SERVER ERROR
+  // ======================================
 
   socket.on(
     "connect_error",
-    error => {
+    (error) => {
 
       showStatus(
         "🔴 SERVER ERROR: " +
@@ -744,13 +639,13 @@
   );
 
 
-  // ============================================================
-  // 🔴 DISCONNECTED
-  // ============================================================
+  // ======================================
+  // DISCONNECTED
+  // ======================================
 
   socket.on(
     "disconnect",
-    reason => {
+    (reason) => {
 
       showStatus(
         "🔴 SERVER DISCONNECTED: " +
@@ -761,16 +656,15 @@
   );
 
 
-  // ============================================================
-  // 🎥 TIKTOK STATUS
-  // ============================================================
+  // ======================================
+  // TIKTOK STATUS
+  // ======================================
 
   socket.on(
     "tiktokStatus",
-    status => {
+    (status) => {
 
       if (
-        status &&
         status.connected
       ) {
 
@@ -790,244 +684,157 @@
   );
 
 
-  // ============================================================
-  // 🎁 MAIN GIFT HANDLER
-  // ============================================================
+  // ======================================
+  // GAME COMMAND
+  // ======================================
 
   socket.on(
     "gameCommand",
-    command => {
-
-      if (
-        !command ||
-        typeof command !== "object"
-      ) {
-
-        console.log(
-          "Invalid command:",
-          command
-        );
-
-        return;
-      }
-
-
-      const gift =
-        getGiftName(command);
-
-      const username =
-        getUsername(command);
-
-      const giftClean =
-        cleanGiftName(gift);
-
-
-      console.log(
-        "🎁 TIKTOK EVENT:",
-        command
-      );
+    (command) => {
 
 
       showStatus(
         "🎁 " +
-        username +
+        command.username +
         " → " +
-        gift +
+        command.gift +
         " ×" +
-        getRepeatCount(command)
+        (command.repeatCount || 1)
       );
 
 
-      // ========================================================
-      // 💐🎉 CHARACTER SWITCH
-      // ========================================================
+      // ====================================
+      // VOICE ANNOUNCEMENT
+      // ====================================
 
-      const switchSide =
-        detectSwitch(command);
+      if (
+        command.type === "attack"
+      ) {
 
-
-      if (switchSide) {
-
-        console.log(
-          "🔥 SWITCH GIFT:",
-          gift,
-          "SIDE:",
-          switchSide
-        );
+        const side =
+          command.side === "boy"
+            ? "BOYS"
+            : "GIRLS";
 
 
-        const count =
-          getRepeatCount(command);
-
-        let number = 0;
-
-
-        function doSwitch() {
-
-          if (
-            number >= count
-          ) {
-            return;
-          }
+        const action =
+          String(
+            command.actionLabel ||
+            command.gift ||
+            ""
+          )
+          .trim()
+          .toLowerCase();
 
 
-          number++;
-
-
-          // Call the function from index.html
-
-          if (
-            typeof switchCharacter ===
-            "function"
-          ) {
-
-            switchCharacter(
-              switchSide,
-              username,
-              gift
-            );
-
-          } else {
-
-            console.error(
-              "❌ switchCharacter() is missing!"
-            );
-
-          }
-
-
-          setTimeout(
-            doSwitch,
-            150
-          );
-
-        }
-
-
-        doSwitch();
-
-
-        // Voice
-
-        speakAnnouncement(
-
-          switchSide === "girl"
-            ? "GIRLS SWITCH!"
-            : "BOYS SWITCH!",
-
-          {
-            rate: 1,
-            pitch:
-              switchSide === "girl"
-                ? 1.25
-                : 0.75
-          }
-
-        );
-
-
-        return;
-      }
-
-
-      // ========================================================
-      // ⚔️ ATTACK GIFTS
-      // ========================================================
-
-      const attackData =
-        detectAttack(command);
-
-
-      if (attackData) {
-
-        const count =
-          getRepeatCount(command);
-
-
-        let power =
-          attackData.power;
-
-
-        let brutal =
-          attackData.brutal;
-
-
-        console.log(
-          "⚔️ ATTACK",
-          gift,
-          attackData.side,
-          power,
-          "x",
-          count
-        );
-
-
-        // ======================================================
-        // 🔊 VOICE
-        // ======================================================
+        // FOLLOW
 
         if (
-          giftClean === "follow"
+          action === "follow"
         ) {
 
           speakAnnouncement(
-            "THANK YOU FOR THE FOLLOW!",
+            "THANK YOU FOR THE FOLLOW.",
             {
               rate: 1.08,
-              pitch: 1.28
+              pitch: 1.28,
+              volume: 1.0
             }
           );
 
         }
 
+
+        // 100 LIKES
+
         else if (
-          giftClean === "100 likes" ||
-          giftClean === "100x likes"
+          action === "100 likes"
         ) {
 
           speakAnnouncement(
-            "GIRLS!",
+            "GIRLS.",
             {
               rate: 1.18,
-              pitch: 1.42
+              pitch: 1.42,
+              volume: 1.0
             }
           );
 
         }
+
+
+        // BRUTALITY
+
+        else if (
+          command.brutality === true
+        ) {
+
+          speakAnnouncement(
+            side + "!",
+            {
+              rate: 0.78,
+
+              pitch:
+                command.side === "boy"
+                  ? 0.62
+                  : 1.18,
+
+              volume: 1.0
+            }
+          );
+
+        }
+
+
+        // NORMAL HIT
 
         else {
 
           speakAnnouncement(
-
-            attackData.side === "girl"
-              ? "GIRLS!"
-              : "BOYS!",
-
+            side + "!",
             {
-              rate:
-                brutal
+              rate: 1.28,
+
+              pitch:
+                command.side === "boy"
                   ? 0.78
                   : 1.28,
 
-              pitch:
-                attackData.side === "boy"
-                  ? 0.78
-                  : 1.28
+              volume: 1.0
             }
-
           );
 
         }
 
+      }
 
-        // ======================================================
-        // ⚔️ PERFORM ATTACKS
-        // ======================================================
+
+      // ====================================
+      // ATTACK
+      // ====================================
+
+      if (
+        command.type === "attack"
+      ) {
+
+        const count =
+          Math.max(
+            1,
+            Number(
+              command.repeatCount
+            ) || 1
+          );
+
+
+        console.log(
+          `⚔️ ${command.gift} = ${count} attack(s) | power ${command.power || "default"}`
+        );
+
 
         let attackNumber = 0;
 
 
-        function doAttack() {
+        function doNextAttack() {
 
           if (
             attackNumber >= count
@@ -1038,9 +845,22 @@
           }
 
 
+          attackNumber++;
+
+
+          attack(
+            command.side,
+            command.brutality,
+            command.username,
+            command.gift,
+            command.power,
+            command.actionLabel || ""
+          );
+
+
           if (
             typeof isMatchActive !==
-            "undefined" &&
+              "undefined" &&
             !isMatchActive
           ) {
 
@@ -1049,135 +869,110 @@
           }
 
 
-          attackNumber++;
-
-
-          if (
-            typeof attack ===
-            "function"
-          ) {
-
-            attack(
-
-              attackData.side,
-
-              brutal,
-
-              username,
-
-              gift,
-
-              power,
-
-              gift
-
-            );
-
-          } else {
-
-            console.error(
-              "❌ attack() is missing!"
-            );
-
-          }
-
-
           setTimeout(
-            doAttack,
-            brutal ? 80 : 70
+            doNextAttack,
+            command.brutality
+              ? 80
+              : 70
           );
 
         }
 
 
-        doAttack();
+        doNextAttack();
 
 
         return;
+
       }
 
 
-      // ========================================================
-      // COMPATIBILITY WITH OLD SERVER COMMANDS
-      // ========================================================
+      // ====================================
+      // CHARACTER SWITCH
+      // ====================================
 
       if (
         command.type ===
         "switchCharacter"
       ) {
 
-        const side =
-          command.side === "boy"
-            ? "boy"
-            : "girl";
+        const count =
+          Math.max(
+            1,
+            Number(
+              command.repeatCount
+            ) || 1
+          );
 
 
-        switchCharacter(
-          side,
-          username,
-          gift
-        );
+        let switchNumber = 0;
 
 
-        return;
-      }
+        function doNextSwitch() {
+
+          if (
+            switchNumber >= count
+          ) {
+
+            return;
+
+          }
 
 
-      if (
-        command.type ===
-        "attack"
-      ) {
-
-        const side =
-          command.side === "boy"
-            ? "boy"
-            : "girl";
+          switchNumber++;
 
 
-        attack(
+          switchCharacter(
+            command.side,
+            command.username,
+            command.gift
+          );
 
-          side,
 
-          Boolean(
-            command.brutality
-          ),
+          setTimeout(
+            doNextSwitch,
+            100
+          );
 
-          username,
+        }
 
-          gift,
 
-          Number(
-            command.power
-          ) || 5,
-
-          command.actionLabel ||
-          gift
-
-        );
+        doNextSwitch();
 
 
         return;
+
       }
-
-
-      // ========================================================
-      // UNKNOWN GIFT
-      // ========================================================
-
-      console.log(
-        "ℹ️ No action matched for gift:",
-        gift,
-        command
-      );
 
     }
   );
 
 
-  // ============================================================
-  // 🚀 START
-  // ============================================================
+  // ======================================
+  // MAKE VOICE AVAILABLE TO index.html
+  // ======================================
 
-  initializeBattleMusic();
+  window.unlockBattleVoice =
+    unlockBattleVoice;
+
+
+  window.setBattleVoice =
+    function (enabled) {
+
+      voiceEnabled =
+        Boolean(enabled);
+
+
+      if (
+        !voiceEnabled &&
+        "speechSynthesis" in window
+      ) {
+
+        window.speechSynthesis.cancel();
+
+      }
+
+    };
+
 
 })();
