@@ -60,8 +60,8 @@ body{
 
 .arena-wrapper{
   width:100%;
-  max-width:960px;
-  aspect-ratio:16/9;
+  max-width:540px;
+  aspect-ratio:9/16;
   position:relative;
 
   border:3px solid #2a1f3d;
@@ -237,118 +237,124 @@ body{
 
 
 /* =====================================================
-   GIFT RULE PANEL
+   GIFT ICON RAILS
 ===================================================== */
 
 .gift-panel{
   position:absolute;
-
   top:50%;
-
   transform:translateY(-50%);
-
   display:flex;
   flex-direction:column;
-
-  gap:6px;
-
+  gap:12px;
   z-index:15;
-
   pointer-events:none;
-
-  background:rgba(0,0,0,.75);
-
-  padding:8px 12px;
-
-  border-radius:10px;
-
-  border:1px solid rgba(255,255,255,.15);
-
-  box-shadow:
-    0 5px 15px rgba(0,0,0,.5);
+  background:rgba(0,0,0,.28);
+  padding:8px 6px;
+  border-radius:14px;
+  backdrop-filter:blur(3px);
 }
 
 .gift-panel.girls-side{
-  left:15px;
-
-  border-left:
-    3px solid #d800ff;
+  left:8px;
+  border-left:3px solid #d800ff;
 }
 
 .gift-panel.boys-side{
-  right:15px;
-
-  border-right:
-    3px solid #00d2ff;
+  right:8px;
+  border-right:3px solid #00d2ff;
 }
-
-
-/* =====================================================
-   GIFT ITEMS
-===================================================== */
 
 .gift-item{
   display:flex;
+  flex-direction:column;
   align-items:center;
-
-  gap:10px;
-
-  font:
-    800 13px
-    "Segoe UI",
-    Arial,
-    sans-serif;
-
-  color:#fff;
-
-  text-shadow:
-    1px 1px 2px #000;
-
-  white-space:nowrap;
+  justify-content:center;
+  min-width:44px;
+  gap:1px;
 }
 
 .gift-icon{
-  width:24px;
-  height:24px;
-
+  width:38px;
+  height:38px;
   object-fit:contain;
-
-  border-radius:4px;
-
-  background:rgba(255,255,255,.05);
+  border-radius:50%;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.7));
 }
 
 .gift-info{
   display:flex;
   flex-direction:column;
-
+  align-items:center;
   justify-content:center;
-
-  line-height:1.1;
+  line-height:1;
 }
 
-.gift-name{
-  font-size:11px;
+.gift-name{ display:none; }
+.gift-points,.gift-action{ display:none; }
+.gift-value{
+  font:900 12px Arial,sans-serif;
+  color:#fff;
+  text-shadow:1px 1px 2px #000,0 0 5px currentColor;
+}
+.girls-side .gift-value{ color:#54ff8a; }
+.boys-side .gift-value{ color:#54ff8a; }
 
-  color:#ddd;
+/* =====================================================
+   LIVE GIFTER ATTACK EFFECT
+===================================================== */
 
-  text-transform:uppercase;
-
-  letter-spacing:.5px;
+.gift-attack-layer{
+  position:absolute;
+  inset:0;
+  z-index:80;
+  pointer-events:none;
+  overflow:hidden;
 }
 
-.gift-points{
-  color:#ffcc00;
-
-  font-size:14px;
+.gifter-attack{
+  position:absolute;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #fff;
+  box-shadow:0 0 10px rgba(255,255,255,.9),0 0 25px rgba(216,0,255,.65);
+  background:#222;
+  opacity:0;
 }
 
-.gift-action{
-  color:#00ffcc;
+.gifter-attack.girl{ animation:gifterPushGirl .72s cubic-bezier(.2,.85,.25,1) forwards; }
+.gifter-attack.boy{ animation:gifterPushBoy .72s cubic-bezier(.2,.85,.25,1) forwards; }
 
-  font-size:12px;
+.gift-hit-number{
+  position:absolute;
+  font:900 34px Impact,"Segoe UI",Arial,sans-serif;
+  color:#fff;
+  text-shadow:2px 3px 0 #000,0 0 12px currentColor;
+  opacity:0;
+  animation:giftDamage .72s ease-out forwards;
 }
+.gift-hit-number.girl{ color:#ff63ff; }
+.gift-hit-number.boy{ color:#44dfff; }
 
+@keyframes gifterPushGirl{
+  0%{left:9%;top:54%;opacity:0;transform:scale(.55) rotate(-8deg);}
+  15%{opacity:1;}
+  70%{left:43%;top:50%;opacity:1;transform:scale(1.05) rotate(8deg);}
+  100%{left:51%;top:49%;opacity:0;transform:scale(.8) rotate(18deg);}
+}
+@keyframes gifterPushBoy{
+  0%{left:91%;top:54%;opacity:0;transform:scale(.55) rotate(8deg);}
+  15%{opacity:1;}
+  70%{left:57%;top:50%;opacity:1;transform:scale(1.05) rotate(-8deg);}
+  100%{left:49%;top:49%;opacity:0;transform:scale(.8) rotate(-18deg);}
+}
+@keyframes giftDamage{
+  0%{opacity:0;transform:translate(-50%,10px) scale(.55);}
+  20%{opacity:1;transform:translate(-50%,0) scale(1.15);}
+  100%{opacity:0;transform:translate(-50%,-65px) scale(1);}
+}
 
 /* =====================================================
    CHARACTERS
@@ -387,6 +393,21 @@ body{
 
   transition:
     transform .15s ease-out;
+}
+
+.avatar.gifter-hit-right{ animation:targetPushRight .55s cubic-bezier(.2,.85,.25,1); }
+.avatar.gifter-hit-left{ animation:targetPushLeft .55s cubic-bezier(.2,.85,.25,1); }
+@keyframes targetPushRight{
+  0%{transform:translateX(0) scale(1);}
+  35%{transform:translateX(22px) scale(1.03);}
+  65%{transform:translateX(8px) scale(1.01);}
+  100%{transform:translateX(0) scale(1);}
+}
+@keyframes targetPushLeft{
+  0%{transform:translateX(0) scale(1);}
+  35%{transform:translateX(-22px) scale(1.03);}
+  65%{transform:translateX(-8px) scale(1.01);}
+  100%{transform:translateX(0) scale(1);}
 }
 
 
@@ -941,20 +962,14 @@ body.viewer-mode #tiktok-debug{
 body.viewer-mode .arena-wrapper{
 
   width:
-    min(
-      100vw,
-      calc(100vh * 16 / 9)
-    );
+    min(100vw, calc(100vh * 9 / 16));
 
   height:
-    min(
-      100vh,
-      calc(100vw * 9 / 16)
-    );
+    min(100vh, calc(100vw * 16 / 9));
 
   max-width:none;
 
-  aspect-ratio:16/9;
+  aspect-ratio:9/16;
 
   border:none;
 
@@ -990,19 +1005,18 @@ body.viewer-mode .arena-wrapper{
   }
 
   .gift-panel{
-    padding:5px 7px;
-
-    gap:3px;
+    padding:6px 4px;
+    gap:8px;
   }
 
   .gift-item{
     font-size:9px;
-    gap:5px;
+    gap:3px;
   }
 
   .gift-icon{
-    width:18px;
-    height:18px;
+    width:30px;
+    height:30px;
   }
 
   .gift-name{
@@ -1072,17 +1086,6 @@ body.viewer-mode .arena-wrapper{
 
 }
 
-
-/* =====================================================
-   BATTLE AUDIO + WIN CONFETTI FX
-===================================================== */
-.battle-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:95;opacity:0}
-.battle-confetti.active{opacity:1}
-.confetti-piece{position:absolute;top:-12%;width:10px;height:18px;border-radius:2px;opacity:0;animation:confettiFall 2.2s cubic-bezier(.15,.7,.25,1) forwards;box-shadow:0 0 7px rgba(255,255,255,.35)}
-@keyframes confettiFall{0%{transform:translate3d(0,-10vh,0) rotate(0deg) scale(.8);opacity:0}8%{opacity:1}45%{transform:translate3d(var(--drift),48vh,0) rotate(420deg) scale(1)}100%{transform:translate3d(calc(var(--drift) * -0.45),112vh,0) rotate(900deg) scale(.9);opacity:0}}
-.win-flash{position:absolute;inset:0;pointer-events:none;z-index:90;opacity:0}
-.win-flash.active{animation:winFlash .65s ease-out forwards}
-@keyframes winFlash{0%{opacity:0}12%{opacity:.75}100%{opacity:0}}
 </style>
 </head>
 
@@ -1140,8 +1143,6 @@ body.viewer-mode .arena-wrapper{
 ===================================================== -->
 
 <div class="arena-wrapper" id="arena">
-  <div class="battle-confetti" id="battle-confetti"></div>
-  <div class="win-flash" id="win-flash"></div>
 
 
   <div
@@ -1207,202 +1208,20 @@ body.viewer-mode .arena-wrapper{
 
 
   <!-- =================================================
-       GIRLS GIFTS
+       GIFT ICONS
+       The icon itself explains the gift. No gift names.
   ================================================== -->
 
   <div class="gift-panel girls-side">
-
-
-    <div class="gift-item">
-
-      <img
-        src="icon_100likes.png"
-        class="gift-icon"
-        alt="100 Likes">
-
-      <div class="gift-info">
-
-        <span class="gift-name">
-          100x Likes
-        </span>
-
-        <span class="gift-points">
-          +1 Pt
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div class="gift-item">
-
-      <img
-        src="icon_rose.png"
-        class="gift-icon"
-        alt="Rose">
-
-      <div class="gift-info">
-
-        <span class="gift-name">
-          Rose
-        </span>
-
-        <span class="gift-points">
-          +5 Pts
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div class="gift-item">
-
-      <img
-        src="icon_rosa.png"
-        class="gift-icon"
-        alt="Rosa">
-
-      <div class="gift-info">
-
-        <span class="gift-name">
-          Rosa
-        </span>
-
-        <span class="gift-points">
-          +50 Pts
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <!-- BUILT-IN BOUQUET ICON -->
-
-    <div class="gift-item">
-
-      <img
-        id="bouquet-rule-icon"
-        class="gift-icon"
-        alt="Bouquet">
-
-      <div class="gift-info">
-
-        <span class="gift-name">
-          Bouquet
-        </span>
-
-        <span class="gift-action">
-          Character Changed
-        </span>
-
-      </div>
-
-    </div>
-
-
+    <div class="gift-item"><img src="icon_100likes.png" class="gift-icon" alt=""><span class="gift-value">+1</span></div>
+    <div class="gift-item"><img src="icon_rose.png" class="gift-icon" alt=""><span class="gift-value">+5</span></div>
+    <div class="gift-item"><img src="icon_rosa.png" class="gift-icon" alt=""><span class="gift-value">+50</span></div>
   </div>
 
-
-  <!-- =================================================
-       BOYS GIFTS
-  ================================================== -->
-
   <div class="gift-panel boys-side">
-
-
-    <div class="gift-item">
-
-      <img
-        src="icon_follow.png"
-        class="gift-icon"
-        alt="Follow">
-
-      <div class="gift-info">
-
-        <span class="gift-name">
-          Follow
-        </span>
-
-        <span class="gift-points">
-          +1 Pt
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div class="gift-item">
-
-      <img
-        src="icon_tiktok.png"
-        class="gift-icon"
-        alt="TikTok">
-
-      <div class="gift-info">
-
-        <span class="gift-name">
-          TikTok
-        </span>
-
-        <span class="gift-points">
-          +5 Pts
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div class="gift-item">
-
-      <img
-        src="icon_necklace.png"
-        class="gift-icon"
-        alt="Necklace">
-
-      <div class="gift-info">
-
-        <span class="gift-name">
-          Necklace
-        </span>
-
-        <span class="gift-points">
-          +50 Pts
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <!-- BUILT-IN CONFETTI ICON -->
-
-    <div class="gift-item">
-
-      <img
-        id="confetti-rule-icon"
-        class="gift-icon"
-        alt="Confetti">
-
-      <div class="gift-info">
-
-        <span class="gift-name">
-          Confetti
-        </span>
-
-        <span class="gift-action">
-          Character Changed
-        </span>
-
-      </div>
-
-    </div>
-
-
+    <div class="gift-item"><img src="icon_follow.png" class="gift-icon" alt=""><span class="gift-value">+1</span></div>
+    <div class="gift-item"><img src="icon_tiktok.png" class="gift-icon" alt=""><span class="gift-value">+5</span></div>
+    <div class="gift-item"><img src="icon_necklace.png" class="gift-icon" alt=""><span class="gift-value">+50</span></div>
   </div>
 
 
@@ -1650,27 +1469,6 @@ body.viewer-mode .arena-wrapper{
   preload="auto"
   playsinline>
 </audio>
-
-<script>
-/* =====================================================
-   BATTLE SOUND ENGINE - no external files required
-===================================================== */
-(function(){
-  let ctx=null,master=null;
-  function audio(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;if(!ctx){ctx=new AC();const comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.knee.value=12;comp.ratio.value=8;comp.attack.value=.003;comp.release.value=.2;master=ctx.createGain();master.gain.value=.78;master.connect(comp).connect(ctx.destination)}if(ctx.state==='suspended')ctx.resume().catch(()=>{});return ctx}catch(e){return null}}
-  function tone(c,f,d,type,v,t,end){const o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(end)o.frequency.exponentialRampToValueAtTime(Math.max(20,end),t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0001,v),t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(master);o.start(t);o.stop(t+d+.03)}
-  function noise(c,d,v,t,filter,cut){const n=Math.max(1,Math.floor(c.sampleRate*d)),b=c.createBuffer(1,n,c.sampleRate),data=b.getChannelData(0);for(let i=0;i<n;i++)data[i]=Math.random()*2-1;const src=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();f.type=filter||'lowpass';f.frequency.value=cut||1200;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);src.buffer=b;src.connect(f).connect(g).connect(master);src.start(t);src.stop(t+d+.02)}
-  function hit(side){const c=audio();if(!c||!master)return;const t=c.currentTime,base=side==='girl'?185:145;noise(c,.10,.32,t,'bandpass',850);tone(c,base,.16,'sawtooth',.34,t,65);tone(c,base*2.1,.08,'square',.16,t+.015,90)}
-  function brutality(side){const c=audio();if(!c||!master)return;const t=c.currentTime,base=side==='girl'?115:90;noise(c,.42,.48,t,'lowpass',900);tone(c,base,.55,'sawtooth',.48,t,35);tone(c,base*2,.32,'square',.22,t+.05,45);tone(c,620,.18,'triangle',.18,t+.12,130)}
-  function win(side){const c=audio();if(!c||!master)return;const t=c.currentTime;noise(c,.18,.18,t,'highpass',1800);const notes=side==='girl'?[523.25,659.25,783.99,1046.5]:[392,493.88,587.33,783.99];notes.forEach((n,i)=>tone(c,n,.42,'triangle',.28,t+i*.12,n*1.01));tone(c,side==='girl'?130:105,.65,'sine',.24,t,55)}
-  function voice(side){if(!('speechSynthesis'in window))return;try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(side==='girl'?'GIRLS!':'BOYS!');u.rate=1.05;u.pitch=side==='girl'?1.35:.72;u.volume=1;const vs=window.speechSynthesis.getVoices(),v=vs.find(x=>/en-US|en-GB/i.test(x.lang));if(v)u.voice=v;window.speechSynthesis.speak(u)}catch(e){}}
-  window.enableBattleSound=function(){const c=audio();try{if('speechSynthesis'in window){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance('');u.volume=0;window.speechSynthesis.speak(u)}}catch(e){}return !!c};
-  window.playBattleHit=function(side,isBrutality){isBrutality?brutality(side):hit(side)};
-  window.playBattleWin=function(side){win(side)};
-  window.playBattleVoice=function(side){voice(side)};
-  window.showWinnerConfetti=function(side){const box=document.getElementById('battle-confetti'),flash=document.getElementById('win-flash');if(!box)return;box.innerHTML='';for(let i=0;i<95;i++){const p=document.createElement('span');p.className='confetti-piece';p.style.left=(Math.random()*100)+'%';p.style.width=(6+Math.random()*8)+'px';p.style.height=(9+Math.random()*15)+'px';p.style.animationDelay=(Math.random()*.45).toFixed(2)+'s';p.style.setProperty('--drift',(Math.random()*220-110).toFixed(0)+'px');p.style.background=side==='girl'?['#ff1e56','#d800ff','#ff66ff','#ffd700'][i%4]:['#0066ff','#00d2ff','#66e8ff','#ffd700'][i%4];p.style.transform='rotate('+(Math.random()*360)+'deg)';box.appendChild(p)}box.classList.remove('active');void box.offsetWidth;box.classList.add('active');if(flash){flash.style.background=side==='girl'?'radial-gradient(circle,rgba(216,0,255,.55),transparent 65%)':'radial-gradient(circle,rgba(0,210,255,.55),transparent 65%)';flash.classList.remove('active');void flash.offsetWidth;flash.classList.add('active')}setTimeout(()=>{box.classList.remove('active');box.innerHTML='';if(flash)flash.classList.remove('active')},2600)};
-})();
-</script>
 
 
 <!-- =====================================================
@@ -2120,20 +1918,13 @@ function attack(
   username = null,
   giftName = "",
   customPower = null,
-  actionLabel = ""
+  actionLabel = "",
+  profilePic = null
 
 ){
 
   if(!isMatchActive)
     return;
-
-  if(typeof playBattleHit === "function")
-    playBattleHit(attacker,isBrutality);
-
-  /* Manual attacks get the team callout. TikTok attacks already use
-     the existing tiktok-client voice, so they are not doubled. */
-  if(!username && typeof playBattleVoice === "function")
-    playBattleVoice(attacker);
 
 
   if(
@@ -2191,6 +1982,7 @@ function attack(
       feedAction
     );
 
+    showGiftAttack("girl", powerPush, profilePic, giftName);
 
     animateCharacter(
       "girl"
@@ -2209,6 +2001,7 @@ function attack(
       feedAction
     );
 
+    showGiftAttack("boy", powerPush, profilePic, giftName);
 
     animateCharacter(
       "boy"
@@ -2227,6 +2020,65 @@ function attack(
 
   checkWinner();
 
+}
+
+
+/* =====================================================
+   GIFTER PROFILE PICTURE ATTACK
+===================================================== */
+
+function showGiftAttack(
+  side,
+  power,
+  profilePic = null,
+  giftName = ""
+){
+
+  const layer = document.getElementById("gift-attack-layer");
+  if(!layer) return;
+
+  const img = document.createElement("img");
+  img.className = `gifter-attack ${side}`;
+  img.alt = "";
+
+  img.src = profilePic ||
+    "data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <rect width="100" height="100" rx="50" fill="#222"/>
+        <circle cx="50" cy="38" r="20" fill="#aaa"/>
+        <path d="M18 92c5-25 18-35 32-35s27 10 32 35" fill="#777"/>
+      </svg>
+    `);
+
+  layer.appendChild(img);
+
+  const damage = document.createElement("div");
+  damage.className = `gift-hit-number ${side}`;
+  damage.innerText = power > 0 ? `+${power}` : "";
+  damage.style.left = side === "girl" ? "55%" : "45%";
+  damage.style.top = "46%";
+  layer.appendChild(damage);
+
+  const target = document.getElementById(
+    side === "girl" ? "avatar-boy" : "avatar-girl"
+  );
+
+  if(target){
+    target.classList.remove("gifter-hit-left","gifter-hit-right");
+    void target.offsetWidth;
+    target.classList.add(
+      side === "girl" ? "gifter-hit-right" : "gifter-hit-left"
+    );
+    setTimeout(() => {
+      target.classList.remove("gifter-hit-left","gifter-hit-right");
+    }, 650);
+  }
+
+  setTimeout(() => {
+    img.remove();
+    damage.remove();
+  }, 780);
 }
 
 
@@ -2262,11 +2114,6 @@ function checkWinner(){
 
     announcement.innerText =
       "GIRLS WIN!";
-
-    if(typeof playBattleWin === "function")
-      playBattleWin("girl");
-    if(typeof showWinnerConfetti === "function")
-      showWinnerConfetti("girl");
 
 
     setTimeout(
@@ -2306,11 +2153,6 @@ function checkWinner(){
 
     announcement.innerText =
       "BOYS WIN!";
-
-    if(typeof playBattleWin === "function")
-      playBattleWin("boy");
-    if(typeof showWinnerConfetti === "function")
-      showWinnerConfetti("boy");
 
 
     setTimeout(
@@ -2417,7 +2259,8 @@ function switchCharacter(
 
   side,
   username = null,
-  giftName = null
+  giftName = null,
+  profilePic = null
 
 ){
 
@@ -2471,6 +2314,8 @@ function switchCharacter(
       "girl"
     );
 
+
+    showGiftAttack("girl", 0, profilePic, giftName);
 
     /* FEED */
 
@@ -2528,6 +2373,8 @@ function switchCharacter(
       "boy"
     );
 
+
+    showGiftAttack("boy", 0, profilePic, giftName);
 
     /* FEED */
 
@@ -2757,13 +2604,6 @@ window.addEventListener(
 ===================================================== */
 
 async function startViewerMode(){
-
-  if(
-    typeof enableBattleSound ===
-    "function"
-  ){
-    enableBattleSound();
-  }
 
   if(
     typeof unlockBattleVoice ===
