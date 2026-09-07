@@ -225,6 +225,55 @@ function isDuplicateMessage(data) {
 }
 
 // ==========================================
+// GET GIFTER PROFILE PICTURE
+// ==========================================
+
+function getProfilePicture(data) {
+
+  const user = data?.user || {};
+
+  const candidates = [
+    user.avatarLarge,
+    user.avatarMedium,
+    user.avatarThumb,
+    user.avatarLarger,
+    user.profilePicture,
+    user.profilePictureUrl,
+    user.avatar?.urlList,
+    user.avatarThumb?.urlList,
+    user.avatarMedium?.urlList,
+    user.avatarLarge?.urlList
+  ];
+
+  function findUrl(value) {
+    if (!value) return null;
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const found = findUrl(item);
+        if (found) return found;
+      }
+    }
+    if (typeof value === "object") {
+      for (const key of ["urlList", "url", "uri", "url_list"]) {
+        if (value[key]) {
+          const found = findUrl(value[key]);
+          if (found) return found;
+        }
+      }
+    }
+    return null;
+  }
+
+  for (const candidate of candidates) {
+    const url = findUrl(candidate);
+    if (url) return url;
+  }
+
+  return null;
+}
+
+// ==========================================
 // PROCESS GIFT
 // ==========================================
 
@@ -246,6 +295,9 @@ function processGift(data) {
   const nickname =
     data.user?.nickname ||
     username;
+
+  const profilePic =
+    getProfilePicture(data);
 
   const giftName =
     data.gift?.name ||
@@ -323,6 +375,7 @@ function processGift(data) {
       power: NORMAL_GIFT_POWER,
       username: username,
       nickname: nickname,
+      profilePic: profilePic,
       gift: giftName,
       repeatCount: newGiftCount
     });
@@ -348,6 +401,7 @@ function processGift(data) {
       power: BIG_GIFT_POWER,
       username: username,
       nickname: nickname,
+      profilePic: profilePic,
       gift: giftName,
       repeatCount: newGiftCount
     });
@@ -373,6 +427,7 @@ function processGift(data) {
       power: NORMAL_GIFT_POWER,
       username: username,
       nickname: nickname,
+      profilePic: profilePic,
       gift: giftName,
       repeatCount: newGiftCount
     });
@@ -399,6 +454,7 @@ function processGift(data) {
       power: BIG_GIFT_POWER,
       username: username,
       nickname: nickname,
+      profilePic: profilePic,
       gift: giftName,
       repeatCount: newGiftCount
     });
@@ -421,6 +477,7 @@ function processGift(data) {
       side: "girl",
       username: username,
       nickname: nickname,
+      profilePic: profilePic,
       gift: giftName,
       repeatCount: newGiftCount
     });
@@ -443,6 +500,7 @@ function processGift(data) {
       side: "boy",
       username: username,
       nickname: nickname,
+      profilePic: profilePic,
       gift: giftName,
       repeatCount: newGiftCount
     });
@@ -485,6 +543,9 @@ function processFollow(data) {
     data.user?.nickname ||
     username;
 
+  const profilePic =
+    getProfilePicture(data);
+
   console.log(
     `👤 ${username} followed | BOYS +${FOLLOW_POWER}`
   );
@@ -496,6 +557,7 @@ function processFollow(data) {
     power: FOLLOW_POWER,
     username: username,
     nickname: nickname,
+    profilePic: profilePic,
     gift: "Follow",
     actionLabel: "Follow",
     repeatCount: 1
@@ -525,6 +587,9 @@ function processLike(data) {
   const nickname =
     data.user?.nickname ||
     username;
+
+  const profilePic =
+    getProfilePicture(data);
 
   const stats =
     likeAccumulator.process(
@@ -595,6 +660,7 @@ function processLike(data) {
       power: LIKE_POWER,
       username: username,
       nickname: nickname,
+      profilePic: profilePic,
       gift: "100 Likes",
       actionLabel: "100 Likes",
       repeatCount: 1
